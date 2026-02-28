@@ -6,13 +6,14 @@ import SkillsPage from './pages/Skills';
 import UserDirectory from './pages/UserDirectory';
 import PublicProfile from './pages/PublicProfile';
 import LoginPage from './pages/Login';
+import RegisterPage from './pages/Register';
 import { ProtectedRoute } from './components/ProtectedRoute';
 
 export default function App() {
     return (
         <Routes>
             <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
             <Route
                 path="/"
                 element={

@@ -4,6 +4,7 @@ interface AuthContextType {
     user: string | null;      // Store user's email
     token: string | null;     // Access token from backend
     login: (email: string, password: string) => Promise<void>;
+    register: (first_name: string, last_name: string, email: string, password: string) => Promise<void>;
     logout: () => void;
     isAuthenticating: boolean; // Used to prevent flickering on refresh
 }
@@ -27,11 +28,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setIsAuthenticating(false); // Finished checking localStorage
     }, []);
 
-    const login = async (email: string, password: string) => {
+    const login = async (username: string, password: string) => {
         const response = await fetch('http://127.0.0.1:8000/api/token/', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password }),
+            body: JSON.stringify({ username, password }),
         });
 
         if (!response.ok) {
@@ -44,11 +45,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         // Save to browser storage
         localStorage.setItem('token', accessToken);
-        localStorage.setItem('user_email', email);
+        localStorage.setItem('user_email', username);
 
         // Update React state
         setToken(accessToken);
-        setUser(email);
+        setUser(username);
+    };
+
+    const register = async (first_name: string, last_name: string, email: string, password: string) => {
+        const response = await fetch('http://127.0.0.1:8000/api/register/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ first_name, last_name, email, password }),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.detail || 'Registration failed');
+        }
+
+        // If registration is successful, automatically log the user in
+        await login(email, password);
     };
 
     const logout = () => {
@@ -58,7 +75,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(null);
     };
 
-    const value = { user, token, login, logout, isAuthenticating };
+    const value = { user, token, login, register, logout, isAuthenticating };
 
     return (
         <AuthContext.Provider value={value}>
