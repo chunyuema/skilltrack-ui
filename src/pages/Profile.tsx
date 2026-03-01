@@ -47,17 +47,17 @@ export default function Profile() {
 
                 // Map API response to the frontend UserProfile type
                 const mappedProfile: UserProfile = {
-                    fullName: data.full_name,
-                    title: data.title,
-                    email: data.email,
-                    phone: data.phone,
-                    location: data.location,
-                    education: data.education,
-                    visaStatus: data.visa_status,
-                    yearsOfExperience: data.years_of_experience,
-                    githubUrl: data.github_url,
-                    linkedinUrl: data.linkedin_url,
-                    bio: data.bio
+                    fullName: data.full_name || '',
+                    title: data.title || '',
+                    email: data.email || '',
+                    phone: data.phone || '',
+                    location: data.location || '',
+                    education: data.education || '',
+                    visaStatus: data.visa_status || '',
+                    yearsOfExperience: data.years_of_experience || 0,
+                    githubUrl: data.github_url || '',
+                    linkedinUrl: data.linkedin_url || '',
+                    bio: data.bio || ''
                 };
 
                 setProfile(mappedProfile);
