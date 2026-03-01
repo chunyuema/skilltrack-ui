@@ -9,6 +9,7 @@ export default function Profile() {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [isEditing, setIsEditing] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
     const { token } = useAuth();
 
     useEffect(() => {
@@ -32,6 +33,21 @@ export default function Profile() {
         fetchProfileData();
     }, [token]);
 
+    const handleSave = async () => {
+        if (profile && token) {
+            setIsSaving(true);
+            try {
+                await profileService.updateProfile(profile, token);
+                setIsEditing(false);
+            } catch (error) {
+                console.error("Failed to save profile:", error);
+                // Optionally, show an error message to the user
+            } finally {
+                setIsSaving(false);
+            }
+        }
+    };
+
     if (isLoading) {
         return <div>Loading profile...</div>;
     }
@@ -49,13 +65,6 @@ export default function Profile() {
             setProfile(prev => prev ? { ...prev, [name]: value } : null);
         }
     };
-
-    const handleSave = () => {
-        if (profile) {
-            console.log('Saving profile:', profile);
-            setIsEditing(false);
-        }
-    };
     return (
         <div className="space-y-8">
             <div className="flex justify-between items-center">
@@ -65,13 +74,14 @@ export default function Profile() {
                 </div>
                 <button
                     onClick={() => isEditing ? handleSave() : setIsEditing(true)}
+                    disabled={isSaving}
                     className={`flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium transition-colors ${isEditing
                         ? 'bg-indigo-600 text-white hover:bg-indigo-700'
                         : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
-                        }`}
+                        } ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                     <Save size={18} />
-                    {isEditing ? 'Save Changes' : 'Edit Profile'}
+                    {isEditing ? (isSaving ? 'Saving...' : 'Save Changes') : 'Edit Profile'}
                 </button>
             </div>
 

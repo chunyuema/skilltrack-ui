@@ -48,4 +48,31 @@ export const profileService = {
 
     return mappedProfile;
   },
+
+  updateProfile: async (profile: UserProfile, token: string): Promise<void> => {
+    const response = await fetch(`${API_URL}/profiles/me/`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        full_name: profile.fullName,
+        title: profile.title,
+        email: profile.email,
+        phone: profile.phone,
+        location: profile.location,
+        education: profile.education,
+        visa_status: profile.visaStatus,
+        years_of_experience: profile.yearsOfExperience,
+        github_url: profile.githubUrl,
+        linkedin_url: profile.linkedinUrl,
+        bio: profile.bio,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to update profile");
+    }
+  },
 };
