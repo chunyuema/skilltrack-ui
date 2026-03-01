@@ -1,24 +1,100 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { UserProfile } from '../types';
-import { INITIAL_PROFILE } from '../data/initialData';
+import { useAuth } from '../hooks/useAuth';
 import { Save, MapPin, Mail, Phone, Github, Linkedin, GraduationCap } from 'lucide-react';
 
+// Type for the raw API response
+interface ApiUserProfile {
+    full_name: string;
+    title: string;
+    email: string;
+    phone: string;
+    location: string;
+    education: string;
+    visa_status: string;
+    years_of_experience: number;
+    github_url: string;
+    linkedin_url: string;
+    bio: string;
+}
+
+
 export default function Profile() {
-    const [profile, setProfile] = useState<UserProfile>(() => {
-        const saved = localStorage.getItem('skilltrack_profile');
-        return saved ? JSON.parse(saved) : INITIAL_PROFILE;
-    });
-
+    const [profile, setProfile] = useState<UserProfile | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [isEditing, setIsEditing] = useState(false);
+    const { token } = useAuth();
 
+    useEffect(() => {
+        const fetchProfile = async () => {
+            if (!token) {
+                setIsLoading(false);
+                setError("No authentication token found.");
+                return;
+            }
+
+            try {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/profiles/me/`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                if (!response.ok) {
+                    throw new Error('Failed to fetch profile');
+                }
+                const data: ApiUserProfile = await response.json();
+
+                // Map API response to the frontend UserProfile type
+                const mappedProfile: UserProfile = {
+                    fullName: data.full_name,
+                    title: data.title,
+                    email: data.email,
+                    phone: data.phone,
+                    location: data.location,
+                    education: data.education,
+                    visaStatus: data.visa_status,
+                    yearsOfExperience: data.years_of_experience,
+                    githubUrl: data.github_url,
+                    linkedinUrl: data.linkedin_url,
+                    bio: data.bio
+                };
+
+                setProfile(mappedProfile);
+            } catch (err) {
+                setError(err instanceof Error ? err.message : 'An unknown error occurred');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchProfile();
+    }, [token]);
+    if (isLoading) {
+        return <div>Loading profile...</div>;
+    }
+
+    if (error) {
+        return <div>Error: {error}</div>;
+    }
+
+    if (!profile) {
+        return <div>No profile data found.</div>;
+    }
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
-        setProfile(prev => ({ ...prev, [name]: value }));
+        if (profile) {
+            setProfile(prev => prev ? { ...prev, [name]: value } : null);
+        }
     };
 
     const handleSave = () => {
-        localStorage.setItem('skilltrack_profile', JSON.stringify(profile));
-        setIsEditing(false);
+        if (profile) {
+            // Here you would typically send the updated profile to the server
+            // For now, we'll just update the local state and log it
+            console.log('Saving profile:', profile);
+            setIsEditing(false);
+        }
     };
 
     return (
