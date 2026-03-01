@@ -1,23 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { UserProfile } from '../types';
 import { useAuth } from '../hooks/useAuth';
+import { profileService } from '../services/profileService';
 import { Save, MapPin, Mail, Phone, Github, Linkedin, GraduationCap } from 'lucide-react';
-
-// Type for the raw API response
-interface ApiUserProfile {
-    full_name: string;
-    title: string;
-    email: string;
-    phone: string;
-    location: string;
-    education: string;
-    visa_status: string;
-    years_of_experience: number;
-    github_url: string;
-    linkedin_url: string;
-    bio: string;
-}
-
 
 export default function Profile() {
     const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -27,7 +12,7 @@ export default function Profile() {
     const { token } = useAuth();
 
     useEffect(() => {
-        const fetchProfile = async () => {
+        const fetchProfileData = async () => {
             if (!token) {
                 setIsLoading(false);
                 setError("No authentication token found.");
@@ -35,32 +20,8 @@ export default function Profile() {
             }
 
             try {
-                const response = await fetch(`${import.meta.env.VITE_API_URL}/profiles/me/`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                if (!response.ok) {
-                    throw new Error('Failed to fetch profile');
-                }
-                const data: ApiUserProfile = await response.json();
-
-                // Map API response to the frontend UserProfile type
-                const mappedProfile: UserProfile = {
-                    fullName: data.full_name || '',
-                    title: data.title || '',
-                    email: data.email || '',
-                    phone: data.phone || '',
-                    location: data.location || '',
-                    education: data.education || '',
-                    visaStatus: data.visa_status || '',
-                    yearsOfExperience: data.years_of_experience || 0,
-                    githubUrl: data.github_url || '',
-                    linkedinUrl: data.linkedin_url || '',
-                    bio: data.bio || ''
-                };
-
-                setProfile(mappedProfile);
+                const userProfile = await profileService.fetchProfile(token);
+                setProfile(userProfile);
             } catch (err) {
                 setError(err instanceof Error ? err.message : 'An unknown error occurred');
             } finally {
@@ -68,8 +29,9 @@ export default function Profile() {
             }
         };
 
-        fetchProfile();
+        fetchProfileData();
     }, [token]);
+
     if (isLoading) {
         return <div>Loading profile...</div>;
     }
@@ -90,13 +52,10 @@ export default function Profile() {
 
     const handleSave = () => {
         if (profile) {
-            // Here you would typically send the updated profile to the server
-            // For now, we'll just update the local state and log it
             console.log('Saving profile:', profile);
             setIsEditing(false);
         }
     };
-
     return (
         <div className="space-y-8">
             <div className="flex justify-between items-center">
