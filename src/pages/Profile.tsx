@@ -1,26 +1,61 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { UserProfile } from '../types';
-import { INITIAL_PROFILE } from '../data/initialData';
+import { useAuth } from '../hooks/useAuth';
+import { profileService } from '../services/profileService';
 import { Save, MapPin, Mail, Phone, Github, Linkedin, GraduationCap } from 'lucide-react';
 
 export default function Profile() {
-    const [profile, setProfile] = useState<UserProfile>(() => {
-        const saved = localStorage.getItem('skilltrack_profile');
-        return saved ? JSON.parse(saved) : INITIAL_PROFILE;
-    });
-
+    const [profile, setProfile] = useState<UserProfile | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [isEditing, setIsEditing] = useState(false);
+    const { token } = useAuth();
 
+    useEffect(() => {
+        const fetchProfileData = async () => {
+            if (!token) {
+                setIsLoading(false);
+                setError("No authentication token found.");
+                return;
+            }
+
+            try {
+                const userProfile = await profileService.fetchProfile(token);
+                setProfile(userProfile);
+            } catch (err) {
+                setError(err instanceof Error ? err.message : 'An unknown error occurred');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchProfileData();
+    }, [token]);
+
+    if (isLoading) {
+        return <div>Loading profile...</div>;
+    }
+
+    if (error) {
+        return <div>Error: {error}</div>;
+    }
+
+    if (!profile) {
+        return <div>No profile data found.</div>;
+    }
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
-        setProfile(prev => ({ ...prev, [name]: value }));
+        if (profile) {
+            setProfile(prev => prev ? { ...prev, [name]: value } : null);
+        }
     };
 
     const handleSave = () => {
-        localStorage.setItem('skilltrack_profile', JSON.stringify(profile));
-        setIsEditing(false);
+        if (profile) {
+            console.log('Saving profile:', profile);
+            setIsEditing(false);
+        }
     };
-
     return (
         <div className="space-y-8">
             <div className="flex justify-between items-center">
