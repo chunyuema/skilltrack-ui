@@ -20,7 +20,8 @@ export const MOCK_USERS: (AppState & { id: string })[] = [
     id: 'user_1',
     profile: {
       ...INITIAL_PROFILE,
-      fullName: 'Sarah Jenkins',
+      firstName: 'Sarah',
+      lastName: 'Jenkins',
       title: 'Staff Backend Engineer',
       bio: 'Distributed systems expert. Love Rust and Go.',
       yearsOfExperience: 8,
@@ -52,7 +53,8 @@ export const MOCK_USERS: (AppState & { id: string })[] = [
     id: 'user_2',
     profile: {
       ...INITIAL_PROFILE,
-      fullName: 'Mike Chen',
+      firstName: 'Mike',
+      lastName: 'Chen',
       title: 'Frontend Architect',
       bio: 'Obsessed with performance and pixel perfection.',
       yearsOfExperience: 6,
@@ -75,7 +77,8 @@ export const MOCK_USERS: (AppState & { id: string })[] = [
     id: 'user_3',
     profile: {
       ...INITIAL_PROFILE,
-      fullName: 'Jessica Alba',
+      firstName: 'Jessica',
+      lastName: 'Alba',
       title: 'DevOps Engineer',
       bio: 'Automating everything. Infrastructure as Code enthusiast.',
       yearsOfExperience: 4,

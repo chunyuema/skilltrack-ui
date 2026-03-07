@@ -2,7 +2,8 @@ import { UserProfile } from "../types";
 
 // Type for the raw API response
 interface ApiUserProfile {
-  full_name: string;
+  first_name: string;
+  last_name: string;
   title: string;
   email: string;
   phone: string;
@@ -33,7 +34,8 @@ export const profileService = {
 
     // Map API response to the frontend UserProfile type
     const mappedProfile: UserProfile = {
-      fullName: data.full_name || "",
+      firstName: data.first_name || "",
+      lastName: data.last_name || "",
       title: data.title || "",
       email: data.email || "",
       phone: data.phone || "",
@@ -57,7 +59,8 @@ export const profileService = {
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
-        full_name: profile.fullName,
+        first_name: profile.firstName,
+        last_name: profile.lastName,
         title: profile.title,
         email: profile.email,
         phone: profile.phone,

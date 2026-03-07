@@ -19,10 +19,10 @@ export default function UserDirectory() {
                     >
                         <div className="flex items-center gap-4 mb-4">
                             <div className="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-lg">
-                                {user.profile.fullName.charAt(0)}
+                                {user.profile.firstName.charAt(0)}
                             </div>
                             <div>
-                                <h3 className="font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">{user.profile.fullName}</h3>
+                                <h3 className="font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">{user.profile.firstName} {user.profile.lastName}</h3>
                                 <p className="text-sm text-slate-500">{user.profile.title}</p>
                             </div>
                         </div>

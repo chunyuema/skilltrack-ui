@@ -345,7 +345,8 @@ export const INITIAL_THEMES: SkillTheme[] = [
 ];
 
 export const INITIAL_PROFILE = {
-  fullName: 'Alex Developer',
+  firstName: 'Alex',
+  lastName: 'Developer',
   title: 'Senior Software Engineer',
   email: 'alex@example.com',
   phone: '+1 (555) 123-4567',

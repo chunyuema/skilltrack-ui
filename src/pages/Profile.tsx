@@ -91,7 +91,7 @@ export default function Profile() {
                     <div className="relative -mt-12 mb-6">
                         <div className="w-24 h-24 rounded-2xl bg-white p-1 shadow-lg inline-block">
                             <div className="w-full h-full bg-slate-100 rounded-xl flex items-center justify-center text-3xl font-bold text-indigo-600">
-                                {profile.fullName.charAt(0)}
+                                {profile.firstName.charAt(0)}
                             </div>
                         </div>
                     </div>
@@ -101,7 +101,14 @@ export default function Profile() {
                         <div className="space-y-6">
                             <h2 className="text-lg font-semibold text-slate-900 border-b border-slate-100 pb-2">Basic Information</h2>
 
-                            <Field label="Full Name" name="fullName" value={profile.fullName} isEditing={isEditing} onChange={handleChange} />
+                            {isEditing ? (
+                                <div className="grid grid-cols-2 gap-4">
+                                    <Field label="First Name" name="firstName" value={profile.firstName} isEditing={true} onChange={handleChange} />
+                                    <Field label="Last Name" name="lastName" value={profile.lastName} isEditing={true} onChange={handleChange} />
+                                </div>
+                            ) : (
+                                <Field label="Full Name" name="fullName" value={`${profile.firstName} ${profile.lastName}`} isEditing={false} onChange={handleChange} />
+                            )}
                             <Field label="Professional Title" name="title" value={profile.title} isEditing={isEditing} onChange={handleChange} />
                             <Field label="Bio" name="bio" value={profile.bio} isEditing={isEditing} onChange={handleChange} type="textarea" />
 

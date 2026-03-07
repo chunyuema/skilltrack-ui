@@ -27,11 +27,11 @@ export default function PublicProfile() {
                         <div className="flex items-end gap-6">
                             <div className="w-24 h-24 rounded-2xl bg-white p-1 shadow-lg">
                                 <div className="w-full h-full bg-indigo-50 rounded-xl flex items-center justify-center text-3xl font-bold text-indigo-600">
-                                    {user.profile.fullName.charAt(0)}
+                                    {user.profile.firstName.charAt(0)}
                                 </div>
                             </div>
                             <div className="mb-2">
-                                <h1 className="text-2xl font-bold text-slate-900">{user.profile.fullName}</h1>
+                                <h1 className="text-2xl font-bold text-slate-900">{user.profile.firstName} {user.profile.lastName}</h1>
                                 <p className="text-slate-500 font-medium">{user.profile.title}</p>
                             </div>
                         </div>
