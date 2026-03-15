@@ -149,6 +149,45 @@ export const profileService = {
     };
   },
 
+  updateExperience: async (
+    id: string,
+    experience: Partial<Experience>,
+    token: string
+  ): Promise<Experience> => {
+    const response = await fetch(`${API_URL}/profiles/experiences/${id}/`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        company: experience.company,
+        role: experience.role,
+        start_date: experience.startDate,
+        end_date:
+          experience.endDate === "Present" ? null : experience.endDate,
+        description: experience.description,
+        technologies: experience.technologies,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to update experience");
+    }
+
+    const data: ApiExperience = await response.json();
+
+    return {
+      id: data.id,
+      company: data.company,
+      role: data.role,
+      startDate: data.start_date,
+      endDate: data.end_date || "Present",
+      description: data.description,
+      technologies: data.technologies,
+    };
+  },
+
   deleteExperience: async (id: string, token: string): Promise<void> => {
     const response = await fetch(`${API_URL}/profiles/experiences/${id}/`, {
       method: "DELETE",
