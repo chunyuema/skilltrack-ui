@@ -1,45 +1,85 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Experience } from '../types';
-import { INITIAL_EXPERIENCE } from '../data/initialData';
-import { Plus, Trash2, Calendar, Building, Briefcase } from 'lucide-react';
+import { Plus, Trash2, Calendar, Building, Briefcase, Loader2 } from 'lucide-react';
+import { profileService } from '../services/profileService';
+import { useAuth } from '../hooks/useAuth';
 
 export default function ExperiencePage() {
-    const [experiences, setExperiences] = useState<Experience[]>(() => {
-        const saved = localStorage.getItem('skilltrack_experience');
-        return saved ? JSON.parse(saved) : INITIAL_EXPERIENCE;
-    });
+    const { token } = useAuth();
+    const [experiences, setExperiences] = useState<Experience[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     const [isAdding, setIsAdding] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
     const [newExp, setNewExp] = useState<Partial<Experience>>({});
 
-    const saveExperiences = (newExperiences: Experience[]) => {
-        setExperiences(newExperiences);
-        localStorage.setItem('skilltrack_experience', JSON.stringify(newExperiences));
-    };
+    useEffect(() => {
+        const loadExperiences = async () => {
+            if (!token) return;
+            try {
+                setIsLoading(true);
+                const data = await profileService.fetchExperiences(token);
+                setExperiences(data);
+                setError(null);
+            } catch (err) {
+                console.error('Error loading experiences:', err);
+                setError('Failed to load experiences. Please try again later.');
+            } finally {
+                setIsLoading(false);
+            }
+        };
 
-    const handleDelete = (id: string) => {
+        loadExperiences();
+    }, [token]);
+
+    const handleDelete = async (id: string) => {
+        if (!token) return;
         if (confirm('Are you sure you want to delete this experience?')) {
-            saveExperiences(experiences.filter(exp => exp.id !== id));
+            try {
+                await profileService.deleteExperience(id, token);
+                setExperiences(experiences.filter(exp => exp.id !== id));
+            } catch (err) {
+                console.error('Error deleting experience:', err);
+                alert('Failed to delete experience.');
+            }
         }
     };
 
-    const handleAdd = () => {
-        if (!newExp.company || !newExp.role) return;
+    const handleAdd = async () => {
+        if (!token || !newExp.company || !newExp.role) return;
 
-        const experience: Experience = {
-            id: Date.now().toString(),
-            company: newExp.company,
-            role: newExp.role,
-            startDate: newExp.startDate || '',
-            endDate: newExp.endDate || 'Present',
-            description: newExp.description || '',
-            technologies: newExp.technologies ? (Array.isArray(newExp.technologies) ? newExp.technologies : (newExp.technologies as string).split(',').map(t => t.trim())) : [],
-        };
+        try {
+            setIsSaving(true);
+            const experience: Omit<Experience, 'id'> = {
+                company: newExp.company,
+                role: newExp.role,
+                startDate: newExp.startDate || '',
+                endDate: newExp.endDate || 'Present',
+                description: newExp.description || '',
+                technologies: newExp.technologies || [],
+            };
 
-        saveExperiences([experience, ...experiences]);
-        setIsAdding(false);
-        setNewExp({});
+            const savedExp = await profileService.addExperience(experience, token);
+            setExperiences([savedExp, ...experiences]);
+            setIsAdding(false);
+            setNewExp({});
+        } catch (err) {
+            console.error('Error adding experience:', err);
+            alert('Failed to save experience.');
+        } finally {
+            setIsSaving(false);
+        }
     };
+
+    if (isLoading) {
+        return (
+            <div className="flex flex-col items-center justify-center py-24 gap-4">
+                <Loader2 className="w-8 h-8 text-indigo-600 animate-spin" />
+                <p className="text-slate-500 font-medium">Loading your experiences...</p>
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-8">
@@ -56,6 +96,12 @@ export default function ExperiencePage() {
                     Add Experience
                 </button>
             </div>
+
+            {error && (
+                <div className="bg-red-50 text-red-600 p-4 rounded-xl border border-red-100">
+                    {error}
+                </div>
+            )}
 
             {isAdding && (
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 animate-in fade-in slide-in-from-top-4">
@@ -97,21 +143,24 @@ export default function ExperiencePage() {
                     <input
                         placeholder="Technologies (comma separated)"
                         className="w-full px-4 py-2 border border-slate-200 rounded-lg mb-6"
-                        value={Array.isArray(newExp.technologies) ? newExp.technologies.join(', ') : newExp.technologies || ''}
-                        onChange={e => setNewExp({ ...newExp, technologies: e.target.value.split(',').map(t => t.trim()) })}
+                        value={Array.isArray(newExp.technologies) ? newExp.technologies.join(', ') : ''}
+                        onChange={e => setNewExp({ ...newExp, technologies: e.target.value.split(',').map(t => t.trim()).filter(t => t !== '') })}
                     />
                     <div className="flex justify-end gap-3">
                         <button
                             onClick={() => setIsAdding(false)}
                             className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg"
+                            disabled={isSaving}
                         >
                             Cancel
                         </button>
                         <button
                             onClick={handleAdd}
-                            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                            disabled={isSaving}
+                            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            Save Role
+                            {isSaving && <Loader2 size={18} className="animate-spin" />}
+                            {isSaving ? 'Saving...' : 'Save Role'}
                         </button>
                     </div>
                 </div>
@@ -149,7 +198,7 @@ export default function ExperiencePage() {
                                     {exp.company}
                                 </div>
 
-                                <p className="text-slate-600 leading-relaxed mb-4">{exp.description}</p>
+                                <p className="text-slate-600 leading-relaxed mb-4 whitespace-pre-wrap">{exp.description}</p>
 
                                 <div className="flex flex-wrap gap-2">
                                     {exp.technologies.map((tech, i) => (
@@ -163,7 +212,7 @@ export default function ExperiencePage() {
                     </div>
                 ))}
 
-                {experiences.length === 0 && (
+                {!isLoading && experiences.length === 0 && (
                     <div className="text-center py-12 bg-slate-50 rounded-2xl border border-dashed border-slate-300">
                         <p className="text-slate-500">No experience added yet. Click "Add Experience" to get started.</p>
                     </div>
