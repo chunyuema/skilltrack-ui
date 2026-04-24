@@ -328,15 +328,17 @@ export default function ExperiencePage() {
                                     <div className="flex-1">
                                         <div className="flex flex-col md:flex-row md:items-center justify-between mb-3">
                                             <h3 className="text-xl font-black text-white tracking-tighter uppercase font-mono">{exp.role}</h3>
-                                            <div className="flex items-center gap-2 text-[10px] text-slate-600 font-bold font-mono mt-1 md:mt-0 uppercase tracking-widest">
+                                        </div>
+
+                                        <div className="flex flex-wrap items-center gap-x-6 gap-y-2 mb-6">
+                                            <div className="flex items-center gap-2 text-sky-500/80 font-bold text-[11px] uppercase tracking-[0.2em] font-mono">
+                                                <Briefcase size={14} className="text-sky-700" />
+                                                {exp.company}
+                                            </div>
+                                            <div className="flex items-center gap-2 text-[10px] text-slate-600 font-bold font-mono uppercase tracking-widest">
                                                 <Calendar size={12} className="text-slate-700" />
                                                 <span>{exp.startDate} :: {exp.endDate}</span>
                                             </div>
-                                        </div>
-
-                                        <div className="flex items-center gap-2 text-sky-500/80 font-bold text-[11px] mb-6 uppercase tracking-[0.2em] font-mono">
-                                            <Briefcase size={14} className="text-sky-700" />
-                                            {exp.company}
                                         </div>
 
                                         <p className="text-slate-400 leading-relaxed mb-8 whitespace-pre-wrap font-medium text-sm border-l border-slate-800 pl-6">{exp.description}</p>
