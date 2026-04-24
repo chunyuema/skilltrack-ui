@@ -17,16 +17,18 @@ export default function SkillsList({ themes, onUpdateSkill, readOnly = false }: 
   return (
     <div className="space-y-4">
       {themes.map((theme) => (
-        <div key={theme.id} className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div key={theme.id} className="bg-bg-card rounded-lg border border-slate-800 shadow-xl overflow-hidden transition-all hover:border-slate-700">
           <button
             onClick={() => setExpandedTheme(expandedTheme === theme.id ? null : theme.id)}
-            className="w-full flex items-center justify-between p-4 hover:bg-slate-50 transition-colors"
+            className="w-full flex items-center justify-between p-6 hover:bg-slate-800/40 transition-colors text-left"
           >
-            <div className="flex flex-col items-start text-left">
-              <h3 className="text-lg font-semibold text-slate-900">{theme.name}</h3>
-              <p className="text-sm text-slate-500">{theme.description}</p>
+            <div className="flex flex-col items-start">
+              <h3 className="text-xl font-black text-white tracking-tighter uppercase font-mono">
+                {expandedTheme === theme.id ? '[ - ]' : '[ + ]'} {theme.name}
+              </h3>
+              <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1 font-mono">{theme.description}</p>
             </div>
-            {expandedTheme === theme.id ? <ChevronUp size={20} className="text-slate-400" /> : <ChevronDown size={20} className="text-slate-400" />}
+            {expandedTheme === theme.id ? <ChevronUp size={20} className="text-sky-500" /> : <ChevronDown size={20} className="text-sky-500" />}
           </button>
           
           <AnimatePresence>
@@ -37,19 +39,19 @@ export default function SkillsList({ themes, onUpdateSkill, readOnly = false }: 
                 exit={{ height: 0, opacity: 0 }}
                 transition={{ duration: 0.2 }}
               >
-                <div className="p-4 pt-0 border-t border-slate-100 space-y-2">
+                <div className="p-6 pt-0 border-t border-slate-800/50 space-y-4">
                   {theme.subCategories.map((subCat) => (
-                    <div key={subCat.id} className="border border-slate-100 rounded-lg overflow-hidden">
+                    <div key={subCat.id} className="border border-slate-800 rounded bg-slate-900/30 overflow-hidden">
                       <button
                         onClick={() => setExpandedSubCategory(expandedSubCategory === subCat.id ? null : subCat.id)}
-                        className="w-full flex items-center justify-between p-3 bg-slate-50 hover:bg-slate-100 transition-colors"
+                        className="w-full flex items-center justify-between p-4 bg-slate-900/50 hover:bg-slate-800/50 transition-colors"
                       >
-                        <span className="font-medium text-slate-700">{subCat.name}</span>
-                        {expandedSubCategory === subCat.id ? <ChevronDown size={16} className="text-slate-400" /> : <ChevronRight size={16} className="text-slate-400" />}
+                        <span className="font-bold text-slate-400 text-xs uppercase tracking-widest font-mono">{`> `}{subCat.name}</span>
+                        {expandedSubCategory === subCat.id ? <ChevronDown size={18} className="text-sky-500" /> : <ChevronRight size={18} className="text-sky-500" />}
                       </button>
                       
                       {expandedSubCategory === subCat.id && (
-                        <div className="p-3 bg-white space-y-3">
+                        <div className="p-6 bg-slate-950/20 space-y-6">
                           {subCat.skills.map((skill) => (
                             <SkillRow 
                               key={skill.id} 
@@ -74,29 +76,32 @@ export default function SkillsList({ themes, onUpdateSkill, readOnly = false }: 
 
 const SkillRow: React.FC<{ skill: Skill; onChange: (val: number) => void; readOnly: boolean }> = ({ skill, onChange, readOnly }) => {
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4 py-2 border-b border-slate-50 last:border-0">
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 group">
       <div className="flex-1">
-        <div className="font-medium text-slate-700 text-sm">{skill.name}</div>
+        <div className="font-bold text-slate-300 text-[11px] flex items-center gap-3 uppercase tracking-wider font-mono">
+          <div className="w-1.5 h-1.5 bg-slate-800 group-hover:bg-sky-500 transition-colors"></div>
+          {skill.name.replace(/ /g, '_')}
+        </div>
       </div>
-      <div className="flex items-center gap-1 self-end sm:self-auto">
+      <div className="flex items-center gap-1.5 self-end sm:self-auto">
         {[0, 1, 2, 3, 4, 5].map((level) => (
           <button
             key={level}
             onClick={() => !readOnly && onChange(level)}
             disabled={readOnly}
             className={cn(
-              "w-7 h-7 rounded-full text-xs font-medium transition-all flex items-center justify-center",
+              "w-8 h-7 rounded-sm text-[10px] font-black transition-all flex items-center justify-center border font-mono",
               skill.level >= level && level !== 0
-                ? "bg-indigo-600 text-white shadow-sm" 
+                ? "bg-sky-500/20 text-sky-400 border-sky-500/40 shadow-[0_0_10px_rgba(14,165,233,0.1)]" 
                 : level === 0 && skill.level === 0
-                ? "bg-slate-200 text-slate-500 ring-2 ring-slate-300"
-                : "bg-slate-100 text-slate-400",
-              !readOnly && "hover:bg-slate-200 cursor-pointer",
+                ? "bg-slate-800 text-slate-400 border-slate-700"
+                : "bg-slate-900 text-slate-700 border-slate-800",
+              !readOnly && "hover:border-sky-500/40 cursor-pointer",
               readOnly && "cursor-default"
             )}
-            title={`Level ${level}`}
+            title={`VAL_${level}`}
           >
-            {level}
+            {level === 0 ? 'X' : level}
           </button>
         ))}
       </div>

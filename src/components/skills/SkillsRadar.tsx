@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react';
 import { SkillTheme } from '../../types';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip } from 'recharts';
-import { Info } from 'lucide-react';
 
 interface SkillsRadarProps {
     themes: SkillTheme[];
@@ -24,7 +23,7 @@ export default function SkillsRadar({ themes }: SkillsRadarProps) {
             const average = skillCount > 0 ? totalLevel / skillCount : 0;
 
             return {
-                subject: theme.name.split(' ')[0], // Shorten name for chart
+                subject: theme.name.split(' ')[0].toUpperCase(),
                 fullName: theme.name,
                 A: parseFloat(average.toFixed(2)),
                 fullMark: 5,
@@ -40,46 +39,47 @@ export default function SkillsRadar({ themes }: SkillsRadarProps) {
     return (
         <div className="space-y-6">
             {/* Summary Card */}
-            <div className="bg-slate-900 text-white p-6 rounded-2xl shadow-lg sticky top-6">
-                <h3 className="text-lg font-semibold mb-2">Overall Proficiency</h3>
-                <div className="flex items-end gap-2 mb-4">
-                    <span className="text-5xl font-bold text-indigo-400">{percentage}%</span>
-                    <span className="text-slate-400 mb-1">of max potential</span>
+            <div className="bg-[#0f172a] border border-slate-800 p-8 rounded-xl shadow-2xl sticky top-6">
+                <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.3em] mb-6 font-mono">// ANALYSIS_SUMMARY</h3>
+                <div className="flex items-end gap-2 mb-6">
+                    <span className="text-6xl font-black text-sky-500 tracking-tighter font-mono">{percentage}%</span>
+                    <span className="text-slate-600 text-[10px] font-bold uppercase mb-2 font-mono tracking-widest">Efficiency</span>
                 </div>
-                <div className="w-full bg-slate-800 rounded-full h-2 mb-2">
+                <div className="w-full bg-slate-900 border border-slate-800 h-3 mb-6 p-0.5">
                     <div
-                        className="bg-indigo-500 h-2 rounded-full transition-all duration-1000 ease-out"
+                        className="bg-sky-500 h-full transition-all duration-1000 ease-out shadow-[0_0_15px_rgba(14,165,233,0.3)]"
                         style={{ width: `${percentage}%` }}
                     ></div>
                 </div>
-                <p className="text-sm text-slate-400 mb-6">
-                    {percentage < 30 ? "Junior Level" :
-                        percentage < 60 ? "Mid-Level" :
-                            percentage < 85 ? "Senior Level" :
-                                "Staff / Principal Level"}
-                </p>
+                <div className="mb-8">
+                    <p className="text-[11px] font-bold text-slate-400 font-mono tracking-widest border-l-2 border-sky-900/50 pl-4 uppercase">
+                        CLASS: {percentage < 30 ? "JUNIOR_INIT" :
+                            percentage < 60 ? "MID_SYSTEMS" :
+                                percentage < 85 ? "SR_ARCHITECT" :
+                                    "MASTER_ENG"}
+                    </p>
+                </div>
 
                 {/* Radar Chart */}
-                <div className="bg-white p-2 rounded-xl h-[300px] flex flex-col">
+                <div className="bg-slate-900/40 p-4 rounded border border-slate-800/50 h-[300px] flex flex-col items-center justify-center">
                     <ResponsiveContainer width="100%" height="100%">
                         <RadarChart cx="50%" cy="50%" outerRadius="70%" data={chartData}>
-                            <PolarGrid stroke="#e2e8f0" />
-                            <PolarAngleAxis dataKey="subject" tick={{ fill: '#64748b', fontSize: 10 }} />
+                            <PolarGrid stroke="#1e293b" />
+                            <PolarAngleAxis dataKey="subject" tick={{ fill: '#475569', fontSize: 9, fontWeight: 700, fontFamily: 'monospace' }} />
                             <PolarRadiusAxis angle={30} domain={[0, 5]} tick={false} axisLine={false} />
                             <Radar
-                                name="Proficiency"
+                                name="Core"
                                 dataKey="A"
-                                stroke="#6366f1"
+                                stroke="#0ea5e9"
                                 strokeWidth={2}
-                                fill="#818cf8"
-                                fillOpacity={0.3}
+                                fill="#0ea5e9"
+                                fillOpacity={0.15}
                             />
                             <Tooltip
-                                formatter={(value: number) => [value, 'Score']}
-                                labelFormatter={(label: string) => {
-                                    const item = chartData.find(d => d.subject === label);
-                                    return item ? item.fullName : label;
-                                }}
+                                contentStyle={{ backgroundColor: '#020617', border: '1px solid #1e293b', borderRadius: '4px' }}
+                                itemStyle={{ color: '#0ea5e9', fontSize: '10px', fontWeight: 'bold', fontFamily: 'monospace' }}
+                                labelStyle={{ color: '#94a3b8', fontSize: '10px', marginBottom: '4px', fontWeight: 'bold', fontFamily: 'monospace' }}
+                                formatter={(value: number) => [value, 'VAL']}
                             />
                         </RadarChart>
                     </ResponsiveContainer>
