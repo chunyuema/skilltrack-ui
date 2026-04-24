@@ -1,1 +1,35 @@
 @import "tailwindcss";
+
+@theme {
+  --color-primary: var(--color-sky-500);
+  --color-primary-hover: var(--color-sky-600);
+  --color-bg-dark: #080c14; /* Deep Steel */
+  --color-bg-card: #0f172a; /* Slate 900 */
+  --color-border-tech: #1e293b; /* Slate 800 */
+  --font-main: "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", monospace;
+}
+
+:root {
+  background-color: var(--color-bg-dark);
+  color: #e2e8f0; /* Slate 200 */
+  font-family: var(--font-main);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #f8fafc;
+  letter-spacing: -0.01em;
+}
+
+@layer base {
+  input, textarea, select {
+    @apply bg-slate-900/50 border-slate-800 text-sky-400 focus:ring-sky-500/30 focus:border-sky-500 font-mono;
+  }
+}

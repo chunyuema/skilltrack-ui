@@ -32,9 +32,9 @@ export default function SkillsPage() {
 
     return (
         <div className="space-y-8">
-            <div>
-                <h1 className="text-3xl font-bold text-slate-900">Skills Matrix</h1>
-                <p className="text-slate-500 mt-1">Assess your technical proficiency against industry standards</p>
+            <div className="border-b border-slate-800 pb-6">
+                <h1 className="text-3xl font-bold text-white">Skills Matrix</h1>
+                <p className="text-slate-500 mt-1">Assess your technical proficiency and identify growth areas</p>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

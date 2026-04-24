@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Experience } from '../types';
-import { Plus, Trash2, Calendar, Building, Briefcase, Loader2, Pencil, X, Check } from 'lucide-react';
+import { Plus, Trash2, Calendar, Building, Briefcase, Loader2, Pencil, X, Check, Terminal } from 'lucide-react';
 import { profileService } from '../services/profileService';
 import { useAuth } from '../hooks/useAuth';
 
@@ -37,7 +37,7 @@ export default function ExperiencePage() {
 
     const handleDelete = async (id: string) => {
         if (!token) return;
-        if (confirm('Are you sure you want to delete this experience?')) {
+        if (confirm('Are you sure you want to purge this record?')) {
             try {
                 await profileService.deleteExperience(id, token);
                 setExperiences(experiences.filter(exp => exp.id !== id));
@@ -103,225 +103,247 @@ export default function ExperiencePage() {
 
     if (isLoading) {
         return (
-            <div className="flex flex-col items-center justify-center py-24 gap-4">
-                <Loader2 className="w-8 h-8 text-indigo-600 animate-spin" />
-                <p className="text-slate-500 font-medium">Loading your experiences...</p>
+            <div className="flex flex-col items-center justify-center py-24 gap-4 font-mono">
+                <div className="w-10 h-10 border-2 border-slate-800 border-t-sky-500 rounded-full animate-spin"></div>
+                <p className="text-sky-500/50 text-[10px] tracking-[0.3em]">SYNCHRONIZING_TIMELINE...</p>
             </div>
         );
     }
 
     return (
-        <div className="space-y-8">
-            <div className="flex justify-between items-center">
+        <div className="space-y-10">
+            <div className="flex justify-between items-end border-b border-slate-800 pb-8">
                 <div>
-                    <h1 className="text-3xl font-bold text-slate-900">Experience</h1>
-                    <p className="text-slate-500 mt-1">Your professional journey</p>
+                    <div className="flex items-center gap-2 mb-2">
+                        <Terminal size={14} className="text-sky-500" />
+                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.3em] font-mono">CHRONOLOGICAL_HISTORY</span>
+                    </div>
+                    <h1 className="text-4xl font-black text-white tracking-tighter uppercase font-mono">Experience</h1>
                 </div>
                 <button
                     onClick={() => {
                         setIsAdding(true);
                         setEditingId(null);
                     }}
-                    className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium"
+                    className="flex items-center gap-2 px-6 py-2 bg-sky-600 text-white rounded font-mono text-[11px] font-bold uppercase tracking-widest hover:bg-sky-500 transition-all shadow-lg shadow-sky-900/40"
                 >
-                    <Plus size={18} />
-                    Add Experience
+                    <Plus size={14} />
+                    PUSH_RECORD
                 </button>
             </div>
 
             {error && (
-                <div className="bg-red-50 text-red-600 p-4 rounded-xl border border-red-100">
-                    {error}
+                <div className="bg-red-900/10 text-red-400 p-4 rounded border border-red-900/20 font-mono text-xs uppercase tracking-widest">
+                    [ ERROR ] {error}
                 </div>
             )}
 
             {isAdding && (
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 animate-in fade-in slide-in-from-top-4">
-                    <h3 className="text-lg font-semibold mb-4">Add New Role</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                        <input
-                            placeholder="Company Name"
-                            className="px-4 py-2 border border-slate-200 rounded-lg"
-                            value={newExp.company || ''}
-                            onChange={e => setNewExp({ ...newExp, company: e.target.value })}
-                        />
-                        <input
-                            placeholder="Role Title"
-                            className="px-4 py-2 border border-slate-200 rounded-lg"
-                            value={newExp.role || ''}
-                            onChange={e => setNewExp({ ...newExp, role: e.target.value })}
-                        />
-                        <input
-                            type="month"
-                            placeholder="Start Date"
-                            className="px-4 py-2 border border-slate-200 rounded-lg"
-                            value={newExp.startDate || ''}
-                            onChange={e => setNewExp({ ...newExp, startDate: e.target.value })}
-                        />
-                        <input
-                            type="text"
-                            placeholder="End Date (or 'Present')"
-                            className="px-4 py-2 border border-slate-200 rounded-lg"
-                            value={newExp.endDate || ''}
-                            onChange={e => setNewExp({ ...newExp, endDate: e.target.value })}
+                <div className="bg-bg-card p-8 rounded-xl border border-slate-800 shadow-2xl animate-in fade-in slide-in-from-top-4 relative">
+                    <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-sky-500/50 to-transparent"></div>
+                    <div className="flex items-center gap-3 mb-8 border-b border-slate-800 pb-4">
+                        <h3 className="text-[11px] font-bold text-sky-500 uppercase tracking-[0.2em] font-mono">// INITIALIZE_NEW_BLOCK</h3>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div className="space-y-1.5">
+                            <label className="text-[10px] font-bold text-slate-600 uppercase tracking-widest font-mono ml-1">Org_Name</label>
+                            <input
+                                placeholder="Organization"
+                                className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded text-sky-400 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-sky-500/30"
+                                value={newExp.company || ''}
+                                onChange={e => setNewExp({ ...newExp, company: e.target.value })}
+                            />
+                        </div>
+                        <div className="space-y-1.5">
+                            <label className="text-[10px] font-bold text-slate-600 uppercase tracking-widest font-mono ml-1">Role_ID</label>
+                            <input
+                                placeholder="Position"
+                                className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded text-sky-400 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-sky-500/30"
+                                value={newExp.role || ''}
+                                onChange={e => setNewExp({ ...newExp, role: e.target.value })}
+                            />
+                        </div>
+                        <div className="space-y-1.5">
+                            <label className="text-[10px] font-bold text-slate-600 uppercase tracking-widest font-mono ml-1">T_Start</label>
+                            <input
+                                type="month"
+                                className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded text-sky-400 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-sky-500/30"
+                                value={newExp.startDate || ''}
+                                onChange={e => setNewExp({ ...newExp, startDate: e.target.value })}
+                            />
+                        </div>
+                        <div className="space-y-1.5">
+                            <label className="text-[10px] font-bold text-slate-600 uppercase tracking-widest font-mono ml-1">T_End</label>
+                            <input
+                                type="text"
+                                placeholder="YYYY-MM or 'Present'"
+                                className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded text-sky-400 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-sky-500/30"
+                                value={newExp.endDate || ''}
+                                onChange={e => setNewExp({ ...newExp, endDate: e.target.value })}
+                            />
+                        </div>
+                    </div>
+                    <div className="space-y-1.5 mb-6">
+                        <label className="text-[10px] font-bold text-slate-600 uppercase tracking-widest font-mono ml-1">Mission_Parameters</label>
+                        <textarea
+                            placeholder="Responsibilities and impact..."
+                            className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded text-sky-400 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-sky-500/30 h-32 leading-relaxed"
+                            value={newExp.description || ''}
+                            onChange={e => setNewExp({ ...newExp, description: e.target.value })}
                         />
                     </div>
-                    <textarea
-                        placeholder="Description of responsibilities..."
-                        className="w-full px-4 py-2 border border-slate-200 rounded-lg mb-4 h-24"
-                        value={newExp.description || ''}
-                        onChange={e => setNewExp({ ...newExp, description: e.target.value })}
-                    />
-                    <input
-                        placeholder="Technologies (comma separated)"
-                        className="w-full px-4 py-2 border border-slate-200 rounded-lg mb-6"
-                        value={Array.isArray(newExp.technologies) ? newExp.technologies.join(', ') : ''}
-                        onChange={e => setNewExp({ ...newExp, technologies: e.target.value.split(',').map(t => t.trim()).filter(t => t !== '') })}
-                    />
+                    <div className="space-y-1.5 mb-8">
+                        <label className="text-[10px] font-bold text-slate-600 uppercase tracking-widest font-mono ml-1">Tech_Dependencies (comma separated)</label>
+                        <input
+                            placeholder="React, AWS, Node, etc."
+                            className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded text-sky-400 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-sky-500/30"
+                            value={Array.isArray(newExp.technologies) ? newExp.technologies.join(', ') : ''}
+                            onChange={e => setNewExp({ ...newExp, technologies: e.target.value.split(',').map(t => t.trim()).filter(t => t !== '') })}
+                        />
+                    </div>
                     <div className="flex justify-end gap-3">
                         <button
                             onClick={() => setIsAdding(false)}
-                            className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg"
+                            className="px-6 py-2 text-slate-500 hover:text-slate-300 font-mono text-xs uppercase font-bold tracking-widest"
                             disabled={isSaving}
                         >
-                            Cancel
+                            ABORT
                         </button>
                         <button
                             onClick={handleAdd}
                             disabled={isSaving}
-                            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex items-center gap-2 px-8 py-2.5 bg-sky-600 text-white rounded font-mono text-[11px] font-bold uppercase tracking-widest hover:bg-sky-500 transition-all shadow-lg shadow-sky-900/40"
                         >
-                            {isSaving && <Loader2 size={18} className="animate-spin" />}
-                            {isSaving ? 'Saving...' : 'Save Role'}
+                            {isSaving ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
+                            {isSaving ? 'PROCESS...' : 'COMMIT_BLOCK'}
                         </button>
                     </div>
                 </div>
             )}
 
-            <div className="space-y-6">
+            <div className="space-y-8">
                 {experiences.map((exp) => (
-                    <div key={exp.id} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 relative group transition-all hover:shadow-md">
+                    <div key={exp.id} className="bg-bg-card p-8 rounded border border-slate-800/60 relative group transition-all hover:border-sky-900/50 shadow-xl">
                         {editingId === exp.id ? (
-                            <div className="space-y-4">
-                                <div className="flex items-center gap-2 text-indigo-600 font-semibold mb-2">
-                                    <Pencil size={18} />
-                                    Editing Experience
+                            <div className="space-y-6">
+                                <div className="flex items-center gap-3 border-b border-slate-800 pb-3 mb-6 font-mono text-sky-500 text-xs font-bold uppercase tracking-widest">
+                                    <Pencil size={14} />
+                                    REWRITING_HISTORY_NODE
                                 </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div className="space-y-1">
-                                        <label className="text-xs font-bold text-slate-500 uppercase">Company</label>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="space-y-1.5">
+                                        <label className="text-[10px] font-bold text-slate-600 uppercase tracking-widest font-mono">Org</label>
                                         <input
-                                            className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                                            className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded text-sky-400 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-sky-500/30"
                                             value={editExp.company || ''}
                                             onChange={e => setEditExp({ ...editExp, company: e.target.value })}
                                         />
                                     </div>
-                                    <div className="space-y-1">
-                                        <label className="text-xs font-bold text-slate-500 uppercase">Role</label>
+                                    <div className="space-y-1.5">
+                                        <label className="text-[10px] font-bold text-slate-600 uppercase tracking-widest font-mono">Role</label>
                                         <input
-                                            className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                                            className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded text-sky-400 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-sky-500/30"
                                             value={editExp.role || ''}
                                             onChange={e => setEditExp({ ...editExp, role: e.target.value })}
                                         />
                                     </div>
-                                    <div className="space-y-1">
-                                        <label className="text-xs font-bold text-slate-500 uppercase">Start Date</label>
+                                    <div className="space-y-1.5">
+                                        <label className="text-[10px] font-bold text-slate-600 uppercase tracking-widest font-mono">Start</label>
                                         <input
                                             type="month"
-                                            className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                                            className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded text-sky-400 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-sky-500/30"
                                             value={editExp.startDate || ''}
                                             onChange={e => setEditExp({ ...editExp, startDate: e.target.value })}
                                         />
                                     </div>
-                                    <div className="space-y-1">
-                                        <label className="text-xs font-bold text-slate-500 uppercase">End Date</label>
+                                    <div className="space-y-1.5">
+                                        <label className="text-[10px] font-bold text-slate-600 uppercase tracking-widest font-mono">End</label>
                                         <input
-                                            className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                                            className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded text-sky-400 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-sky-500/30"
                                             value={editExp.endDate || ''}
                                             onChange={e => setEditExp({ ...editExp, endDate: e.target.value })}
                                         />
                                     </div>
                                 </div>
-                                <div className="space-y-1">
-                                    <label className="text-xs font-bold text-slate-500 uppercase">Description</label>
+                                <div className="space-y-1.5">
+                                    <label className="text-[10px] font-bold text-slate-600 uppercase tracking-widest font-mono">Mission_Params</label>
                                     <textarea
-                                        className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none h-24"
+                                        className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded text-sky-400 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-sky-500/30 h-32 leading-relaxed"
                                         value={editExp.description || ''}
                                         onChange={e => setEditExp({ ...editExp, description: e.target.value })}
                                     />
                                 </div>
-                                <div className="space-y-1">
-                                    <label className="text-xs font-bold text-slate-500 uppercase">Technologies (comma separated)</label>
+                                <div className="space-y-1.5">
+                                    <label className="text-[10px] font-bold text-slate-600 uppercase tracking-widest font-mono">Dependencies</label>
                                     <input
-                                        className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                                        className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded text-sky-400 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-sky-500/30"
                                         value={Array.isArray(editExp.technologies) ? editExp.technologies.join(', ') : ''}
                                         onChange={e => setEditExp({ ...editExp, technologies: e.target.value.split(',').map(t => t.trim()).filter(t => t !== '') })}
                                     />
                                 </div>
-                                <div className="flex justify-end gap-3 pt-2">
+                                <div className="flex justify-end gap-3 pt-4">
                                     <button
                                         onClick={handleCancelEdit}
-                                        className="flex items-center gap-1.5 px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg font-medium"
+                                        className="px-6 py-2 text-slate-500 hover:text-slate-300 font-mono text-xs uppercase font-bold tracking-widest"
                                         disabled={isSaving}
                                     >
-                                        <X size={18} />
-                                        Cancel
+                                        ABORT
                                     </button>
                                     <button
                                         onClick={handleUpdate}
                                         disabled={isSaving}
-                                        className="flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 font-medium"
+                                        className="flex items-center gap-2 px-8 py-2.5 bg-sky-600 text-white rounded font-mono text-[11px] font-bold uppercase tracking-widest hover:bg-sky-500 transition-all shadow-lg shadow-sky-900/40"
                                     >
-                                        {isSaving ? <Loader2 size={18} className="animate-spin" /> : <Check size={18} />}
-                                        {isSaving ? 'Updating...' : 'Update Experience'}
+                                        {isSaving ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
+                                        {isSaving ? 'PATCHING...' : 'APPLY_PATCH'}
                                     </button>
                                 </div>
                             </div>
                         ) : (
                             <>
-                                <div className="absolute top-6 right-6 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                                <div className="absolute top-8 right-8 flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-all">
                                     <button
                                         onClick={() => handleEdit(exp)}
-                                        className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
-                                        title="Edit"
+                                        className="p-2.5 text-slate-600 hover:text-sky-400 hover:bg-slate-900 rounded border border-transparent hover:border-slate-800 transition-all"
+                                        title="EDIT_NODE"
                                     >
-                                        <Pencil size={18} />
+                                        <Pencil size={16} />
                                     </button>
                                     <button
                                         onClick={() => handleDelete(exp.id)}
-                                        className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
-                                        title="Delete"
+                                        className="p-2.5 text-slate-600 hover:text-red-400 hover:bg-slate-900 rounded border border-transparent hover:border-slate-800 transition-all"
+                                        title="PURGE_NODE"
                                     >
-                                        <Trash2 size={18} />
+                                        <Trash2 size={16} />
                                     </button>
                                 </div>
 
-                                <div className="flex flex-col md:flex-row gap-6">
-                                    <div className="flex-shrink-0">
-                                        <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600">
+                                <div className="flex flex-col md:flex-row gap-10">
+                                    <div className="flex-shrink-0 pt-1">
+                                        <div className="w-14 h-14 bg-slate-900 rounded flex items-center justify-center text-sky-500 border border-slate-800 shadow-inner">
                                             <Building size={24} />
                                         </div>
                                     </div>
 
                                     <div className="flex-1">
-                                        <div className="flex flex-col md:flex-row md:items-center justify-between mb-2">
-                                            <h3 className="text-xl font-bold text-slate-900">{exp.role}</h3>
-                                            <div className="flex items-center gap-2 text-sm text-slate-500 font-medium">
-                                                <Calendar size={14} />
-                                                <span>{exp.startDate} — {exp.endDate}</span>
+                                        <div className="flex flex-col md:flex-row md:items-center justify-between mb-3">
+                                            <h3 className="text-xl font-black text-white tracking-tighter uppercase font-mono">{exp.role}</h3>
+                                            <div className="flex items-center gap-2 text-[10px] text-slate-600 font-bold font-mono mt-1 md:mt-0 uppercase tracking-widest">
+                                                <Calendar size={12} className="text-slate-700" />
+                                                <span>{exp.startDate} :: {exp.endDate}</span>
                                             </div>
                                         </div>
 
-                                        <div className="flex items-center gap-2 text-indigo-600 font-medium mb-4">
-                                            <Briefcase size={16} />
+                                        <div className="flex items-center gap-2 text-sky-500/80 font-bold text-[11px] mb-6 uppercase tracking-[0.2em] font-mono">
+                                            <Briefcase size={14} className="text-sky-700" />
                                             {exp.company}
                                         </div>
 
-                                        <p className="text-slate-600 leading-relaxed mb-4 whitespace-pre-wrap">{exp.description}</p>
+                                        <p className="text-slate-400 leading-relaxed mb-8 whitespace-pre-wrap font-medium text-sm border-l border-slate-800 pl-6">{exp.description}</p>
 
                                         <div className="flex flex-wrap gap-2">
                                             {exp.technologies.map((tech, i) => (
-                                                <span key={i} className="px-2.5 py-1 bg-slate-100 text-slate-600 text-xs font-medium rounded-full">
+                                                <span key={i} className="px-3 py-1 bg-slate-900/50 text-slate-500 text-[10px] font-bold font-mono rounded border border-slate-800 uppercase tracking-widest">
                                                     {tech}
                                                 </span>
                                             ))}
@@ -334,8 +356,8 @@ export default function ExperiencePage() {
                 ))}
 
                 {!isLoading && experiences.length === 0 && (
-                    <div className="text-center py-12 bg-slate-50 rounded-2xl border border-dashed border-slate-300">
-                        <p className="text-slate-500">No experience added yet. Click "Add Experience" to get started.</p>
+                    <div className="text-center py-24 bg-slate-900/20 rounded-xl border border-dashed border-slate-800">
+                        <p className="text-slate-600 font-mono text-xs uppercase tracking-[0.3em] font-bold">HISTORICAL_BUFFER_EMPTY</p>
                     </div>
                 )}
             </div>
