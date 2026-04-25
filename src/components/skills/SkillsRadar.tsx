@@ -38,51 +38,57 @@ export default function SkillsRadar({ themes }: SkillsRadarProps) {
 
     return (
         <div className="space-y-6">
-            {/* Summary Card */}
-            <div className="bg-[#0f172a] border border-slate-800 p-8 rounded-xl shadow-2xl sticky top-6">
-                <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.3em] font-mono">Expertise Summary</h3>
-                <div className="flex items-end gap-2 mb-6 mt-6">
-                    <span className="text-6xl font-black text-sky-500 tracking-tighter font-mono">{percentage}%</span>
-                    <span className="text-slate-600 text-[10px] font-bold uppercase mb-2 font-mono tracking-widest">Proficiency</span>
+            <div className="bg-bg-card border border-divider p-8 rounded-lg shadow-xl relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 -mr-16 -mt-16 rounded-full blur-2xl"></div>
+                
+                <div className="flex items-end gap-3 mb-6 relative">
+                    <span className="text-6xl font-black text-white tracking-tighter leading-none">{percentage}%</span>
+                    <div className="flex flex-col mb-1">
+                        <span className="text-primary font-black text-[10px] uppercase tracking-widest">Global</span>
+                        <span className="text-text-secondary font-bold text-[10px] uppercase tracking-widest">Score</span>
+                    </div>
                 </div>
-                <div className="w-full bg-slate-900 border border-slate-800 h-3 mb-6 p-0.5">
+
+                <div className="w-full bg-slate-900 border border-divider h-1.5 mb-8 rounded-full overflow-hidden">
                     <div
-                        className="bg-sky-500 h-full transition-all duration-1000 ease-out shadow-[0_0_15px_rgba(14,165,233,0.3)]"
+                        className="bg-primary h-full transition-all duration-1000 ease-out"
                         style={{ width: `${percentage}%` }}
                     ></div>
                 </div>
-                <div className="mb-8">
-                    <p className="text-[11px] font-bold text-slate-400 font-mono tracking-widest border-l-2 border-sky-900/50 pl-4 uppercase">
-                        Level: {percentage < 30 ? "Junior Level" :
-                            percentage < 60 ? "Mid-Level" :
-                                percentage < 85 ? "Senior Level" :
-                                    "Principal Engineer"}
-                    </p>
-                </div>
 
                 {/* Radar Chart */}
-                <div className="bg-slate-900/40 p-4 rounded border border-slate-800/50 h-[300px] flex flex-col items-center justify-center">
+                <div className="h-[280px] w-full flex flex-col items-center justify-center">
                     <ResponsiveContainer width="100%" height="100%">
-                        <RadarChart cx="50%" cy="50%" outerRadius="70%" data={chartData}>
-                            <PolarGrid stroke="#1e293b" />
-                            <PolarAngleAxis dataKey="subject" tick={{ fill: '#475569', fontSize: 9, fontWeight: 700, fontFamily: 'monospace' }} />
+                        <RadarChart cx="50%" cy="50%" outerRadius="75%" data={chartData}>
+                            <PolarGrid stroke="#1a202c" />
+                            <PolarAngleAxis dataKey="subject" tick={{ fill: '#718096', fontSize: 9, fontWeight: 700, fontFamily: 'monospace' }} />
                             <PolarRadiusAxis angle={30} domain={[0, 5]} tick={false} axisLine={false} />
                             <Radar
-                                name="Core"
+                                name="Competency"
                                 dataKey="A"
-                                stroke="#0ea5e9"
+                                stroke="#5a67d8"
                                 strokeWidth={2}
-                                fill="#0ea5e9"
+                                fill="#5a67d8"
                                 fillOpacity={0.15}
                             />
                             <Tooltip
-                                contentStyle={{ backgroundColor: '#020617', border: '1px solid #1e293b', borderRadius: '4px' }}
-                                itemStyle={{ color: '#0ea5e9', fontSize: '10px', fontWeight: 'bold', fontFamily: 'monospace' }}
-                                labelStyle={{ color: '#94a3b8', fontSize: '10px', marginBottom: '4px', fontWeight: 'bold', fontFamily: 'monospace' }}
-                                formatter={(value: number) => [value, 'Score']}
+                                contentStyle={{ backgroundColor: '#0b0e14', border: '1px solid #1a202c', borderRadius: '4px', padding: '12px' }}
+                                itemStyle={{ color: '#ffffff', fontSize: '11px', fontWeight: 'bold' }}
+                                labelStyle={{ color: '#5a67d8', fontSize: '10px', marginBottom: '4px', fontWeight: 'black', textTransform: 'uppercase' }}
+                                formatter={(value: number) => [value, 'PROFICIENCY']}
                             />
                         </RadarChart>
                     </ResponsiveContainer>
+                </div>
+                
+                <div className="mt-6 pt-6 border-t border-divider flex justify-between items-center">
+                    <span className="text-[10px] font-bold text-text-secondary uppercase tracking-widest">Tier Rank</span>
+                    <span className="text-xs font-black text-white uppercase tracking-tighter">
+                        {percentage < 30 ? "Associate" :
+                            percentage < 60 ? "Professional" :
+                                percentage < 85 ? "Strategic" :
+                                    "Distinguished"}
+                    </span>
                 </div>
             </div>
         </div>

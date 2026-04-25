@@ -29,76 +29,73 @@ export default function LoginPage() {
     }
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-[#0b1120] p-4">
-            <div className="w-full max-w-[440px] p-12 bg-[#161e31] border border-slate-800 rounded-[32px] shadow-2xl relative overflow-hidden">
-                {/* Decorative background element */}
-                <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-600/10 rounded-full blur-3xl"></div>
-                
-                <div className="mb-12 text-center relative">
-                    <div className="inline-flex items-center justify-center w-20 h-20 bg-blue-600 rounded-3xl mb-8 shadow-xl shadow-blue-900/40 rotate-12 transition-transform hover:rotate-0 duration-500">
+        <div className="flex items-center justify-center min-h-screen bg-bg-deep p-4 font-main">
+            <div className="w-full max-w-[440px] animate-in fade-in zoom-in-95 duration-700">
+                <div className="mb-12 text-center">
+                    <div className="inline-flex items-center justify-center w-20 h-20 bg-primary rounded-3xl mb-8 shadow-2xl shadow-primary/30 rotate-12 transition-transform hover:rotate-0 duration-500 group">
                         <Layers className="text-white w-10 h-10 -rotate-12 group-hover:rotate-0 transition-transform" />
                     </div>
-                    <h1 className="text-4xl font-bold text-white tracking-tight leading-tight">
-                        SkillTrack Pro
+                    <h1 className="text-4xl font-black text-white tracking-tighter leading-tight uppercase">
+                        SkillTrack
                     </h1>
-                    <p className="text-slate-400 mt-3 font-medium text-lg">Sign in to your engineer dashboard</p>
                 </div>
 
-                {error && (
-                    <div className="p-4 text-sm font-semibold text-red-400 bg-red-900/20 border border-red-900/30 rounded-2xl mb-10 animate-in fade-in slide-in-from-top-2">
-                        {error}
-                    </div>
-                )}
-
-                <form onSubmit={handleSubmit} className="space-y-7 relative">
-                    <div className="space-y-2.5">
-                        <label className="text-[11px] font-bold text-slate-500 uppercase tracking-[0.15em] block ml-1">Work Email</label>
-                        <input
-                            type="email"
-                            required
-                            placeholder="john@company.com"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className="w-full px-6 py-4 bg-slate-900/50 border border-slate-800 rounded-2xl text-white text-base focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 transition-all placeholder:text-slate-600"
-                        />
-                    </div>
-                    <div className="space-y-2.5">
-                        <div className="flex justify-between items-center ml-1">
-                            <label className="text-[11px] font-bold text-slate-500 uppercase tracking-[0.15em] block">Secure Password</label>
-                        </div>
-                        <input
-                            type="password"
-                            required
-                            placeholder="••••••••"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className="w-full px-6 py-4 bg-slate-900/50 border border-slate-800 rounded-2xl text-white text-base focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 transition-all placeholder:text-slate-600"
-                        />
-                    </div>
-                    <button
-                        type="submit"
-                        disabled={isSubmitting}
-                        className="w-full bg-blue-600 text-white font-bold py-5 px-4 rounded-2xl text-base hover:bg-blue-500 transition-all shadow-xl shadow-blue-900/30 disabled:opacity-50 mt-4 active:scale-[0.98]"
-                    >
-                        {isSubmitting ? 'Authenticating...' : 'Enter Dashboard'}
-                    </button>
+                <div className="bg-bg-card border border-divider p-10 rounded-2xl shadow-2xl relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-primary/50 to-transparent"></div>
                     
-                    <div className="flex items-center justify-center gap-2 text-slate-500 py-2">
-                        <ShieldCheck size={16} />
-                        <span className="text-[10px] font-bold uppercase tracking-widest">Enterprise SSO Secure</span>
-                    </div>
+                    <h2 className="text-xl font-black text-white mb-8 uppercase tracking-[0.2em]">Sign In</h2>
 
-                    <div className="text-center text-sm font-medium mt-10 pt-4 border-t border-slate-800/50 text-slate-400">
+                    {error && (
+                        <div className="p-4 text-xs font-bold text-red-400 bg-red-900/20 border border-red-900/30 rounded mb-10 uppercase tracking-widest">
+                            {error}
+                        </div>
+                    )}
+
+                    <form onSubmit={handleSubmit} className="space-y-7">
+                        <div className="space-y-2.5">
+                            <label className="text-[10px] font-black text-text-secondary uppercase tracking-[0.2em] block ml-1">Work Email</label>
+                            <input
+                                type="email"
+                                required
+                                placeholder="name@company.com"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                className="w-full px-6 py-4 bg-bg-deep border border-divider rounded-md text-white text-base focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all placeholder:text-slate-700"
+                            />
+                        </div>
+                        <div className="space-y-2.5">
+                            <label className="text-[10px] font-black text-text-secondary uppercase tracking-[0.2em] block ml-1">Secure Password</label>
+                            <input
+                                type="password"
+                                required
+                                placeholder="••••••••"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                className="w-full px-6 py-4 bg-bg-deep border border-divider rounded-md text-white text-base focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all placeholder:text-slate-700"
+                            />
+                        </div>
+                        <button
+                            type="submit"
+                            disabled={isSubmitting}
+                            className="w-full bg-primary text-white font-black py-5 px-4 rounded text-xs uppercase tracking-[0.3em] hover:bg-primary-hover transition-all shadow-xl shadow-primary/30 disabled:opacity-50 mt-4 active:scale-[0.98]"
+                        >
+                            {isSubmitting ? 'Authenticating...' : 'Enter Dashboard'}
+                        </button>
+                    </form>
+                </div>
+                
+                <div className="text-center mt-12 pt-6 border-t border-divider/50">
+                    <p className="text-text-secondary font-bold text-xs uppercase tracking-widest">
                         New to the platform?{' '}
                         <button
                             type="button"
                             onClick={() => navigate('/register')}
-                            className="text-blue-400 hover:text-blue-300 font-bold underline underline-offset-4"
+                            className="text-primary hover:text-white transition-colors font-black"
                         >
-                            Create Professional ID
+                            Initialize Account
                         </button>
-                    </div>
-                </form>
+                    </p>
+                </div>
             </div>
         </div>
     );
