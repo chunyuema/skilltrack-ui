@@ -22,23 +22,23 @@ export default function Layout() {
             <div className="w-9 h-9 bg-sky-600 rounded flex items-center justify-center shadow-lg shadow-sky-900/40">
               <Layers className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-bold tracking-tighter font-mono">SKILL_TRACK</span>
+            <span className="text-xl font-bold tracking-tight">SkillTrack</span>
           </div>
         </div>
         
         <nav className="p-4 space-y-1.5 flex-1">
-          <NavItem to="/profile" icon={<User size={18} />} label="USR_PROFILE" />
-          <NavItem to="/experience" icon={<Briefcase size={18} />} label="EXP_TIMELINE" />
-          <NavItem to="/skills" icon={<BarChart2 size={18} />} label="SKILL_MATRIX" />
+          <NavItem to="/profile" icon={<User size={18} />} label="Profile" />
+          <NavItem to="/experience" icon={<Briefcase size={18} />} label="Experience" />
+          <NavItem to="/skills" icon={<BarChart2 size={18} />} label="Skills Matrix" />
           <div className="pt-6 mt-6 border-t border-slate-800/80">
-            <p className="px-4 text-[10px] font-bold text-slate-600 uppercase tracking-[0.2em] mb-4 font-mono">// COMMUNITY</p>
-            <NavItem to="/directory" icon={<Users size={18} />} label="NET_DIRECTORY" />
+            <p className="px-4 text-[10px] font-bold text-slate-600 uppercase tracking-[0.2em] mb-4 font-mono">Community</p>
+            <NavItem to="/directory" icon={<Users size={18} />} label="Member Directory" />
           </div>
         </nav>
 
         <div className="p-4 border-t border-slate-800/80 space-y-4">
           <div className="px-4 py-3 bg-slate-900/50 rounded border border-slate-800/50">
-            <p className="text-[9px] text-slate-600 font-bold uppercase tracking-widest font-mono mb-1">Session_Active</p>
+            <p className="text-[9px] text-slate-600 font-bold uppercase tracking-widest font-mono mb-1">Logged in as</p>
             <p className="text-sm text-sky-400 truncate font-bold font-mono" title={user || ''}>{user}</p>
           </div>
           <button
@@ -46,7 +46,7 @@ export default function Layout() {
             className="flex items-center gap-3 w-full px-4 py-2.5 rounded text-slate-500 hover:bg-slate-800 hover:text-white transition-all duration-200 font-mono text-xs uppercase font-bold tracking-wider"
           >
             <LogOut size={16} />
-            <span>Terminate</span>
+            <span>Sign out</span>
           </button>
         </div>
       </aside>

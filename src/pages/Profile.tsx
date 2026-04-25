@@ -72,7 +72,7 @@ export default function Profile() {
                 <div>
                     <div className="flex items-center gap-2 mb-2">
                         <Terminal size={14} className="text-sky-500" />
-                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.3em] font-mono">IDENTITY_PARAMETERS</span>
+                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.3em] font-mono">Profile Details</span>
                     </div>
                     <h1 className="text-4xl font-black text-white tracking-tighter uppercase font-mono">Profile</h1>
                 </div>
@@ -85,7 +85,7 @@ export default function Profile() {
                         } ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                     {isEditing ? <Save size={14} /> : <Edit3 size={14} />}
-                    {isEditing ? (isSaving ? 'EXECUTING...' : 'COMMIT_CHANGES') : 'EDIT_PARAMS'}
+                    {isEditing ? (isSaving ? 'Saving...' : 'Save Changes') : 'Edit Profile'}
                 </button>
             </div>
 
@@ -100,18 +100,18 @@ export default function Profile() {
                         </div>
                         <div className="flex-1 space-y-4">
                             <div className="space-y-1">
-                                <p className="text-[10px] font-bold text-sky-500 uppercase tracking-[0.2em] font-mono">// ENGINEER_UID: {profile.email.split('@')[0].toUpperCase()}</p>
+                                <p className="text-[10px] font-bold text-sky-500 uppercase tracking-[0.2em] font-mono">User ID: {profile.email.split('@')[0].toUpperCase()}</p>
                                 <h2 className="text-3xl font-black text-white uppercase tracking-tighter font-mono">{profile.firstName} {profile.lastName}</h2>
                             </div>
                             <p className="text-slate-400 font-medium text-lg border-l-2 border-slate-800 pl-4">{profile.title}</p>
                             <div className="flex flex-wrap gap-3">
                                 <div className="flex items-center gap-2 px-3 py-1 bg-slate-900/50 rounded border border-slate-800 text-[11px] font-bold text-slate-500 font-mono">
                                     <MapPin size={12} className="text-sky-600" />
-                                    {profile.location.toUpperCase()}
+                                    {profile.location}
                                 </div>
                                 <div className="flex items-center gap-2 px-3 py-1 bg-slate-900/50 rounded border border-slate-800 text-[11px] font-bold text-slate-500 font-mono">
                                     <Terminal size={12} className="text-sky-600" />
-                                    EXP: {profile.yearsOfExperience}Y
+                                    Experience: {profile.yearsOfExperience}Y
                                 </div>
                             </div>
                         </div>
@@ -120,32 +120,32 @@ export default function Profile() {
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-20 gap-y-12">
                         {/* Basic Info */}
                         <div className="space-y-8">
-                            <h3 className="text-xs font-black text-slate-600 uppercase tracking-[0.3em] font-mono border-b border-slate-800/50 pb-3">[ CORE_ATTRIBUTES ]</h3>
+                            <h3 className="text-xs font-black text-slate-600 uppercase tracking-[0.3em] font-mono border-b border-slate-800/50 pb-3">Personal Information</h3>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {isEditing ? (
                                     <>
-                                        <Field label="First_Name" name="firstName" value={profile.firstName} isEditing={true} onChange={handleChange} />
-                                        <Field label="Last_Name" name="lastName" value={profile.lastName} isEditing={true} onChange={handleChange} />
+                                        <Field label="First Name" name="firstName" value={profile.firstName} isEditing={true} onChange={handleChange} />
+                                        <Field label="Last Name" name="lastName" value={profile.lastName} isEditing={true} onChange={handleChange} />
                                     </>
                                 ) : null}
                             </div>
-                            <Field label="Professional_Role" name="title" value={profile.title} isEditing={isEditing} onChange={handleChange} />
-                            <Field label="System_Description" name="bio" value={profile.bio} isEditing={isEditing} onChange={handleChange} type="textarea" />
+                            <Field label="Professional Title" name="title" value={profile.title} isEditing={isEditing} onChange={handleChange} />
+                            <Field label="About Me" name="bio" value={profile.bio} isEditing={isEditing} onChange={handleChange} type="textarea" />
 
                             <div className="grid grid-cols-2 gap-6">
-                                <Field label="Experience_Cycle" name="yearsOfExperience" value={profile.yearsOfExperience} isEditing={isEditing} onChange={handleChange} type="number" />
-                                <Field label="Authentication_Status" name="visaStatus" value={profile.visaStatus} isEditing={isEditing} onChange={handleChange} />
+                                <Field label="Years of Experience" name="yearsOfExperience" value={profile.yearsOfExperience} isEditing={isEditing} onChange={handleChange} type="number" />
+                                <Field label="Visa Status" name="visaStatus" value={profile.visaStatus} isEditing={isEditing} onChange={handleChange} />
                             </div>
                         </div>
 
                         {/* Contact & Social */}
                         <div className="space-y-8">
-                            <h3 className="text-xs font-black text-slate-600 uppercase tracking-[0.3em] font-mono border-b border-slate-800/50 pb-3">[ DATA_NODES ]</h3>
+                            <h3 className="text-xs font-black text-slate-600 uppercase tracking-[0.3em] font-mono border-b border-slate-800/50 pb-3">Contact Details</h3>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                                 <Field
-                                    label="Network_Address"
+                                    label="Email"
                                     name="email"
                                     value={profile.email}
                                     isEditing={isEditing}
@@ -153,7 +153,7 @@ export default function Profile() {
                                     icon={<Mail size={14} />}
                                 />
                                 <Field
-                                    label="Comms_Channel"
+                                    label="Phone"
                                     name="phone"
                                     value={profile.phone}
                                     isEditing={isEditing}
@@ -161,7 +161,7 @@ export default function Profile() {
                                     icon={<Phone size={14} />}
                                 />
                                 <Field
-                                    label="Geo_Reference"
+                                    label="Location"
                                     name="location"
                                     value={profile.location}
                                     isEditing={isEditing}
@@ -169,7 +169,7 @@ export default function Profile() {
                                     icon={<MapPin size={14} />}
                                 />
                                 <Field
-                                    label="Academic_Log"
+                                    label="Education"
                                     name="education"
                                     value={profile.education}
                                     isEditing={isEditing}
@@ -177,7 +177,7 @@ export default function Profile() {
                                     icon={<GraduationCap size={14} />}
                                 />
                                 <Field
-                                    label="Source_Repo"
+                                    label="GitHub Profile"
                                     name="githubUrl"
                                     value={profile.githubUrl}
                                     isEditing={isEditing}
@@ -185,7 +185,7 @@ export default function Profile() {
                                     icon={<Github size={14} />}
                                 />
                                 <Field
-                                    label="Professional_Net"
+                                    label="LinkedIn Profile"
                                     name="linkedinUrl"
                                     value={profile.linkedinUrl}
                                     isEditing={isEditing}

@@ -116,7 +116,7 @@ export default function ExperiencePage() {
                 <div>
                     <div className="flex items-center gap-2 mb-2">
                         <Terminal size={14} className="text-sky-500" />
-                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.3em] font-mono">CHRONOLOGICAL_HISTORY</span>
+                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.3em] font-mono">Professional History</span>
                     </div>
                     <h1 className="text-4xl font-black text-white tracking-tighter uppercase font-mono">Experience</h1>
                 </div>
@@ -128,13 +128,13 @@ export default function ExperiencePage() {
                     className="flex items-center gap-2 px-6 py-2 bg-sky-600 text-white rounded font-mono text-[11px] font-bold uppercase tracking-widest hover:bg-sky-500 transition-all shadow-lg shadow-sky-900/40"
                 >
                     <Plus size={14} />
-                    PUSH_RECORD
+                    Add Experience
                 </button>
             </div>
 
             {error && (
                 <div className="bg-red-900/10 text-red-400 p-4 rounded border border-red-900/20 font-mono text-xs uppercase tracking-widest">
-                    [ ERROR ] {error}
+                    {error}
                 </div>
             )}
 
@@ -142,11 +142,11 @@ export default function ExperiencePage() {
                 <div className="bg-bg-card p-8 rounded-xl border border-slate-800 shadow-2xl animate-in fade-in slide-in-from-top-4 relative">
                     <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-sky-500/50 to-transparent"></div>
                     <div className="flex items-center gap-3 mb-8 border-b border-slate-800 pb-4">
-                        <h3 className="text-[11px] font-bold text-sky-500 uppercase tracking-[0.2em] font-mono">// INITIALIZE_NEW_BLOCK</h3>
+                        <h3 className="text-[11px] font-bold text-sky-500 uppercase tracking-[0.2em] font-mono">Add New Position</h3>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold text-slate-600 uppercase tracking-widest font-mono ml-1">Org_Name</label>
+                            <label className="text-[10px] font-bold text-slate-600 uppercase tracking-widest font-mono ml-1">Company Name</label>
                             <input
                                 placeholder="Organization"
                                 className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded text-sky-400 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-sky-500/30"
@@ -155,7 +155,7 @@ export default function ExperiencePage() {
                             />
                         </div>
                         <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold text-slate-600 uppercase tracking-widest font-mono ml-1">Role_ID</label>
+                            <label className="text-[10px] font-bold text-slate-600 uppercase tracking-widest font-mono ml-1">Job Title</label>
                             <input
                                 placeholder="Position"
                                 className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded text-sky-400 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-sky-500/30"
@@ -164,7 +164,7 @@ export default function ExperiencePage() {
                             />
                         </div>
                         <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold text-slate-600 uppercase tracking-widest font-mono ml-1">T_Start</label>
+                            <label className="text-[10px] font-bold text-slate-600 uppercase tracking-widest font-mono ml-1">Start Date</label>
                             <input
                                 type="month"
                                 className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded text-sky-400 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-sky-500/30"
@@ -173,7 +173,7 @@ export default function ExperiencePage() {
                             />
                         </div>
                         <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold text-slate-600 uppercase tracking-widest font-mono ml-1">T_End</label>
+                            <label className="text-[10px] font-bold text-slate-600 uppercase tracking-widest font-mono ml-1">End Date</label>
                             <input
                                 type="text"
                                 placeholder="YYYY-MM or 'Present'"
@@ -184,7 +184,7 @@ export default function ExperiencePage() {
                         </div>
                     </div>
                     <div className="space-y-1.5 mb-6">
-                        <label className="text-[10px] font-bold text-slate-600 uppercase tracking-widest font-mono ml-1">Mission_Parameters</label>
+                        <label className="text-[10px] font-bold text-slate-600 uppercase tracking-widest font-mono ml-1">Description</label>
                         <textarea
                             placeholder="Responsibilities and impact..."
                             className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded text-sky-400 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-sky-500/30 h-32 leading-relaxed"
@@ -193,7 +193,7 @@ export default function ExperiencePage() {
                         />
                     </div>
                     <div className="space-y-1.5 mb-8">
-                        <label className="text-[10px] font-bold text-slate-600 uppercase tracking-widest font-mono ml-1">Tech_Dependencies (comma separated)</label>
+                        <label className="text-[10px] font-bold text-slate-600 uppercase tracking-widest font-mono ml-1">Technologies Used (comma separated)</label>
                         <input
                             placeholder="React, AWS, Node, etc."
                             className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded text-sky-400 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-sky-500/30"
@@ -207,7 +207,7 @@ export default function ExperiencePage() {
                             className="px-6 py-2 text-slate-500 hover:text-slate-300 font-mono text-xs uppercase font-bold tracking-widest"
                             disabled={isSaving}
                         >
-                            ABORT
+                            Cancel
                         </button>
                         <button
                             onClick={handleAdd}
@@ -215,7 +215,7 @@ export default function ExperiencePage() {
                             className="flex items-center gap-2 px-8 py-2.5 bg-sky-600 text-white rounded font-mono text-[11px] font-bold uppercase tracking-widest hover:bg-sky-500 transition-all shadow-lg shadow-sky-900/40"
                         >
                             {isSaving ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
-                            {isSaving ? 'PROCESS...' : 'COMMIT_BLOCK'}
+                            {isSaving ? 'Saving...' : 'Save Position'}
                         </button>
                     </div>
                 </div>

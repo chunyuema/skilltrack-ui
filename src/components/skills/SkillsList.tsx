@@ -24,7 +24,7 @@ export default function SkillsList({ themes, onUpdateSkill, readOnly = false }: 
           >
             <div className="flex flex-col items-start">
               <h3 className="text-xl font-black text-white tracking-tighter uppercase font-mono">
-                {expandedTheme === theme.id ? '[ - ]' : '[ + ]'} {theme.name}
+                {theme.name}
               </h3>
               <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1 font-mono">{theme.description}</p>
             </div>
@@ -46,7 +46,7 @@ export default function SkillsList({ themes, onUpdateSkill, readOnly = false }: 
                         onClick={() => setExpandedSubCategory(expandedSubCategory === subCat.id ? null : subCat.id)}
                         className="w-full flex items-center justify-between p-4 bg-slate-900/50 hover:bg-slate-800/50 transition-colors"
                       >
-                        <span className="font-bold text-slate-400 text-xs uppercase tracking-widest font-mono">{`> `}{subCat.name}</span>
+                        <span className="font-bold text-slate-400 text-xs uppercase tracking-widest font-mono">{subCat.name}</span>
                         {expandedSubCategory === subCat.id ? <ChevronDown size={18} className="text-sky-500" /> : <ChevronRight size={18} className="text-sky-500" />}
                       </button>
                       
@@ -80,7 +80,7 @@ const SkillRow: React.FC<{ skill: Skill; onChange: (val: number) => void; readOn
       <div className="flex-1">
         <div className="font-bold text-slate-300 text-[11px] flex items-center gap-3 uppercase tracking-wider font-mono">
           <div className="w-1.5 h-1.5 bg-slate-800 group-hover:bg-sky-500 transition-colors"></div>
-          {skill.name.replace(/ /g, '_')}
+          {skill.name}
         </div>
       </div>
       <div className="flex items-center gap-1.5 self-end sm:self-auto">
@@ -99,9 +99,9 @@ const SkillRow: React.FC<{ skill: Skill; onChange: (val: number) => void; readOn
               !readOnly && "hover:border-sky-500/40 cursor-pointer",
               readOnly && "cursor-default"
             )}
-            title={`VAL_${level}`}
+            title={`Level ${level}`}
           >
-            {level === 0 ? 'X' : level}
+            {level === 0 ? 'Reset' : level}
           </button>
         ))}
       </div>

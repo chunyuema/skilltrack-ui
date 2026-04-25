@@ -3,6 +3,7 @@ import { SkillTheme } from '../types';
 import { INITIAL_THEMES } from '../data/initialData';
 import SkillsRadar from '../components/skills/SkillsRadar';
 import SkillsList from '../components/skills/SkillsList';
+import { Terminal } from 'lucide-react';
 
 export default function SkillsPage() {
     const [themes, setThemes] = useState<SkillTheme[]>(() => {
@@ -15,13 +16,14 @@ export default function SkillsPage() {
             if (theme.id !== themeId) return theme;
             return {
                 ...theme,
-                subCategories: theme.subCategories.map(subCat => {
-                    if (subCat.id !== subCatId) return subCat;
+                subCategories: theme.subCategories.map(sub => {
+                    if (sub.id !== subCatId) return sub;
                     return {
-                        ...subCat,
-                        skills: subCat.skills.map(skill =>
-                            skill.id === skillId ? { ...skill, level: level as any } : skill
-                        )
+                        ...sub,
+                        skills: sub.skills.map(skill => {
+                            if (skill.id !== skillId) return skill;
+                            return { ...skill, level };
+                        })
                     };
                 })
             };
@@ -31,13 +33,16 @@ export default function SkillsPage() {
     };
 
     return (
-        <div className="space-y-8">
-            <div className="border-b border-slate-800 pb-6">
-                <h1 className="text-3xl font-bold text-white">Skills Matrix</h1>
-                <p className="text-slate-500 mt-1">Assess your technical proficiency and identify growth areas</p>
+        <div className="space-y-10">
+            <div className="border-b border-slate-800 pb-8">
+                <div className="flex items-center gap-2 mb-2">
+                    <Terminal size={14} className="text-sky-500" />
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.3em] font-mono">Proficiency Assessment</span>
+                </div>
+                <h1 className="text-4xl font-black text-white tracking-tighter uppercase font-mono">Skills Matrix</h1>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
                 {/* Left Column: Visualization */}
                 <div className="lg:col-span-1">
                     <SkillsRadar themes={themes} />

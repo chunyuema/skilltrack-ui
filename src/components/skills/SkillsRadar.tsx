@@ -40,10 +40,10 @@ export default function SkillsRadar({ themes }: SkillsRadarProps) {
         <div className="space-y-6">
             {/* Summary Card */}
             <div className="bg-[#0f172a] border border-slate-800 p-8 rounded-xl shadow-2xl sticky top-6">
-                <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.3em] mb-6 font-mono">// ANALYSIS_SUMMARY</h3>
-                <div className="flex items-end gap-2 mb-6">
+                <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.3em] font-mono">Expertise Summary</h3>
+                <div className="flex items-end gap-2 mb-6 mt-6">
                     <span className="text-6xl font-black text-sky-500 tracking-tighter font-mono">{percentage}%</span>
-                    <span className="text-slate-600 text-[10px] font-bold uppercase mb-2 font-mono tracking-widest">Efficiency</span>
+                    <span className="text-slate-600 text-[10px] font-bold uppercase mb-2 font-mono tracking-widest">Proficiency</span>
                 </div>
                 <div className="w-full bg-slate-900 border border-slate-800 h-3 mb-6 p-0.5">
                     <div
@@ -53,10 +53,10 @@ export default function SkillsRadar({ themes }: SkillsRadarProps) {
                 </div>
                 <div className="mb-8">
                     <p className="text-[11px] font-bold text-slate-400 font-mono tracking-widest border-l-2 border-sky-900/50 pl-4 uppercase">
-                        CLASS: {percentage < 30 ? "JUNIOR_INIT" :
-                            percentage < 60 ? "MID_SYSTEMS" :
-                                percentage < 85 ? "SR_ARCHITECT" :
-                                    "MASTER_ENG"}
+                        Level: {percentage < 30 ? "Junior Level" :
+                            percentage < 60 ? "Mid-Level" :
+                                percentage < 85 ? "Senior Level" :
+                                    "Principal Engineer"}
                     </p>
                 </div>
 
@@ -79,7 +79,7 @@ export default function SkillsRadar({ themes }: SkillsRadarProps) {
                                 contentStyle={{ backgroundColor: '#020617', border: '1px solid #1e293b', borderRadius: '4px' }}
                                 itemStyle={{ color: '#0ea5e9', fontSize: '10px', fontWeight: 'bold', fontFamily: 'monospace' }}
                                 labelStyle={{ color: '#94a3b8', fontSize: '10px', marginBottom: '4px', fontWeight: 'bold', fontFamily: 'monospace' }}
-                                formatter={(value: number) => [value, 'VAL']}
+                                formatter={(value: number) => [value, 'Score']}
                             />
                         </RadarChart>
                     </ResponsiveContainer>

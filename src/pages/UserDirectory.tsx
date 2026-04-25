@@ -9,7 +9,7 @@ export default function UserDirectory() {
                 <div>
                     <div className="flex items-center gap-2 mb-2">
                         <Terminal size={14} className="text-sky-500" />
-                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.3em] font-mono">GLOBAL_NETWORK_NODES</span>
+                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.3em] font-mono">Community Network</span>
                     </div>
                     <h1 className="text-4xl font-black text-white tracking-tighter uppercase font-mono">Directory</h1>
                 </div>
@@ -17,7 +17,7 @@ export default function UserDirectory() {
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600 group-focus-within:text-sky-400 transition-colors" />
                     <input 
                         type="text" 
-                        placeholder="SEARCH_BY_ID_OR_ROLE..." 
+                        placeholder="Search by name or role..." 
                         className="bg-slate-900 border border-slate-800 rounded py-2.5 pl-11 pr-4 text-xs text-sky-500 font-mono focus:outline-none focus:ring-1 focus:ring-sky-500/30 w-full md:w-80 transition-all placeholder:text-slate-700"
                     />
                 </div>
@@ -36,7 +36,7 @@ export default function UserDirectory() {
                             </div>
                             <div>
                                 <h3 className="font-black text-white group-hover:text-sky-400 transition-colors text-lg tracking-tight leading-tight uppercase font-mono">{user.profile.firstName} {user.profile.lastName}</h3>
-                                <p className="text-[9px] text-slate-500 font-bold mt-1 uppercase tracking-widest font-mono">// {user.profile.title.replace(/ /g, '_')}</p>
+                                <p className="text-[9px] text-slate-500 font-bold mt-1 uppercase tracking-widest font-mono">// {user.profile.title}</p>
                             </div>
                         </div>
 
@@ -47,10 +47,10 @@ export default function UserDirectory() {
                         <div className="flex items-center justify-between text-[10px] text-slate-500 font-bold border-t border-slate-800 pt-6 font-mono tracking-widest">
                             <div className="flex items-center gap-2.5">
                                 <Briefcase size={14} className="text-sky-700" />
-                                <span>EXP: {user.profile.yearsOfExperience}Y</span>
+                                <span>Experience: {user.profile.yearsOfExperience}Y</span>
                             </div>
                             <div className="flex items-center gap-1.5 text-sky-500 font-black uppercase transition-all group-hover:gap-3">
-                                PULL_DATA
+                                View Profile
                                 <ChevronRight size={14} />
                             </div>
                         </div>
