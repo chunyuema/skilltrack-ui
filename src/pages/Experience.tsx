@@ -1,11 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Experience, UserProfile } from '../types';
 import { Plus, Trash2, Calendar, Building, Briefcase, Loader2, Pencil, X, Check, Globe, User, Edit3, Save } from 'lucide-react';
 import { profileService } from '../services/profileService';
 import { useAuth } from '../hooks/useAuth';
 
 export default function ExperiencePage() {
-    const { token } = useAuth();
+    const navigate = useNavigate();
+    const { token, logout } = useAuth();
     const [experiences, setExperiences] = useState<Experience[]>([]);
     const [profile, setProfile] = useState<UserProfile | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -19,6 +21,18 @@ export default function ExperiencePage() {
     
     const [isEditingBio, setIsEditingBio] = useState(false);
     const [bioText, setBioText] = useState('');
+
+    const handleApiError = useCallback((err: unknown) => {
+        // Intercept 401 Unauthorized errors to handle session expiry.
+        // Instead of showing a raw error, we clear the expired token and 
+        // redirect the user back to the login screen for a better UX.
+        if (err instanceof Error && err.message === 'Unauthorized') {
+            logout();
+            navigate('/login');
+            return true;
+        }
+        return false;
+    }, [logout, navigate]);
 
     useEffect(() => {
         const loadData = async () => {
@@ -34,15 +48,17 @@ export default function ExperiencePage() {
                 setBioText(profileData.bio);
                 setError(null);
             } catch (err) {
-                console.error('Error loading data:', err);
-                setError('Failed to load professional data.');
+                if (!handleApiError(err)) {
+                    console.error('Error loading data:', err);
+                    setError('Failed to load professional data.');
+                }
             } finally {
                 setIsLoading(false);
             }
         };
 
         loadData();
-    }, [token]);
+    }, [token, handleApiError]);
 
     const handleSaveBio = async () => {
         if (!profile || !token) return;
@@ -53,8 +69,10 @@ export default function ExperiencePage() {
             setProfile(updatedProfile);
             setIsEditingBio(false);
         } catch (err) {
-            console.error('Failed to update bio:', err);
-            alert('Failed to save bio.');
+            if (!handleApiError(err)) {
+                console.error('Failed to update bio:', err);
+                alert('Failed to save bio.');
+            }
         } finally {
             setIsSaving(false);
         }
@@ -67,8 +85,10 @@ export default function ExperiencePage() {
                 await profileService.deleteExperience(id, token);
                 setExperiences(experiences.filter(exp => exp.id !== id));
             } catch (err) {
-                console.error('Error deleting experience:', err);
-                alert('Failed to delete experience.');
+                if (!handleApiError(err)) {
+                    console.error('Error deleting experience:', err);
+                    alert('Failed to delete experience.');
+                }
             }
         }
     };
@@ -92,21 +112,13 @@ export default function ExperiencePage() {
             setIsAdding(false);
             setNewExp({});
         } catch (err) {
-            console.error('Error adding experience:', err);
-            alert('Failed to save experience.');
+            if (!handleApiError(err)) {
+                console.error('Error adding experience:', err);
+                alert('Failed to save experience.');
+            }
         } finally {
             setIsSaving(false);
         }
-    };
-
-    const handleEdit = (exp: Experience) => {
-        setEditingId(exp.id);
-        setEditExp({ ...exp });
-    };
-
-    const handleCancelEdit = () => {
-        setEditingId(null);
-        setEditExp({});
     };
 
     const handleUpdate = async () => {
@@ -119,8 +131,10 @@ export default function ExperiencePage() {
             setEditingId(null);
             setEditExp({});
         } catch (err) {
-            console.error('Error updating experience:', err);
-            alert('Failed to update experience.');
+            if (!handleApiError(err)) {
+                console.error('Error updating experience:', err);
+                alert('Failed to update experience.');
+            }
         } finally {
             setIsSaving(false);
         }

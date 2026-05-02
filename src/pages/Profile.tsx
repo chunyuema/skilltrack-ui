@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { UserProfile } from '../types';
 import { useAuth } from '../hooks/useAuth';
 import { profileService } from '../services/profileService';
 import { Save, MapPin, Mail, Phone, Github, Linkedin, GraduationCap, Edit3, Shield } from 'lucide-react';
 
 export default function Profile() {
+    const navigate = useNavigate();
     const [profile, setProfile] = useState<UserProfile | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [isEditing, setIsEditing] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
-    const { token } = useAuth();
+    const { token, logout } = useAuth();
 
     useEffect(() => {
         const fetchProfileData = async () => {
@@ -24,14 +26,22 @@ export default function Profile() {
                 const userProfile = await profileService.fetchProfile(token);
                 setProfile(userProfile);
             } catch (err) {
-                setError(err instanceof Error ? err.message : 'An unknown error occurred');
+                // Graceful session expiry handling:
+                // If the service identifies an 'Unauthorized' error, we clear the local 
+                // auth state and send the user back to Login to re-authenticate.
+                if (err instanceof Error && err.message === 'Unauthorized') {
+                    logout();
+                    navigate('/login');
+                } else {
+                    setError(err instanceof Error ? err.message : 'An unknown error occurred');
+                }
             } finally {
                 setIsLoading(false);
             }
         };
 
         fetchProfileData();
-    }, [token]);
+    }, [token, logout, navigate]);
 
     const handleSave = async () => {
         if (profile && token) {
@@ -39,8 +49,13 @@ export default function Profile() {
             try {
                 await profileService.updateProfile(profile, token);
                 setIsEditing(false);
-            } catch (error) {
-                console.error("Failed to save profile:", error);
+            } catch (err) {
+                if (err instanceof Error && err.message === 'Unauthorized') {
+                    logout();
+                    navigate('/login');
+                } else {
+                    console.error("Failed to save profile:", err);
+                }
             } finally {
                 setIsSaving(false);
             }
