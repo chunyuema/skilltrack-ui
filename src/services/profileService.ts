@@ -28,6 +28,20 @@ interface ApiExperience {
 
 const API_URL = import.meta.env.VITE_API_URL;
 
+const handleResponse = async (response: Response) => {
+  // If the server returns 401 Unauthorized, it means the JWT access token is expired or invalid.
+  // We throw a specific "Unauthorized" error message that the UI components look for 
+  // to trigger a graceful logout and redirect to the login page.
+  if (response.status === 401) {
+    throw new Error("Unauthorized");
+  }
+  if (!response.ok) {
+    const errorBody = await response.json().catch(() => ({}));
+    throw new Error(errorBody.detail || "API request failed");
+  }
+  return response.json();
+};
+
 export const profileService = {
   fetchProfile: async (token: string): Promise<UserProfile> => {
     const response = await fetch(`${API_URL}/profiles/me/`, {
@@ -36,11 +50,7 @@ export const profileService = {
       },
     });
 
-    if (!response.ok) {
-      throw new Error("Failed to fetch profile");
-    }
-
-    const data: ApiUserProfile = await response.json();
+    const data: ApiUserProfile = await handleResponse(response);
 
     // Map API response to the frontend UserProfile type
     return {
@@ -82,9 +92,7 @@ export const profileService = {
       }),
     });
 
-    if (!response.ok) {
-      throw new Error("Failed to update profile");
-    }
+    await handleResponse(response);
   },
 
   fetchExperiences: async (token: string): Promise<Experience[]> => {
@@ -94,11 +102,7 @@ export const profileService = {
       },
     });
 
-    if (!response.ok) {
-      throw new Error("Failed to fetch experiences");
-    }
-
-    const data: ApiExperience[] = await response.json();
+    const data: ApiExperience[] = await handleResponse(response);
 
     return data.map((exp) => ({
       id: exp.id,
@@ -132,11 +136,7 @@ export const profileService = {
       }),
     });
 
-    if (!response.ok) {
-      throw new Error("Failed to add experience");
-    }
-
-    const data: ApiExperience = await response.json();
+    const data: ApiExperience = await handleResponse(response);
 
     return {
       id: data.id,
@@ -171,11 +171,7 @@ export const profileService = {
       }),
     });
 
-    if (!response.ok) {
-      throw new Error("Failed to update experience");
-    }
-
-    const data: ApiExperience = await response.json();
+    const data: ApiExperience = await handleResponse(response);
 
     return {
       id: data.id,
@@ -196,6 +192,9 @@ export const profileService = {
       },
     });
 
+    if (response.status === 401) {
+      throw new Error("Unauthorized");
+    }
     if (!response.ok) {
       throw new Error("Failed to delete experience");
     }
