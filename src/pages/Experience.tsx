@@ -4,6 +4,8 @@ import { Experience, UserProfile } from '../types';
 import { Plus, Trash2, Calendar, Building, Briefcase, Loader2, Pencil, X, Check, Globe, User, Edit3, Save } from 'lucide-react';
 import { profileService } from '../services/profileService';
 import { useAuth } from '../hooks/useAuth';
+import { FormInput } from '../components/ui/FormInput';
+import { MonthYearPicker } from '../components/ui/MonthYearPicker';
 
 export default function ExperiencePage() {
     const navigate = useNavigate();
@@ -140,6 +142,16 @@ export default function ExperiencePage() {
         }
     };
 
+    const handleEdit = (exp: Experience) => {
+        setEditingId(exp.id);
+        setEditExp({ ...exp });
+    };
+
+    const handleCancelEdit = () => {
+        setEditingId(null);
+        setEditExp({});
+    };
+
     if (isLoading) {
         return (
             <div className="flex flex-col items-center justify-center py-24 gap-4">
@@ -184,62 +196,45 @@ export default function ExperiencePage() {
                         <div className="bg-bg-card p-10 rounded-lg border border-primary/30 shadow-2xl animate-in slide-in-from-top-4 duration-500 mb-12">
                             <h3 className="text-xs font-black text-white uppercase tracking-[0.3em] mb-10 border-b border-divider pb-4">Initialize New Record</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-text-secondary uppercase tracking-widest ml-1">Organization</label>
-                                    <input
-                                        placeholder="Company Name"
-                                        className="w-full px-5 py-4 bg-bg-deep border border-divider rounded-md text-white focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all text-base"
-                                        value={newExp.company || ''}
-                                        onChange={e => setNewExp({ ...newExp, company: e.target.value })}
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-text-secondary uppercase tracking-widest ml-1">Role ID</label>
-                                    <input
-                                        placeholder="Role Title"
-                                        className="w-full px-5 py-4 bg-bg-deep border border-divider rounded-md text-white focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all text-base"
-                                        value={newExp.role || ''}
-                                        onChange={e => setNewExp({ ...newExp, role: e.target.value })}
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-text-secondary uppercase tracking-widest ml-1">Start Date</label>
-                                    <input
-                                        type="month"
-                                        className="w-full px-5 py-4 bg-bg-deep border border-divider rounded-md text-white focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all text-base"
-                                        value={newExp.startDate || ''}
-                                        onChange={e => setNewExp({ ...newExp, startDate: e.target.value })}
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-text-secondary uppercase tracking-widest ml-1">End Date</label>
-                                    <input
-                                        type="text"
-                                        placeholder="YYYY-MM or 'Present'"
-                                        className="w-full px-5 py-4 bg-bg-deep border border-divider rounded-md text-white focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all text-base"
-                                        value={newExp.endDate || ''}
-                                        onChange={e => setNewExp({ ...newExp, endDate: e.target.value })}
-                                    />
-                                </div>
-                            </div>
-                            <div className="space-y-2 mb-8">
-                                <label className="text-[10px] font-black text-text-secondary uppercase tracking-widest ml-1">Job Description</label>
-                                <textarea
-                                    placeholder="Impact summary..."
-                                    className="w-full px-5 py-4 bg-bg-deep border border-divider rounded-md text-white focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all text-base h-32 leading-relaxed"
-                                    value={newExp.description || ''}
-                                    onChange={e => setNewExp({ ...newExp, description: e.target.value })}
+                                <FormInput
+                                    label="Organization"
+                                    placeholder="Company Name"
+                                    value={newExp.company || ''}
+                                    onChange={val => setNewExp({ ...newExp, company: val })}
+                                />
+                                <FormInput
+                                    label="Role ID"
+                                    placeholder="Role Title"
+                                    value={newExp.role || ''}
+                                    onChange={val => setNewExp({ ...newExp, role: val })}
+                                />
+                                <MonthYearPicker 
+                                    label="Start Date" 
+                                    value={newExp.startDate || ''} 
+                                    onChange={val => setNewExp({ ...newExp, startDate: val })} 
+                                />
+                                <MonthYearPicker 
+                                    label="End Date" 
+                                    value={newExp.endDate || ''} 
+                                    onChange={val => setNewExp({ ...newExp, endDate: val })} 
+                                    allowPresent={true}
                                 />
                             </div>
-                            <div className="space-y-2 mb-10">
-                                <label className="text-[10px] font-black text-text-secondary uppercase tracking-widest ml-1">Tech Stack (comma separated)</label>
-                                <input
-                                    placeholder="React, AWS, Node, etc."
-                                    className="w-full px-5 py-4 bg-bg-deep border border-divider rounded-md text-white focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all text-base"
-                                    value={Array.isArray(newExp.technologies) ? newExp.technologies.join(', ') : ''}
-                                    onChange={e => setNewExp({ ...newExp, technologies: e.target.value.split(',').map(t => t.trim()).filter(t => t !== '') })}
-                                />
-                            </div>
+                            <FormInput
+                                label="Job Description"
+                                type="textarea"
+                                placeholder="Impact summary..."
+                                value={newExp.description || ''}
+                                onChange={val => setNewExp({ ...newExp, description: val })}
+                                className="mb-8"
+                            />
+                            <FormInput
+                                label="Tech Stack (comma separated)"
+                                placeholder="React, AWS, Node, etc."
+                                value={Array.isArray(newExp.technologies) ? newExp.technologies.join(', ') : ''}
+                                onChange={val => setNewExp({ ...newExp, technologies: val.split(',').map(t => t.trim()).filter(t => t !== '') })}
+                                className="mb-10"
+                            />
                             <div className="flex justify-end gap-4">
                                 <button
                                     onClick={() => setIsAdding(false)}
@@ -266,19 +261,27 @@ export default function ExperiencePage() {
                                 {editingId === exp.id ? (
                                      <div className="bg-bg-card p-10 rounded-lg border border-primary/30 shadow-2xl animate-in slide-in-from-top-4 duration-500">
                                          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-                                            <FieldSmall label="Org" value={editExp.company || ''} onChange={val => setEditExp({...editExp, company: val})} />
-                                            <FieldSmall label="Role" value={editExp.role || ''} onChange={val => setEditExp({...editExp, role: val})} />
-                                            <FieldSmall label="Start" value={editExp.startDate || ''} onChange={val => setEditExp({...editExp, startDate: val})} />
-                                            <FieldSmall label="End" value={editExp.endDate || ''} onChange={val => setEditExp({...editExp, endDate: val})} />
-                                         </div>
-                                         <div className="space-y-2 mb-8">
-                                            <label className="text-[10px] font-black text-text-secondary uppercase tracking-widest">Mission Log</label>
-                                            <textarea
-                                                className="w-full px-5 py-4 bg-bg-deep border border-divider rounded-md text-white focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all text-base h-32"
-                                                value={editExp.description || ''}
-                                                onChange={e => setEditExp({ ...editExp, description: e.target.value })}
+                                            <FormInput label="Org" value={editExp.company || ''} onChange={val => setEditExp({...editExp, company: val})} />
+                                            <FormInput label="Role" value={editExp.role || ''} onChange={val => setEditExp({...editExp, role: val})} />
+                                            <MonthYearPicker 
+                                                label="Start" 
+                                                value={editExp.startDate || ''} 
+                                                onChange={val => setEditExp({ ...editExp, startDate: val })} 
+                                            />
+                                            <MonthYearPicker 
+                                                label="End" 
+                                                value={editExp.endDate || ''} 
+                                                onChange={val => setEditExp({ ...editExp, endDate: val })} 
+                                                allowPresent={true}
                                             />
                                          </div>
+                                         <FormInput
+                                            label="Mission Log"
+                                            type="textarea"
+                                            value={editExp.description || ''}
+                                            onChange={val => setEditExp({ ...editExp, description: val })}
+                                            className="mb-8"
+                                         />
                                          <div className="flex justify-end gap-4 pt-4">
                                             <button onClick={handleCancelEdit} className="px-6 py-3 text-text-secondary hover:text-white font-black text-xs uppercase tracking-widest">Abort</button>
                                             <button onClick={handleUpdate} className="px-8 py-3 bg-primary text-white rounded font-black text-xs uppercase tracking-widest hover:bg-primary-hover">Commit Patch</button>
@@ -392,15 +395,3 @@ export default function ExperiencePage() {
     );
 }
 
-function FieldSmall({ label, value, onChange }: { label: string, value: string, onChange: (val: string) => void }) {
-    return (
-        <div className="space-y-1.5">
-            <label className="text-[10px] font-black text-text-secondary uppercase tracking-widest ml-1">{label}</label>
-            <input
-                className="w-full px-4 py-3 bg-bg-deep border border-divider rounded text-white focus:outline-none focus:ring-1 focus:ring-primary/40 transition-all text-sm font-mono"
-                value={value}
-                onChange={e => onChange(e.target.value)}
-            />
-        </div>
-    );
-}
