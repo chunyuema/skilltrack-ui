@@ -62,6 +62,20 @@ export default function ExperiencePage() {
         loadData();
     }, [token, handleApiError]);
 
+    const validateDates = (start: string, end: string): string | null => {
+        const today = new Date().toISOString().slice(0, 7); // YYYY-MM
+        
+        if (!start) return 'Start date is required.';
+        if (start > today) return 'Start date cannot be in the future.';
+        
+        if (end !== 'Present') {
+            if (!end) return 'End date is required.';
+            if (end < start) return 'The end date must be after or equal to the start date.';
+        }
+
+        return null;
+    };
+
     const handleSaveBio = async () => {
         if (!profile || !token) return;
         try {
@@ -73,7 +87,7 @@ export default function ExperiencePage() {
         } catch (err) {
             if (!handleApiError(err)) {
                 console.error('Failed to update bio:', err);
-                alert('Failed to save bio.');
+                setError('Failed to save bio.');
             }
         } finally {
             setIsSaving(false);
@@ -98,13 +112,30 @@ export default function ExperiencePage() {
     const handleAdd = async () => {
         if (!token || !newExp.company || !newExp.role) return;
 
+        setError(null);
+        let start = newExp.startDate || '';
+        let end = newExp.endDate || 'Present';
+        const today = new Date().toISOString().slice(0, 7);
+
+        // Auto-cast future end date to Present
+        if (end !== 'Present' && end > today) {
+            end = 'Present';
+        }
+
+        const validationError = validateDates(start, end);
+        if (validationError) {
+            setError(validationError);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            return;
+        }
+
         try {
             setIsSaving(true);
             const experience: Omit<Experience, 'id'> = {
                 company: newExp.company,
                 role: newExp.role,
-                startDate: newExp.startDate || '',
-                endDate: newExp.endDate || 'Present',
+                startDate: start,
+                endDate: end,
                 description: newExp.description || '',
                 technologies: newExp.technologies || [],
             };
@@ -116,7 +147,7 @@ export default function ExperiencePage() {
         } catch (err) {
             if (!handleApiError(err)) {
                 console.error('Error adding experience:', err);
-                alert('Failed to save experience.');
+                setError('Failed to save experience.');
             }
         } finally {
             setIsSaving(false);
@@ -126,16 +157,33 @@ export default function ExperiencePage() {
     const handleUpdate = async () => {
         if (!token || !editingId || !editExp.company || !editExp.role) return;
 
+        setError(null);
+        let start = editExp.startDate || '';
+        let end = editExp.endDate || 'Present';
+        const today = new Date().toISOString().slice(0, 7);
+
+        // Auto-cast future end date to Present
+        if (end !== 'Present' && end > today) {
+            end = 'Present';
+        }
+
+        const validationError = validateDates(start, end);
+        if (validationError) {
+            setError(validationError);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            return;
+        }
+
         try {
             setIsSaving(true);
-            const updatedExp = await profileService.updateExperience(editingId, editExp, token);
+            const updatedExp = await profileService.updateExperience(editingId, { ...editExp, startDate: start, endDate: end }, token);
             setExperiences(experiences.map(exp => exp.id === editingId ? updatedExp : exp));
             setEditingId(null);
             setEditExp({});
         } catch (err) {
             if (!handleApiError(err)) {
                 console.error('Error updating experience:', err);
-                alert('Failed to update experience.');
+                setError('Failed to update experience.');
             }
         } finally {
             setIsSaving(false);
