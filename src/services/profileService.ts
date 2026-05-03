@@ -1,3 +1,4 @@
+/// <reference types="vite/client" />
 import { UserProfile, Experience } from "../types";
 
 // Type for the raw API response

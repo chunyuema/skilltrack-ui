@@ -4,6 +4,7 @@ import { UserProfile } from '../types';
 import { useAuth } from '../hooks/useAuth';
 import { profileService } from '../services/profileService';
 import { Save, MapPin, Mail, Phone, Github, Linkedin, GraduationCap, Edit3, Shield } from 'lucide-react';
+import { FormInput } from '../components/ui/FormInput';
 
 export default function Profile() {
     const navigate = useNavigate();
@@ -73,8 +74,7 @@ export default function Profile() {
     if (error) return <div className="text-red-400 p-6 bg-red-900/10 rounded-2xl border border-red-900/20 font-bold uppercase tracking-widest text-xs">{error}</div>;
     if (!profile) return <div className="text-slate-500 font-bold uppercase tracking-widest text-xs">No profile data found.</div>;
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.target;
+    const handleFieldChange = (name: string, value: string) => {
         if (profile) {
             setProfile(prev => prev ? { ...prev, [name]: value } : null);
         }
@@ -142,20 +142,20 @@ export default function Profile() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             {isEditing ? (
                                 <>
-                                    <Field label="First Name" name="firstName" value={profile.firstName} isEditing={true} onChange={handleChange} />
-                                    <Field label="Last Name" name="lastName" value={profile.lastName} isEditing={true} onChange={handleChange} />
+                                    <FormInput label="First Name" name="firstName" value={profile.firstName} isEditing={true} onChange={val => handleFieldChange("firstName", val)} />
+                                    <FormInput label="Last Name" name="lastName" value={profile.lastName} isEditing={true} onChange={val => handleFieldChange("lastName", val)} />
                                 </>
                             ) : (
                                 <div className="md:col-span-2">
-                                    <Field label="Full Name" name="fullName" value={`${profile.firstName} ${profile.lastName}`} isEditing={false} onChange={handleChange} />
+                                    <FormInput label="Full Name" name="fullName" value={`${profile.firstName} ${profile.lastName}`} isEditing={false} onChange={() => {}} />
                                 </div>
                             )}
                             <div className="md:col-span-2">
-                                <Field label="Professional Title" name="title" value={profile.title} isEditing={isEditing} onChange={handleChange} />
+                                <FormInput label="Professional Title" name="title" value={profile.title} isEditing={isEditing} onChange={val => handleFieldChange("title", val)} />
                             </div>
 
-                            <Field label="Years of Experience" name="yearsOfExperience" value={profile.yearsOfExperience} isEditing={isEditing} onChange={handleChange} type="number" />
-                            <Field label="Visa Status" name="visaStatus" value={profile.visaStatus} isEditing={isEditing} onChange={handleChange} />
+                            <FormInput label="Years of Experience" name="yearsOfExperience" value={profile.yearsOfExperience} isEditing={isEditing} onChange={val => handleFieldChange("yearsOfExperience", val)} type="number" />
+                            <FormInput label="Visa Status" name="visaStatus" value={profile.visaStatus} isEditing={isEditing} onChange={val => handleFieldChange("visaStatus", val)} />
                         </div>
                     </section>
 
@@ -167,52 +167,52 @@ export default function Profile() {
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <Field
+                            <FormInput
                                 label="Email Address"
                                 name="email"
                                 value={profile.email}
                                 isEditing={isEditing}
-                                onChange={handleChange}
+                                onChange={val => handleFieldChange("email", val)}
                                 icon={<Mail size={16} />}
                             />
-                            <Field
+                            <FormInput
                                 label="Phone Number"
                                 name="phone"
                                 value={profile.phone}
                                 isEditing={isEditing}
-                                onChange={handleChange}
+                                onChange={val => handleFieldChange("phone", val)}
                                 icon={<Phone size={16} />}
                             />
-                            <Field
+                            <FormInput
                                 label="Location"
                                 name="location"
                                 value={profile.location}
                                 isEditing={isEditing}
-                                onChange={handleChange}
+                                onChange={val => handleFieldChange("location", val)}
                                 icon={<MapPin size={16} />}
                             />
-                            <Field
+                            <FormInput
                                 label="Education"
                                 name="education"
                                 value={profile.education}
                                 isEditing={isEditing}
-                                onChange={handleChange}
+                                onChange={val => handleFieldChange("education", val)}
                                 icon={<GraduationCap size={16} />}
                             />
-                            <Field
+                            <FormInput
                                 label="GitHub Profile"
                                 name="githubUrl"
                                 value={profile.githubUrl}
                                 isEditing={isEditing}
-                                onChange={handleChange}
+                                onChange={val => handleFieldChange("githubUrl", val)}
                                 icon={<Github size={16} />}
                             />
-                            <Field
+                            <FormInput
                                 label="LinkedIn Profile"
                                 name="linkedinUrl"
                                 value={profile.linkedinUrl}
                                 isEditing={isEditing}
-                                onChange={handleChange}
+                                onChange={val => handleFieldChange("linkedinUrl", val)}
                                 icon={<Linkedin size={16} />}
                             />
                         </div>
@@ -233,46 +233,3 @@ function SidebarStat({ label, value }: { label: string, value: string }) {
     );
 }
 
-interface FieldProps {
-    label: string;
-    name: string;
-    value: string | number;
-    isEditing: boolean;
-    onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-    type?: 'text' | 'textarea' | 'number';
-    icon?: React.ReactNode;
-}
-
-function Field({ label, name, value, isEditing, onChange, type = 'text', icon }: FieldProps) {
-    return (
-        <div className="space-y-3">
-            <label className="text-[10px] font-black text-text-secondary uppercase tracking-[0.2em] flex items-center gap-2">
-                {icon}
-                {label}
-            </label>
-            {isEditing ? (
-                type === 'textarea' ? (
-                    <textarea
-                        name={name}
-                        value={value}
-                        onChange={onChange}
-                        rows={5}
-                        className="w-full px-5 py-4 bg-bg-deep border border-divider rounded-md text-white focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all text-base leading-relaxed"
-                    />
-                ) : (
-                    <input
-                        type={type}
-                        name={name}
-                        value={value}
-                        onChange={onChange}
-                        className="w-full px-5 py-4 bg-bg-deep border border-divider rounded-md text-white focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all text-base"
-                    />
-                )
-            ) : (
-                <div className={`text-white ${type === 'textarea' ? 'whitespace-pre-wrap leading-relaxed' : ''} font-bold text-xl tracking-tight`}>
-                    {value || <span className="text-slate-700 italic font-normal tracking-widest text-sm">NULL</span>}
-                </div>
-            )}
-        </div>
-    );
-}
