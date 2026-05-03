@@ -32,6 +32,7 @@ export function FormInput({
   inputClassName,
   readOnlyClassName,
 }: FormInputProps) {
+  const inputId = React.useId();
   const commonInputStyles = cn(
     "w-full px-5 py-4 bg-bg-deep border border-divider rounded-md text-white focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all text-base disabled:opacity-50",
     inputClassName
@@ -39,13 +40,17 @@ export function FormInput({
 
   return (
     <div className={cn("space-y-3", className)}>
-      <label className={cn("text-[10px] font-black text-text-secondary uppercase tracking-[0.2em] flex items-center gap-2", labelClassName)}>
+      <label 
+        htmlFor={isEditing ? inputId : undefined}
+        className={cn("text-[10px] font-black text-text-secondary uppercase tracking-[0.2em] flex items-center gap-2", labelClassName)}
+      >
         {icon}
         {label}
       </label>
       {isEditing ? (
         type === 'textarea' ? (
           <textarea
+            id={inputId}
             name={name}
             value={value}
             onChange={(e) => onChange(e.target.value)}
@@ -56,6 +61,7 @@ export function FormInput({
           />
         ) : (
           <input
+            id={inputId}
             type={type}
             name={name}
             value={value}
