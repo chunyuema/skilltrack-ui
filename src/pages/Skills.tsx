@@ -1,17 +1,41 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { SkillTheme } from '../types';
-import { INITIAL_THEMES } from '../data/initialData';
 import SkillsRadar from '../components/skills/SkillsRadar';
 import SkillsList from '../components/skills/SkillsList';
-import { Shield, Target } from 'lucide-react';
+import { Target } from 'lucide-react';
+import { useAuth } from '../hooks/useAuth';
+import { profileService } from '../services/profileService';
 
 export default function SkillsPage() {
-    const [themes, setThemes] = useState<SkillTheme[]>(() => {
-        const saved = localStorage.getItem('skilltrack_themes');
-        return saved ? JSON.parse(saved) : INITIAL_THEMES;
-    });
+    const { token } = useAuth();
+    const [themes, setThemes] = useState<SkillTheme[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
-    const updateSkill = (themeId: string, subCatId: string, skillId: string, level: number) => {
+    useEffect(() => {
+        const loadSkills = async () => {
+            if (!token) return;
+            try {
+                setLoading(true);
+                const data = await profileService.fetchSkills(token);
+                setThemes(data);
+                setError(null);
+            } catch (err) {
+                console.error("Failed to load skills:", err);
+                setError("Could not load your skills matrix. Please try again later.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadSkills();
+    }, [token]);
+
+    const updateSkill = async (themeId: string, subCatId: string, skillId: string, level: number) => {
+        if (!token) return;
+
+        // Optimistic update
+        const previousThemes = [...themes];
         const newThemes = themes.map(theme => {
             if (theme.id !== themeId) return theme;
             return {
@@ -29,8 +53,38 @@ export default function SkillsPage() {
             };
         });
         setThemes(newThemes);
-        localStorage.setItem('skilltrack_themes', JSON.stringify(newThemes));
+
+        try {
+            await profileService.updateSkillLevel(skillId, level, token);
+        } catch (err) {
+            console.error("Failed to update skill:", err);
+            // Rollback on failure
+            setThemes(previousThemes);
+            alert("Failed to save skill update. Please check your connection.");
+        }
     };
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center min-h-[400px]">
+                <div className="text-primary font-mono animate-pulse uppercase tracking-widest">Initialising Matrix...</div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
+                <div className="text-red-500 font-bold uppercase">{error}</div>
+                <button 
+                    onClick={() => window.location.reload()}
+                    className="px-4 py-2 border border-divider hover:bg-white/5 transition-colors uppercase text-xs font-black"
+                >
+                    Retry Connection
+                </button>
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-12 animate-in fade-in duration-700">

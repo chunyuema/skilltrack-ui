@@ -200,4 +200,34 @@ export const profileService = {
       throw new Error("Failed to delete experience");
     }
   },
+
+  fetchSkills: async (token: string): Promise<SkillTheme[]> => {
+    const response = await fetch(`${API_URL}/profiles/skill-list/`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return handleResponse(response);
+  },
+
+  updateSkillLevel: async (
+    skillId: string,
+    level: number,
+    token: string
+  ): Promise<void> => {
+    const response = await fetch(`${API_URL}/profiles/skills/update/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        skill_id: skillId,
+        level,
+      }),
+    });
+
+    await handleResponse(response);
+  },
 };
