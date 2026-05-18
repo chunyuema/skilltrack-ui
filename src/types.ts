@@ -18,6 +18,7 @@ export interface SkillSubCategory {
 export interface SkillTheme {
   id: string;
   name: string;
+  icon?: string;
   description?: string;
   subCategories: SkillSubCategory[];
 }

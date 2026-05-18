@@ -107,12 +107,12 @@ export default function PublicProfile() {
                 </div>
             </div>
 
-            {/* Skills Matrix */}
+            {/* Skills Section */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 pt-8">
                 <div className="lg:col-span-2 space-y-8">
                     <div className="flex items-center gap-3 border-b border-divider pb-4">
                         <Terminal size={18} className="text-primary" />
-                        <h2 className="text-xl font-black text-white tracking-tighter uppercase">Skills Matrix</h2>
+                        <h2 className="text-xl font-black text-white tracking-tighter uppercase">Skills</h2>
                     </div>
                     <SkillsList themes={user.themes} readOnly />
                 </div>

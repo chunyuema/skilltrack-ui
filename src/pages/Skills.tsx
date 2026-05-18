@@ -1,17 +1,41 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { SkillTheme } from '../types';
-import { INITIAL_THEMES } from '../data/initialData';
 import SkillsRadar from '../components/skills/SkillsRadar';
 import SkillsList from '../components/skills/SkillsList';
-import { Shield, Target } from 'lucide-react';
+import { Target } from 'lucide-react';
+import { useAuth } from '../hooks/useAuth';
+import { profileService } from '../services/profileService';
 
 export default function SkillsPage() {
-    const [themes, setThemes] = useState<SkillTheme[]>(() => {
-        const saved = localStorage.getItem('skilltrack_themes');
-        return saved ? JSON.parse(saved) : INITIAL_THEMES;
-    });
+    const { token } = useAuth();
+    const [themes, setThemes] = useState<SkillTheme[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
-    const updateSkill = (themeId: string, subCatId: string, skillId: string, level: number) => {
+    useEffect(() => {
+        const loadSkills = async () => {
+            if (!token) return;
+            try {
+                setLoading(true);
+                const data = await profileService.fetchSkills(token);
+                setThemes(data);
+                setError(null);
+            } catch (err) {
+                console.error("Failed to load skills:", err);
+                setError("Could not load your skills. Please try again later.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadSkills();
+    }, [token]);
+
+    const updateSkill = async (themeId: string, subCatId: string, skillId: string, level: number) => {
+        if (!token) return;
+
+        // Optimistic update
+        const previousThemes = [...themes];
         const newThemes = themes.map(theme => {
             if (theme.id !== themeId) return theme;
             return {
@@ -29,8 +53,38 @@ export default function SkillsPage() {
             };
         });
         setThemes(newThemes);
-        localStorage.setItem('skilltrack_themes', JSON.stringify(newThemes));
+
+        try {
+            await profileService.updateSkillLevel(skillId, level, token);
+        } catch (err) {
+            console.error("Failed to update skill:", err);
+            // Rollback on failure
+            setThemes(previousThemes);
+            alert("Failed to save skill update. Please check your connection.");
+        }
     };
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center min-h-[400px]">
+                <div className="text-primary font-mono animate-pulse uppercase tracking-widest">Initialising Skills...</div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
+                <div className="text-red-500 font-bold uppercase">{error}</div>
+                <button 
+                    onClick={() => window.location.reload()}
+                    className="px-4 py-2 border border-divider hover:bg-white/5 transition-colors uppercase text-xs font-black"
+                >
+                    Retry Connection
+                </button>
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-12 animate-in fade-in duration-700">
@@ -39,9 +93,9 @@ export default function SkillsPage() {
                 <div className="flex items-center gap-4">
                     <div className="pill-success flex items-center gap-1.5">
                         <Target size={12} />
-                        Active Matrix
+                        Active Skills
                     </div>
-                    <h1 className="text-2xl font-black text-white uppercase tracking-tight">Skills Matrix</h1>
+                    <h1 className="text-2xl font-black text-white uppercase tracking-tight">Skills</h1>
                 </div>
                 <div className="text-[9px] font-bold text-text-secondary uppercase tracking-[0.2em] opacity-50">Reviewing: Professional Portfolio</div>
             </div>
@@ -65,17 +119,6 @@ export default function SkillsPage() {
                         <div className="h-1 w-20 bg-primary/20"></div>
                     </div>
                     <SkillsRadar themes={themes} />
-                    
-                    <div className="bg-bg-card border border-divider p-8 rounded-lg space-y-6">
-                        <h4 className="font-black text-xs text-white uppercase tracking-[0.3em] flex items-center gap-2">
-                             System Logic
-                        </h4>
-                        <p className="text-sm leading-relaxed text-text-secondary">Changes to competency levels are reflected in real-time across your proficiency map and network profile.</p>
-                        <div className="pt-4 border-t border-divider flex items-center justify-between">
-                            <span className="text-[10px] font-bold text-text-secondary uppercase">Sync Status</span>
-                            <span className="text-[10px] font-black text-emerald-accent uppercase font-mono">LIVE_FEED</span>
-                        </div>
-                    </div>
                 </aside>
             </div>
         </div>

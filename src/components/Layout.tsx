@@ -30,7 +30,7 @@ export default function Layout() {
           <nav className="hidden md:flex items-center gap-8">
             <HeaderLink to="/profile" label="Profile" />
             <HeaderLink to="/experience" label="Experience" />
-            <HeaderLink to="/skills" label="Matrix" />
+            <HeaderLink to="/skills" label="Skills" />
             <HeaderLink to="/directory" label="Community" />
           </nav>
 
@@ -72,9 +72,9 @@ export default function Layout() {
           </div>
           <p className="text-xs text-text-secondary font-medium">© 2026 SkillTrack Engineering Network. Built for technical excellence.</p>
           <div className="flex gap-6">
-            <footerLink label="Privacy" />
-            <footerLink label="Terms" />
-            <footerLink label="Support" />
+            <FooterLink label="Privacy" />
+            <FooterLink label="Terms" />
+            <FooterLink label="Support" />
           </div>
         </div>
       </footer>
@@ -105,6 +105,6 @@ function HeaderLink({ to, label }: { to: string; label: string }) {
   );
 }
 
-function footerLink({ label }: { label: string }) {
+function FooterLink({ label }: { label: string }) {
   return <span className="text-xs font-bold text-text-secondary hover:text-primary transition-colors cursor-pointer uppercase tracking-widest">{label}</span>;
 }
