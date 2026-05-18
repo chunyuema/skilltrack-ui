@@ -119,17 +119,6 @@ export default function SkillsPage() {
                         <div className="h-1 w-20 bg-primary/20"></div>
                     </div>
                     <SkillsRadar themes={themes} />
-                    
-                    <div className="bg-bg-card border border-divider p-8 rounded-lg space-y-6">
-                        <h4 className="font-black text-xs text-white uppercase tracking-[0.3em] flex items-center gap-2">
-                             System Logic
-                        </h4>
-                        <p className="text-sm leading-relaxed text-text-secondary">Changes to competency levels are reflected in real-time across your proficiency map and network profile.</p>
-                        <div className="pt-4 border-t border-divider flex items-center justify-between">
-                            <span className="text-[10px] font-bold text-text-secondary uppercase">Sync Status</span>
-                            <span className="text-[10px] font-black text-emerald-accent uppercase font-mono">LIVE_FEED</span>
-                        </div>
-                    </div>
                 </aside>
             </div>
         </div>

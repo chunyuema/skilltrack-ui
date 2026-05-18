@@ -4,6 +4,7 @@ export const INITIAL_THEMES: SkillTheme[] = [
   {
     id: 'foundations',
     name: 'Low-Level Foundations & Core CS',
+    icon: 'Cpu',
     description: 'The mechanical "physics" of software before frameworks.',
     subCategories: [
       {
@@ -48,6 +49,7 @@ export const INITIAL_THEMES: SkillTheme[] = [
   {
     id: 'language',
     name: 'Language & Runtime Mastery',
+    icon: 'Code2',
     description: 'How code behaves under pressure, beyond syntax.',
     subCategories: [
       {
@@ -90,6 +92,7 @@ export const INITIAL_THEMES: SkillTheme[] = [
   {
     id: 'backend',
     name: 'Backend & Distributed Systems',
+    icon: 'Server',
     description: 'How services talk to each other and stay alive at scale.',
     subCategories: [
       {
@@ -132,6 +135,7 @@ export const INITIAL_THEMES: SkillTheme[] = [
   {
     id: 'data',
     name: 'Data Engineering & Persistence',
+    icon: 'Database',
     description: 'Managing the most expensive part of any system.',
     subCategories: [
       {
@@ -165,6 +169,7 @@ export const INITIAL_THEMES: SkillTheme[] = [
   {
     id: 'frontend',
     name: 'Frontend & Client-Side',
+    icon: 'Monitor',
     description: 'Distributed systems running in a browser.',
     subCategories: [
       {
@@ -205,6 +210,7 @@ export const INITIAL_THEMES: SkillTheme[] = [
   {
     id: 'cloud',
     name: 'Cloud & Infrastructure',
+    icon: 'Cloud',
     description: 'Owning the environment.',
     subCategories: [
       {
@@ -244,6 +250,7 @@ export const INITIAL_THEMES: SkillTheme[] = [
   {
     id: 'security',
     name: 'Security (Shift-Left)',
+    icon: 'ShieldCheck',
     description: 'Security as a technical requirement.',
     subCategories: [
       {
@@ -282,6 +289,7 @@ export const INITIAL_THEMES: SkillTheme[] = [
   {
     id: 'quality',
     name: 'Quality & Observability',
+    icon: 'Activity',
     description: 'Keeping the system green.',
     subCategories: [
       {
@@ -314,6 +322,7 @@ export const INITIAL_THEMES: SkillTheme[] = [
   {
     id: 'ai',
     name: 'AI Engineering',
+    icon: 'Brain',
     description: 'Integrating machine intelligence.',
     subCategories: [
       {
