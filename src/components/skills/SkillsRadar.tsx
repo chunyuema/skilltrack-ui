@@ -80,16 +80,6 @@ export default function SkillsRadar({ themes }: SkillsRadarProps) {
                         </RadarChart>
                     </ResponsiveContainer>
                 </div>
-                
-                <div className="mt-6 pt-6 border-t border-divider flex justify-between items-center">
-                    <span className="text-[10px] font-bold text-text-secondary uppercase tracking-widest">Tier Rank</span>
-                    <span className="text-xs font-black text-white uppercase tracking-tighter">
-                        {percentage < 30 ? "Associate" :
-                            percentage < 60 ? "Professional" :
-                                percentage < 85 ? "Strategic" :
-                                    "Distinguished"}
-                    </span>
-                </div>
             </div>
         </div>
     );
