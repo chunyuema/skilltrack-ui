@@ -22,7 +22,7 @@ export default function SkillsPage() {
                 setError(null);
             } catch (err) {
                 console.error("Failed to load skills:", err);
-                setError("Could not load your skills matrix. Please try again later.");
+                setError("Could not load your skills. Please try again later.");
             } finally {
                 setLoading(false);
             }
@@ -67,7 +67,7 @@ export default function SkillsPage() {
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-[400px]">
-                <div className="text-primary font-mono animate-pulse uppercase tracking-widest">Initialising Matrix...</div>
+                <div className="text-primary font-mono animate-pulse uppercase tracking-widest">Initialising Skills...</div>
             </div>
         );
     }
@@ -93,9 +93,9 @@ export default function SkillsPage() {
                 <div className="flex items-center gap-4">
                     <div className="pill-success flex items-center gap-1.5">
                         <Target size={12} />
-                        Active Matrix
+                        Active Skills
                     </div>
-                    <h1 className="text-2xl font-black text-white uppercase tracking-tight">Skills Matrix</h1>
+                    <h1 className="text-2xl font-black text-white uppercase tracking-tight">Skills</h1>
                 </div>
                 <div className="text-[9px] font-bold text-text-secondary uppercase tracking-[0.2em] opacity-50">Reviewing: Professional Portfolio</div>
             </div>
