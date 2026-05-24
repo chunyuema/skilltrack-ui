@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { UserProfile } from '../types';
 import { useAuth } from '../hooks/useAuth';
 import { profileService } from '../services/profileService';
-import { Save, Mail, Github, Linkedin, GraduationCap, Edit3, Shield } from 'lucide-react';
+import { Save, Mail, Github, Linkedin, GraduationCap, Edit3, Shield, User, Clock, Globe } from 'lucide-react';
 import { FormInput } from '../components/ui/FormInput';
 
 const COUNTRY_OPTIONS = [
@@ -149,8 +149,8 @@ export default function Profile() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
                             {isEditing ? (
                                 <>
-                                    <FormInput label="First Name" name="firstName" value={profile.firstName} isEditing={true} onChange={val => handleFieldChange("firstName", val)} />
-                                    <FormInput label="Last Name" name="lastName" value={profile.lastName} isEditing={true} onChange={val => handleFieldChange("lastName", val)} />
+                                    <FormInput label="First Name" name="firstName" value={profile.firstName} isEditing={true} onChange={val => handleFieldChange("firstName", val)} icon={<User size={16} />} />
+                                    <FormInput label="Last Name" name="lastName" value={profile.lastName} isEditing={true} onChange={val => handleFieldChange("lastName", val)} icon={<User size={16} />} />
                                 </>
                             ) : (
                                 <div className="md:col-span-2">
@@ -160,6 +160,7 @@ export default function Profile() {
                                         value={`${profile.firstName} ${profile.lastName}`.toUpperCase()} 
                                         isEditing={false} 
                                         onChange={() => {}} 
+                                        icon={<User size={16} />}
                                     />
                                 </div>
                             )}
@@ -182,6 +183,7 @@ export default function Profile() {
                                 isEditing={isEditing} 
                                 onChange={val => handleFieldChange("yearsOfExperience", val)} 
                                 type="number" 
+                                icon={<Clock size={16} />}
                             />
                             
                             <FormInput 
@@ -193,6 +195,7 @@ export default function Profile() {
                                 type="select"
                                 options={COUNTRY_OPTIONS}
                                 placeholder="Select a country"
+                                icon={<Globe size={16} />}
                             />
 
                             <FormInput 
@@ -201,6 +204,7 @@ export default function Profile() {
                                 value={profile.visaStatus} 
                                 isEditing={isEditing} 
                                 onChange={val => handleFieldChange("visaStatus", val)} 
+                                icon={<Shield size={16} />}
                             />
 
                             <FormInput
