@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { UserProfile } from '../types';
+import { UserProfile, Experience } from '../types';
 import { useAuth } from '../hooks/useAuth';
 import { profileService } from '../services/profileService';
-import { Save, Mail, Github, Linkedin, GraduationCap, Edit3, Shield, User, Clock, Globe } from 'lucide-react';
+import { Save, Mail, Github, Linkedin, GraduationCap, Edit3, Shield, User, Clock, Globe, Plus, Trash2, Pencil, Check } from 'lucide-react';
 import { FormInput } from '../components/ui/FormInput';
+import { MonthYearPicker } from '../components/ui/MonthYearPicker';
 
 const COUNTRY_OPTIONS = [
   { label: 'United States', value: 'United States' },
@@ -24,194 +25,99 @@ const COUNTRY_OPTIONS = [
 export default function Profile() {
     const navigate = useNavigate();
     const [profile, setProfile] = useState<UserProfile | null>(null);
+    const [experiences, setExperiences] = useState<Experience[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
     const [isEditing, setIsEditing] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
+    const [isAddingExp, setIsAddingExp] = useState(false);
+    const [editingExpId, setEditingExpId] = useState<string | null>(null);
+    const [newExp, setNewExp] = useState<Partial<Experience>>({});
+    const [editExp, setEditExp] = useState<Partial<Experience>>({});
     const { token, logout } = useAuth();
 
     useEffect(() => {
-        const fetchProfileData = async () => {
-            if (!token) {
-                setIsLoading(false);
-                setError("No authentication token found.");
-                return;
-            }
-
+        const loadData = async () => {
+            if (!token) { setIsLoading(false); return; }
             try {
-                const userProfile = await profileService.fetchProfile(token);
-                setProfile(userProfile);
-            } catch (err) {
-                if (err instanceof Error && err.message === 'Unauthorized') {
-                    logout();
-                    navigate('/login');
-                } else {
-                    setError(err instanceof Error ? err.message : 'An unknown error occurred');
-                }
-            } finally {
-                setIsLoading(false);
-            }
+                const [p, e] = await Promise.all([profileService.fetchProfile(token), profileService.fetchExperiences(token)]);
+                setProfile(p); setExperiences(e);
+            } catch (err) { logout(); navigate('/login'); } finally { setIsLoading(false); }
         };
-
-        fetchProfileData();
+        loadData();
     }, [token, logout, navigate]);
 
     const handleSave = async () => {
-        if (profile && token) {
-            setIsSaving(true);
-            try {
-                await profileService.updateProfile(profile, token);
-                setIsEditing(false);
-            } catch (err) {
-                if (err instanceof Error && err.message === 'Unauthorized') {
-                    logout();
-                    navigate('/login');
-                } else {
-                    console.error("Failed to save profile:", err);
-                }
-            } finally {
-                setIsSaving(false);
-            }
-        }
+        setIsSaving(true);
+        await profileService.updateProfile(profile!, token!);
+        setIsEditing(false); setIsSaving(false);
     };
 
-    if (isLoading) {
-        return (
-            <div className="flex flex-col items-center justify-center py-24 gap-4">
-                <div className="w-12 h-12 border-2 border-primary/20 border-t-primary rounded-full animate-spin"></div>
-            </div>
-        );
-    }
-
-    if (error) return <div className="text-red-400 p-6 bg-red-900/10 rounded-2xl border border-red-900/20 font-bold uppercase tracking-widest text-xs">{error}</div>;
-    if (!profile) return <div className="text-slate-500 font-bold uppercase tracking-widest text-xs">No profile data found.</div>;
-
-    const handleFieldChange = (name: string, value: string | number) => {
-        if (profile) {
-            setProfile(prev => prev ? { ...prev, [name]: value } : null);
-        }
+    const handleUpdateExperience = async () => {
+        if (!editingExpId) return;
+        setIsSaving(true);
+        const updated = await profileService.updateExperience(editingExpId, editExp as any, token!);
+        setExperiences(experiences.map(e => e.id === editingExpId ? updated : e));
+        setEditingExpId(null); setIsSaving(false);
     };
+
+    if (isLoading || !profile) return <div className="p-24 text-center text-white">Loading...</div>;
 
     return (
-        <div className="animate-in fade-in duration-700 max-w-xl mx-auto">
-            {/* Unified Sidebar Card */}
+        <div className="animate-in fade-in duration-700 max-w-[1200px] mx-auto grid grid-cols-1 lg:grid-cols-[350px_1fr] gap-12">
+            {/* Sidebar Name Card */}
             <aside className="space-y-6">
-                <div className="bg-bg-card border border-divider p-6 rounded-lg space-y-6">
-                    <div className="space-y-4 text-center">
-                        <div className="w-20 h-20 mx-auto bg-slate-900 border-2 border-divider rounded-full flex items-center justify-center text-3xl font-black text-white shadow-inner">
-                            {profile.firstName.charAt(0)}
-                        </div>
-                        <div className="space-y-1">
-                            {isEditing ? (
-                                <div className="grid grid-cols-2 gap-2">
-                                    <input 
-                                        value={profile.firstName} 
-                                        onChange={(e) => handleFieldChange("firstName", e.target.value)} 
-                                        className="w-full bg-bg-deep border border-divider rounded px-2 py-1 text-center text-sm text-white"
-                                    />
-                                    <input 
-                                        value={profile.lastName} 
-                                        onChange={(e) => handleFieldChange("lastName", e.target.value)} 
-                                        className="w-full bg-bg-deep border border-divider rounded px-2 py-1 text-center text-sm text-white"
-                                    />
-                                </div>
-                            ) : (
-                                <h3 className="font-black text-xl text-white uppercase tracking-tight">{profile.firstName} {profile.lastName}</h3>
-                            )}
-                        </div>
+                <div className="bg-bg-card border border-divider p-6 rounded-lg space-y-6 sticky top-24">
+                    <div className="text-center">
+                        <div className="w-24 h-24 mx-auto bg-slate-900 rounded-full flex items-center justify-center text-4xl font-black text-white">{profile.firstName.charAt(0)}</div>
+                        <h3 className="mt-4 font-black text-xl text-white uppercase">{profile.firstName} {profile.lastName}</h3>
                     </div>
 
                     <div className="space-y-4 pt-4 border-t border-divider">
-                        <FormInput 
-                            label="Email" 
-                            name="email" 
-                            value={profile.email} 
-                            isEditing={isEditing} 
-                            onChange={val => handleFieldChange("email", val)} 
-                            icon={<Mail size={14} />} 
-                        />
-                        <FormInput 
-                            label="Years of Exp" 
-                            name="yearsOfExperience" 
-                            value={profile.yearsOfExperience} 
-                            isEditing={isEditing} 
-                            onChange={val => handleFieldChange("yearsOfExperience", val)} 
-                            type="number" 
-                            icon={<Clock size={14} />} 
-                        />
-                        <FormInput 
-                            label="Country" 
-                            name="country" 
-                            value={profile.country} 
-                            isEditing={isEditing} 
-                            onChange={val => handleFieldChange("country", val)} 
-                            type="select"
-                            options={COUNTRY_OPTIONS}
-                            icon={<Globe size={14} />} 
-                        />
-                        <FormInput 
-                            label="Education" 
-                            name="education" 
-                            value={profile.education} 
-                            isEditing={isEditing} 
-                            onChange={val => handleFieldChange("education", val)} 
-                            icon={<GraduationCap size={14} />} 
-                        />
-                        <FormInput 
-                            label="Visa" 
-                            name="visaStatus" 
-                            value={profile.visaStatus} 
-                            isEditing={isEditing} 
-                            onChange={val => handleFieldChange("visaStatus", val)} 
-                            icon={<Shield size={14} />} 
-                        />
-                        <FormInput 
-                            label="LinkedIn" 
-                            name="linkedinUrl" 
-                            value={profile.linkedinUrl} 
-                            isEditing={isEditing} 
-                            onChange={val => handleFieldChange("linkedinUrl", val)} 
-                            icon={<Linkedin size={14} />} 
-                        />
-                        <FormInput 
-                            label="GitHub" 
-                            name="githubUrl" 
-                            value={profile.githubUrl} 
-                            isEditing={isEditing} 
-                            onChange={val => handleFieldChange("githubUrl", val)} 
-                            icon={<Github size={14} />} 
-                        />
-                        {isEditing ? (
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-mono font-bold text-text-secondary uppercase tracking-[0.2em]">Bio</label>
-                                <textarea
-                                    value={profile.bio || ''}
-                                    onChange={(e) => handleFieldChange("bio", e.target.value)}
-                                    rows={4}
-                                    className="w-full px-3 py-2 bg-bg-deep border border-divider rounded text-xs text-white focus:outline-none focus:ring-1 focus:ring-primary/40 focus:border-primary transition-all resize-none leading-relaxed"
-                                />
-                            </div>
-                        ) : (
-                            <div className="space-y-2">
-                                <h4 className="text-[10px] font-mono font-bold text-text-secondary uppercase tracking-[0.2em]">Bio</h4>
-                                <p className="text-xs text-white leading-relaxed font-medium whitespace-pre-wrap">{profile.bio || "No bio added."}</p>
-                            </div>
-                        )}
+                        <FormInput label="Email" value={profile.email} onChange={v => setProfile({...profile, email: v})} isEditing={isEditing} icon={<Mail size={14}/>} />
+                        <FormInput label="Years of Exp" value={profile.yearsOfExperience} onChange={v => setProfile({...profile, yearsOfExperience: parseInt(v)})} isEditing={isEditing} type="number" icon={<Clock size={14}/>} />
+                        <FormInput label="Country" value={profile.country} onChange={v => setProfile({...profile, country: v})} isEditing={isEditing} type="select" options={COUNTRY_OPTIONS} icon={<Globe size={14}/>} />
+                        <FormInput label="Education" value={profile.education} onChange={v => setProfile({...profile, education: v})} isEditing={isEditing} icon={<GraduationCap size={14}/>} />
+                        <FormInput label="Visa" value={profile.visaStatus} onChange={v => setProfile({...profile, visaStatus: v})} isEditing={isEditing} icon={<Shield size={14}/>} />
+                        <FormInput label="LinkedIn" value={profile.linkedinUrl} onChange={v => setProfile({...profile, linkedinUrl: v})} isEditing={isEditing} icon={<Linkedin size={14}/>} />
+                        <FormInput label="GitHub" value={profile.githubUrl} onChange={v => setProfile({...profile, githubUrl: v})} isEditing={isEditing} icon={<Github size={14}/>} />
                     </div>
 
-                    <button
-                        onClick={() => isEditing ? handleSave() : setIsEditing(true)}
-                        disabled={isSaving}
-                        className={`w-full flex items-center justify-center gap-2 px-5 py-3 rounded font-bold text-[10px] uppercase tracking-widest transition-all ${isEditing
-                            ? 'bg-primary text-white hover:bg-primary-hover shadow-lg shadow-primary/20'
-                            : 'bg-white/[0.03] border border-divider text-text-secondary hover:text-white hover:bg-white/[0.08]'
-                            } ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
-                    >
-                        {isEditing ? <Save size={14} /> : <Edit3 size={14} />}
-                        {isEditing ? (isSaving ? 'Saving...' : 'Save') : 'Edit Profile'}
+                    <button onClick={() => isEditing ? handleSave() : setIsEditing(true)} className="w-full py-3 bg-primary text-white rounded font-bold text-[10px] uppercase">
+                        {isEditing ? 'Save Profile' : 'Edit Profile'}
                     </button>
                 </div>
             </aside>
+
+            {/* Main Content: Experience */}
+            <main className="space-y-8">
+                 <div className="flex justify-between items-center pb-4 border-b border-divider">
+                     <h2 className="text-sm font-black text-white uppercase tracking-[0.3em]">Work History</h2>
+                     <button onClick={() => setIsAddingExp(true)} className="text-primary"><Plus size={18} /></button>
+                 </div>
+                 {experiences.map(exp => (
+                     <div key={exp.id} className="bg-bg-card border border-divider p-6 rounded-lg">
+                        {editingExpId === exp.id ? (
+                           <div className="space-y-4">
+                              <FormInput label="Company" value={editExp.company || exp.company} onChange={v => setEditExp({...editExp, company: v})} />
+                              <FormInput label="Role" value={editExp.role || exp.role} onChange={v => setEditExp({...editExp, role: v})} />
+                              <button onClick={handleUpdateExperience} className="px-4 py-2 bg-primary text-white text-xs font-bold rounded">Commit</button>
+                           </div>
+                        ) : (
+                           <div className="flex justify-between items-start">
+                               <div>
+                                   <h4 className="font-bold text-white text-lg">{exp.role}</h4>
+                                   <p className="text-sm text-text-secondary">{exp.company}</p>
+                                   <p className="text-xs text-text-secondary mt-2">{exp.description}</p>
+                               </div>
+                               <div className="flex gap-2">
+                                   <button onClick={() => setEditingExpId(exp.id)} className="text-text-secondary hover:text-white"><Pencil size={14}/></button>
+                                   <button onClick={() => {}} className="text-text-secondary hover:text-red-400"><Trash2 size={14}/></button>
+                               </div>
+                           </div>
+                        )}
+                     </div>
+                 ))}
+            </main>
         </div>
     );
 }
