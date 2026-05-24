@@ -103,7 +103,22 @@ export default function Profile() {
                                 {profile.firstName.charAt(0)}
                             </div>
                             <div className="space-y-1">
-                                <h3 className="font-black text-xl text-white uppercase tracking-tight">{profile.firstName}</h3>
+                                {isEditing ? (
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <input 
+                                            value={profile.firstName} 
+                                            onChange={(e) => handleFieldChange("firstName", e.target.value)} 
+                                            className="w-full bg-bg-deep border border-divider rounded px-2 py-1 text-center text-sm text-white"
+                                        />
+                                        <input 
+                                            value={profile.lastName} 
+                                            onChange={(e) => handleFieldChange("lastName", e.target.value)} 
+                                            className="w-full bg-bg-deep border border-divider rounded px-2 py-1 text-center text-sm text-white"
+                                        />
+                                    </div>
+                                ) : (
+                                    <h3 className="font-black text-xl text-white uppercase tracking-tight">{profile.firstName} {profile.lastName}</h3>
+                                )}
                             </div>
                         </div>
 
@@ -147,24 +162,7 @@ export default function Profile() {
                 <div className="space-y-12">
                     <section className="space-y-8">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
-                            {/* Row 1: Name | Email */}
-                            {isEditing ? (
-                                <>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <FormInput label="First Name" name="firstName" value={profile.firstName} isEditing={true} onChange={val => handleFieldChange("firstName", val)} icon={<User size={16} />} />
-                                        <FormInput label="Last Name" name="lastName" value={profile.lastName} isEditing={true} onChange={val => handleFieldChange("lastName", val)} icon={<User size={16} />} />
-                                    </div>
-                                </>
-                            ) : (
-                                <FormInput 
-                                    label="Full Name" 
-                                    name="fullName" 
-                                    value={`${profile.firstName} ${profile.lastName}`.toUpperCase()} 
-                                    isEditing={false} 
-                                    onChange={() => {}} 
-                                    icon={<User size={16} />}
-                                />
-                            )}
+                            {/* Row 1: Email */}
                             <FormInput
                                 label="Email Address"
                                 name="email"
@@ -173,6 +171,8 @@ export default function Profile() {
                                 onChange={val => handleFieldChange("email", val)}
                                 icon={<Mail size={16} />}
                             />
+                            {/* Placeholder for layout balance */}
+                            <div className="hidden md:block"></div>
 
                             {/* Row 2: Experience | Education */}
                             <FormInput 
