@@ -29,7 +29,6 @@ export default function Layout() {
           {/* Centered Navigation */}
           <nav className="hidden md:flex items-center gap-6">
             <HeaderLink to="/profile" label="Profile" />
-            <HeaderLink to="/experience" label="Experience" />
             <HeaderLink to="/skills" label="Skills" />
             <HeaderLink to="/directory" label="Community" />
           </nav>
