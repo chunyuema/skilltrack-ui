@@ -95,14 +95,7 @@ export default function Profile() {
     return (
         <div className="space-y-12 animate-in fade-in duration-700">
             {/* Compact Header */}
-            <div className="flex flex-col md:flex-row justify-between items-center gap-6 pb-6 border-b border-divider">
-                <div className="flex items-center gap-4">
-                    <div className="pill-success flex items-center gap-1.5">
-                        <Shield size={12} />
-                        Verified
-                    </div>
-                    <h1 className="text-2xl font-black text-white tracking-tight uppercase">Identity</h1>
-                </div>
+            <div className="flex flex-col md:flex-row justify-end items-center gap-6 pb-6 border-b border-divider">
                 <button
                     onClick={() => isEditing ? handleSave() : setIsEditing(true)}
                     disabled={isSaving}
