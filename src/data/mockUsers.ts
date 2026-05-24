@@ -22,7 +22,7 @@ export const MOCK_USERS: (AppState & { id: string })[] = [
       ...INITIAL_PROFILE,
       firstName: 'Sarah',
       lastName: 'Jenkins',
-      title: 'Staff Backend Engineer',
+      country: 'United Kingdom',
       bio: 'Distributed systems expert. Love Rust and Go.',
       yearsOfExperience: 8,
       email: 'sarah.j@example.com'
@@ -55,7 +55,7 @@ export const MOCK_USERS: (AppState & { id: string })[] = [
       ...INITIAL_PROFILE,
       firstName: 'Mike',
       lastName: 'Chen',
-      title: 'Frontend Architect',
+      country: 'Canada',
       bio: 'Obsessed with performance and pixel perfection.',
       yearsOfExperience: 6,
       email: 'mike.c@example.com'
@@ -79,7 +79,7 @@ export const MOCK_USERS: (AppState & { id: string })[] = [
       ...INITIAL_PROFILE,
       firstName: 'Jessica',
       lastName: 'Alba',
-      title: 'DevOps Engineer',
+      country: 'Germany',
       bio: 'Automating everything. Infrastructure as Code enthusiast.',
       yearsOfExperience: 4,
       email: 'jess.ops@example.com'

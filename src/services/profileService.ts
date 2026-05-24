@@ -5,7 +5,7 @@ import { UserProfile, Experience } from "../types";
 interface ApiUserProfile {
   first_name: string;
   last_name: string;
-  title: string;
+  country: string;
   email: string;
   phone: string;
   location: string;
@@ -57,7 +57,7 @@ export const profileService = {
     return {
       firstName: data.first_name || "",
       lastName: data.last_name || "",
-      title: data.title || "",
+      country: data.country || "",
       email: data.email || "",
       phone: data.phone || "",
       location: data.location || "",
@@ -80,7 +80,7 @@ export const profileService = {
       body: JSON.stringify({
         first_name: profile.firstName,
         last_name: profile.lastName,
-        title: profile.title,
+        country: profile.country,
         email: profile.email,
         phone: profile.phone,
         location: profile.location,

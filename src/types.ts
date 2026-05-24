@@ -36,7 +36,7 @@ export interface Experience {
 export interface UserProfile {
   firstName: string;
   lastName: string;
-  title: string;
+  country: string;
   email: string;
   phone: string;
   location: string;

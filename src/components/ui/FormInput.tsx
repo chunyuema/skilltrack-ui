@@ -6,7 +6,8 @@ interface FormInputProps {
   name?: string;
   value: string | number;
   onChange: (val: string) => void;
-  type?: 'text' | 'textarea' | 'number' | 'month';
+  type?: 'text' | 'textarea' | 'number' | 'month' | 'select';
+  options?: { label: string; value: string }[];
   placeholder?: string;
   disabled?: boolean;
   icon?: React.ReactNode;
@@ -23,6 +24,7 @@ export function FormInput({
   value,
   onChange,
   type = 'text',
+  options = [],
   placeholder,
   disabled = false,
   icon,
@@ -59,6 +61,22 @@ export function FormInput({
             rows={5}
             className={cn(commonInputStyles, "h-32 leading-relaxed")}
           />
+        ) : type === 'select' ? (
+          <select
+            id={inputId}
+            name={name}
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            disabled={disabled}
+            className={cn(commonInputStyles, "appearance-none cursor-pointer")}
+          >
+            {placeholder && <option value="" disabled>{placeholder}</option>}
+            {options.map((opt) => (
+              <option key={opt.value} value={opt.value} className="bg-bg-deep text-white">
+                {opt.label}
+              </option>
+            ))}
+          </select>
         ) : (
           <input
             id={inputId}

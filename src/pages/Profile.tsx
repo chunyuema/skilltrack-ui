@@ -3,8 +3,23 @@ import { useNavigate } from 'react-router-dom';
 import { UserProfile } from '../types';
 import { useAuth } from '../hooks/useAuth';
 import { profileService } from '../services/profileService';
-import { Save, MapPin, Mail, Phone, Github, Linkedin, GraduationCap, Edit3, Shield } from 'lucide-react';
+import { Save, Mail, Github, Linkedin, GraduationCap, Edit3, Shield } from 'lucide-react';
 import { FormInput } from '../components/ui/FormInput';
+
+const COUNTRY_OPTIONS = [
+  { label: 'United States', value: 'United States' },
+  { label: 'United Kingdom', value: 'United Kingdom' },
+  { label: 'Canada', value: 'Canada' },
+  { label: 'Germany', value: 'Germany' },
+  { label: 'France', value: 'France' },
+  { label: 'Japan', value: 'Japan' },
+  { label: 'China', value: 'China' },
+  { label: 'India', value: 'India' },
+  { label: 'Brazil', value: 'Brazil' },
+  { label: 'Australia', value: 'Australia' },
+  { label: 'Singapore', value: 'Singapore' },
+  { label: 'Netherlands', value: 'Netherlands' },
+];
 
 export default function Profile() {
     const navigate = useNavigate();
@@ -27,9 +42,6 @@ export default function Profile() {
                 const userProfile = await profileService.fetchProfile(token);
                 setProfile(userProfile);
             } catch (err) {
-                // Graceful session expiry handling:
-                // If the service identifies an 'Unauthorized' error, we clear the local 
-                // auth state and send the user back to Login to re-authenticate.
                 if (err instanceof Error && err.message === 'Unauthorized') {
                     logout();
                     navigate('/login');
@@ -74,7 +86,7 @@ export default function Profile() {
     if (error) return <div className="text-red-400 p-6 bg-red-900/10 rounded-2xl border border-red-900/20 font-bold uppercase tracking-widest text-xs">{error}</div>;
     if (!profile) return <div className="text-slate-500 font-bold uppercase tracking-widest text-xs">No profile data found.</div>;
 
-    const handleFieldChange = (name: string, value: string) => {
+    const handleFieldChange = (name: string, value: string | number) => {
         if (profile) {
             setProfile(prev => prev ? { ...prev, [name]: value } : null);
         }
@@ -89,7 +101,7 @@ export default function Profile() {
                         <Shield size={12} />
                         Verified
                     </div>
-                    <h1 className="text-2xl font-black text-white tracking-tight">PROFILE</h1>
+                    <h1 className="text-2xl font-black text-white tracking-tight uppercase">Identity</h1>
                 </div>
                 <button
                     onClick={() => isEditing ? handleSave() : setIsEditing(true)}
@@ -104,17 +116,16 @@ export default function Profile() {
                 </button>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-[360px_1fr] gap-12 lg:gap-20">
-                {/* Sidebar Column */}
-                <aside className="space-y-8">
-                    <div className="bg-bg-card border border-divider p-8 rounded-lg space-y-8">
+            <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-8 lg:gap-16">
+                {/* Name Card (Sidebar) */}
+                <aside className="space-y-6">
+                    <div className="bg-bg-card border border-divider p-6 rounded-lg space-y-6">
                         <div className="space-y-4 text-center">
-                            <div className="w-24 h-24 mx-auto bg-slate-900 border-2 border-divider rounded-full flex items-center justify-center text-4xl font-black text-white shadow-inner">
+                            <div className="w-20 h-20 mx-auto bg-slate-900 border-2 border-divider rounded-full flex items-center justify-center text-3xl font-black text-white shadow-inner">
                                 {profile.firstName.charAt(0)}
                             </div>
                             <div className="space-y-1">
                                 <h3 className="font-black text-xl text-white uppercase tracking-tight">{profile.firstName}</h3>
-                                <p className="text-[10px] font-bold text-text-secondary uppercase tracking-[0.2em] font-mono">Tier: Senior Engineer</p>
                             </div>
                         </div>
 
@@ -134,28 +145,18 @@ export default function Profile() {
                                 <h4 className="text-[10px] font-mono font-bold text-text-secondary uppercase tracking-[0.2em]">Bio</h4>
                                 <p className="text-xs text-white leading-relaxed font-medium whitespace-pre-wrap">
                                     {profile.bio || (
-                                        <span className="text-slate-600 italic">No bio added yet. Click 'Edit Profile' to add one.</span>
+                                        <span className="text-slate-600 italic">No bio added yet.</span>
                                     )}
                                 </p>
                             </div>
                         )}
-
-                        <button className="w-full py-4 bg-white/[0.03] border border-divider rounded font-black text-[10px] uppercase tracking-[0.2em] text-text-secondary hover:text-white hover:bg-white/[0.08] transition-all">
-                             Generate Resume PDF
-                        </button>
                     </div>
                 </aside>
 
-                {/* Main Column */}
-                <div className="space-y-16">
-                    {/* Basic Info */}
-                    <section className="space-y-10">
-                        <div className="space-y-1">
-                            <h2 className="text-xs font-black uppercase tracking-[0.3em] text-primary">Personal Information</h2>
-                            <div className="h-1 w-20 bg-primary/20"></div>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* Simplified Sections */}
+                <div className="space-y-12">
+                    <section className="space-y-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
                             {isEditing ? (
                                 <>
                                     <FormInput label="First Name" name="firstName" value={profile.firstName} isEditing={true} onChange={val => handleFieldChange("firstName", val)} />
@@ -163,26 +164,55 @@ export default function Profile() {
                                 </>
                             ) : (
                                 <div className="md:col-span-2">
-                                    <FormInput label="Full Name" name="fullName" value={`${profile.firstName} ${profile.lastName}`} isEditing={false} onChange={() => {}} />
+                                    <FormInput 
+                                        label="Full Name" 
+                                        name="fullName" 
+                                        value={`${profile.firstName} ${profile.lastName}`.toUpperCase()} 
+                                        isEditing={false} 
+                                        onChange={() => {}} 
+                                    />
                                 </div>
                             )}
+
                             <div className="md:col-span-2">
-                                <FormInput label="Professional Title" name="title" value={profile.title} isEditing={isEditing} onChange={val => handleFieldChange("title", val)} />
+                                <FormInput 
+                                    label="Education" 
+                                    name="education" 
+                                    value={profile.education} 
+                                    isEditing={isEditing} 
+                                    onChange={val => handleFieldChange("education", val)} 
+                                    icon={<GraduationCap size={16} />}
+                                />
                             </div>
 
-                            <FormInput label="Years of Experience" name="yearsOfExperience" value={profile.yearsOfExperience} isEditing={isEditing} onChange={val => handleFieldChange("yearsOfExperience", val)} type="number" />
-                            <FormInput label="Visa Status" name="visaStatus" value={profile.visaStatus} isEditing={isEditing} onChange={val => handleFieldChange("visaStatus", val)} />
-                        </div>
-                    </section>
+                            <FormInput 
+                                label="Years of Experience" 
+                                name="yearsOfExperience" 
+                                value={profile.yearsOfExperience} 
+                                isEditing={isEditing} 
+                                onChange={val => handleFieldChange("yearsOfExperience", val)} 
+                                type="number" 
+                            />
+                            
+                            <FormInput 
+                                label="Country of Residence" 
+                                name="country" 
+                                value={profile.country} 
+                                isEditing={isEditing} 
+                                onChange={val => handleFieldChange("country", val)} 
+                                type="select"
+                                options={COUNTRY_OPTIONS}
+                                placeholder="Select a country"
+                            />
 
-                    {/* Links */}
-                    <section className="space-y-10">
-                         <div className="space-y-1">
-                            <h2 className="text-xs font-black uppercase tracking-[0.3em] text-primary">Contact & Social</h2>
-                            <div className="h-1 w-20 bg-primary/20"></div>
-                        </div>
+                            <FormInput 
+                                label="Visa Status" 
+                                name="visaStatus" 
+                                value={profile.visaStatus} 
+                                isEditing={isEditing} 
+                                onChange={val => handleFieldChange("visaStatus", val)} 
+                            />
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <FormInput
                                 label="Email Address"
                                 name="email"
@@ -191,38 +221,7 @@ export default function Profile() {
                                 onChange={val => handleFieldChange("email", val)}
                                 icon={<Mail size={16} />}
                             />
-                            <FormInput
-                                label="Phone Number"
-                                name="phone"
-                                value={profile.phone}
-                                isEditing={isEditing}
-                                onChange={val => handleFieldChange("phone", val)}
-                                icon={<Phone size={16} />}
-                            />
-                            <FormInput
-                                label="Location"
-                                name="location"
-                                value={profile.location}
-                                isEditing={isEditing}
-                                onChange={val => handleFieldChange("location", val)}
-                                icon={<MapPin size={16} />}
-                            />
-                            <FormInput
-                                label="Education"
-                                name="education"
-                                value={profile.education}
-                                isEditing={isEditing}
-                                onChange={val => handleFieldChange("education", val)}
-                                icon={<GraduationCap size={16} />}
-                            />
-                            <FormInput
-                                label="GitHub Profile"
-                                name="githubUrl"
-                                value={profile.githubUrl}
-                                isEditing={isEditing}
-                                onChange={val => handleFieldChange("githubUrl", val)}
-                                icon={<Github size={16} />}
-                            />
+
                             <FormInput
                                 label="LinkedIn Profile"
                                 name="linkedinUrl"
@@ -231,14 +230,19 @@ export default function Profile() {
                                 onChange={val => handleFieldChange("linkedinUrl", val)}
                                 icon={<Linkedin size={16} />}
                             />
+
+                            <FormInput
+                                label="GitHub Profile"
+                                name="githubUrl"
+                                value={profile.githubUrl}
+                                isEditing={isEditing}
+                                onChange={val => handleFieldChange("githubUrl", val)}
+                                icon={<Github size={16} />}
+                            />
                         </div>
                     </section>
                 </div>
             </div>
-
         </div>
     );
 }
-
-
-
