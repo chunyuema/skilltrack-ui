@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { UserProfile, Experience } from '../types';
 import { useAuth } from '../hooks/useAuth';
 import { profileService } from '../services/profileService';
-import { Save, Mail, Github, Linkedin, GraduationCap, Edit3, Shield, User, Clock, Globe, Plus, Trash2, Pencil, Check } from 'lucide-react';
+import { Save, Mail, Github, Linkedin, GraduationCap, Edit3, Shield, User, Clock, Globe, Plus, Trash2, Pencil } from 'lucide-react';
 import { FormInput } from '../components/ui/FormInput';
 import { MonthYearPicker } from '../components/ui/MonthYearPicker';
 
@@ -52,6 +52,14 @@ export default function Profile() {
         setIsEditing(false); setIsSaving(false);
     };
 
+    const handleAddExperience = async () => {
+        if (!token || !newExp.company || !newExp.role) return;
+        setIsSaving(true);
+        const exp = await profileService.addExperience({ company: newExp.company, role: newExp.role, startDate: newExp.startDate || '', endDate: newExp.endDate || 'Present', description: newExp.description || '', technologies: newExp.technologies || [] }, token);
+        setExperiences([exp, ...experiences]);
+        setIsAddingExp(false); setNewExp({}); setIsSaving(false);
+    };
+
     const handleUpdateExperience = async () => {
         if (!editingExpId) return;
         setIsSaving(true);
@@ -60,11 +68,15 @@ export default function Profile() {
         setEditingExpId(null); setIsSaving(false);
     };
 
+    const handleDeleteExperience = async (id: string) => {
+        await profileService.deleteExperience(id, token!);
+        setExperiences(experiences.filter(exp => exp.id !== id));
+    };
+
     if (isLoading || !profile) return <div className="p-24 text-center text-white">Loading...</div>;
 
     return (
         <div className="animate-in fade-in duration-700 max-w-[1200px] mx-auto grid grid-cols-1 lg:grid-cols-[350px_1fr] gap-12">
-            {/* Sidebar Name Card */}
             <aside className="space-y-6">
                 <div className="bg-bg-card border border-divider p-6 rounded-lg space-y-6 sticky top-24">
                     <div className="text-center">
@@ -88,44 +100,53 @@ export default function Profile() {
                 </div>
             </aside>
 
-            {/* Main Content: Bio & Experience */}
             <main className="space-y-8">
                 <div className="bg-bg-card border border-divider p-6 rounded-lg space-y-4">
                      <h2 className="text-sm font-black text-white uppercase tracking-[0.3em]">Bio</h2>
-                     {isEditing ? (
-                        <textarea 
-                            value={profile.bio || ''} 
-                            onChange={(e) => setProfile({...profile, bio: e.target.value})} 
-                            className="w-full bg-bg-deep border border-divider rounded p-3 text-xs text-white" 
-                            rows={4}
-                        />
-                     ) : (
-                        <p className="text-sm text-text-secondary leading-relaxed">{profile.bio || "No bio added."}</p>
-                     )}
+                     {isEditing ? <textarea value={profile.bio || ''} onChange={(e) => setProfile({...profile, bio: e.target.value})} className="w-full bg-bg-deep border border-divider rounded p-3 text-xs text-white" rows={4} /> : <p className="text-sm text-text-secondary leading-relaxed">{profile.bio || "No bio added."}</p>}
                 </div>
 
                  <div className="flex justify-between items-center pb-4 border-b border-divider">
                      <h2 className="text-sm font-black text-white uppercase tracking-[0.3em]">Work History</h2>
                      <button onClick={() => setIsAddingExp(true)} className="text-primary"><Plus size={18} /></button>
                  </div>
+
+                 {isAddingExp && (
+                     <div className="bg-bg-deep p-6 rounded-lg border border-divider space-y-4">
+                        <FormInput label="Company" value={newExp.company || ''} onChange={v => setNewExp({...newExp, company: v})} />
+                        <FormInput label="Role" value={newExp.role || ''} onChange={v => setNewExp({...newExp, role: v})} />
+                        <div className="grid grid-cols-2 gap-4">
+                            <MonthYearPicker label="Start" value={newExp.startDate || ''} onChange={v => setNewExp({...newExp, startDate: v})} />
+                            <MonthYearPicker label="End" value={newExp.endDate || ''} onChange={v => setNewExp({...newExp, endDate: v})} allowPresent />
+                        </div>
+                        <textarea value={newExp.description || ''} onChange={e => setNewExp({...newExp, description: e.target.value})} className="w-full bg-bg-card border border-divider rounded p-3 text-xs text-white" rows={3} placeholder="Description" />
+                        <button onClick={handleAddExperience} className="px-4 py-2 bg-primary text-white text-xs font-bold rounded">Save Position</button>
+                     </div>
+                 )}
+
                  {experiences.map(exp => (
                      <div key={exp.id} className="bg-bg-card border border-divider p-6 rounded-lg">
                         {editingExpId === exp.id ? (
                            <div className="space-y-4">
                               <FormInput label="Company" value={editExp.company || exp.company} onChange={v => setEditExp({...editExp, company: v})} />
                               <FormInput label="Role" value={editExp.role || exp.role} onChange={v => setEditExp({...editExp, role: v})} />
+                              <div className="grid grid-cols-2 gap-4">
+                                  <MonthYearPicker label="Start" value={editExp.startDate || exp.startDate} onChange={v => setEditExp({...editExp, startDate: v})} />
+                                  <MonthYearPicker label="End" value={editExp.endDate || exp.endDate} onChange={v => setEditExp({...editExp, endDate: v})} allowPresent />
+                              </div>
+                              <textarea value={editExp.description || exp.description} onChange={e => setEditExp({...editExp, description: e.target.value})} className="w-full bg-bg-deep border border-divider rounded p-3 text-xs text-white" rows={3} />
                               <button onClick={handleUpdateExperience} className="px-4 py-2 bg-primary text-white text-xs font-bold rounded">Commit</button>
                            </div>
                         ) : (
                            <div className="flex justify-between items-start">
                                <div>
                                    <h4 className="font-bold text-white text-lg">{exp.role}</h4>
-                                   <p className="text-sm text-text-secondary">{exp.company}</p>
+                                   <p className="text-sm text-text-secondary">{exp.company} • {exp.startDate} to {exp.endDate}</p>
                                    <p className="text-xs text-text-secondary mt-2">{exp.description}</p>
                                </div>
                                <div className="flex gap-2">
-                                   <button onClick={() => setEditingExpId(exp.id)} className="text-text-secondary hover:text-white"><Pencil size={14}/></button>
-                                   <button onClick={() => {}} className="text-text-secondary hover:text-red-400"><Trash2 size={14}/></button>
+                                   <button onClick={() => { setEditingExpId(exp.id); setEditExp(exp); }} className="text-text-secondary hover:text-white"><Pencil size={14}/></button>
+                                   <button onClick={() => handleDeleteExperience(exp.id)} className="text-text-secondary hover:text-red-400"><Trash2 size={14}/></button>
                                </div>
                            </div>
                         )}
