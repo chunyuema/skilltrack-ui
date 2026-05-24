@@ -128,24 +128,23 @@ export default function Profile() {
                                 </p>
                             </div>
                         )}
-                    </div>
-                </aside>
 
-                {/* Simplified Sections */}
-                <div className="space-y-12">
-                    <div className="flex justify-end">
                         <button
                             onClick={() => isEditing ? handleSave() : setIsEditing(true)}
                             disabled={isSaving}
-                            className={`flex items-center gap-2 px-5 py-2 rounded font-bold text-[10px] uppercase tracking-widest transition-all ${isEditing
+                            className={`w-full flex items-center justify-center gap-2 px-5 py-3 rounded font-bold text-[10px] uppercase tracking-widest transition-all ${isEditing
                                 ? 'bg-primary text-white hover:bg-primary-hover shadow-lg shadow-primary/20'
-                                : 'bg-transparent border border-divider text-white hover:bg-white/[0.05]'
+                                : 'bg-white/[0.03] border border-divider text-text-secondary hover:text-white hover:bg-white/[0.08]'
                                 } ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
                             {isEditing ? <Save size={14} /> : <Edit3 size={14} />}
                             {isEditing ? (isSaving ? 'Saving...' : 'Save') : 'Edit Profile'}
                         </button>
                     </div>
+                </aside>
+
+                {/* Simplified Sections */}
+                <div className="space-y-12">
                     <section className="space-y-8">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
                             {isEditing ? (
