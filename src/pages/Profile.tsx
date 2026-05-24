@@ -118,11 +118,27 @@ export default function Profile() {
                             </div>
                         </div>
 
-                        <div className="space-y-4 pt-4 border-t border-divider">
-                             <SidebarStat label="Profile Strength" value="94%" />
-                             <SidebarStat label="Skill Nodes" value="28" />
-                             <SidebarStat label="Endorsements" value="12" />
-                        </div>
+                        {isEditing ? (
+                            <div className="space-y-2 pt-4 border-t border-divider">
+                                <label className="text-[10px] font-mono font-bold text-text-secondary uppercase tracking-[0.2em]">Bio</label>
+                                <textarea
+                                    value={profile.bio || ''}
+                                    onChange={(e) => handleFieldChange("bio", e.target.value)}
+                                    placeholder="Write a small bio..."
+                                    rows={4}
+                                    className="w-full px-3 py-2 bg-bg-deep border border-divider rounded text-xs text-white focus:outline-none focus:ring-1 focus:ring-primary/40 focus:border-primary transition-all resize-none leading-relaxed"
+                                />
+                            </div>
+                        ) : (
+                            <div className="space-y-2 pt-4 border-t border-divider">
+                                <h4 className="text-[10px] font-mono font-bold text-text-secondary uppercase tracking-[0.2em]">Bio</h4>
+                                <p className="text-xs text-white leading-relaxed font-medium whitespace-pre-wrap">
+                                    {profile.bio || (
+                                        <span className="text-slate-600 italic">No bio added yet. Click 'Edit Profile' to add one.</span>
+                                    )}
+                                </p>
+                            </div>
+                        )}
 
                         <button className="w-full py-4 bg-white/[0.03] border border-divider rounded font-black text-[10px] uppercase tracking-[0.2em] text-text-secondary hover:text-white hover:bg-white/[0.08] transition-all">
                              Generate Resume PDF
@@ -224,12 +240,5 @@ export default function Profile() {
     );
 }
 
-function SidebarStat({ label, value }: { label: string, value: string }) {
-    return (
-        <div className="flex justify-between items-center text-xs">
-            <span className="font-bold text-text-secondary uppercase tracking-wider">{label}</span>
-            <span className="font-black text-white font-mono">{value}</span>
-        </div>
-    );
-}
+
 
