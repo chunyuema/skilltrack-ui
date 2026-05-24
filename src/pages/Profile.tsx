@@ -93,22 +93,7 @@ export default function Profile() {
     };
 
     return (
-        <div className="space-y-12 animate-in fade-in duration-700">
-            {/* Compact Header */}
-            <div className="flex flex-col md:flex-row justify-end items-center gap-6 pb-6 border-b border-divider">
-                <button
-                    onClick={() => isEditing ? handleSave() : setIsEditing(true)}
-                    disabled={isSaving}
-                    className={`flex items-center gap-2 px-5 py-2 rounded font-bold text-[10px] uppercase tracking-widest transition-all ${isEditing
-                        ? 'bg-primary text-white hover:bg-primary-hover shadow-lg shadow-primary/20'
-                        : 'bg-transparent border border-divider text-white hover:bg-white/[0.05]'
-                        } ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
-                >
-                    {isEditing ? <Save size={14} /> : <Edit3 size={14} />}
-                    {isEditing ? (isSaving ? 'Saving...' : 'Save') : 'Edit Profile'}
-                </button>
-            </div>
-
+        <div className="animate-in fade-in duration-700">
             <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-8 lg:gap-16">
                 {/* Name Card (Sidebar) */}
                 <aside className="space-y-6">
@@ -148,6 +133,19 @@ export default function Profile() {
 
                 {/* Simplified Sections */}
                 <div className="space-y-12">
+                    <div className="flex justify-end">
+                        <button
+                            onClick={() => isEditing ? handleSave() : setIsEditing(true)}
+                            disabled={isSaving}
+                            className={`flex items-center gap-2 px-5 py-2 rounded font-bold text-[10px] uppercase tracking-widest transition-all ${isEditing
+                                ? 'bg-primary text-white hover:bg-primary-hover shadow-lg shadow-primary/20'
+                                : 'bg-transparent border border-divider text-white hover:bg-white/[0.05]'
+                                } ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        >
+                            {isEditing ? <Save size={14} /> : <Edit3 size={14} />}
+                            {isEditing ? (isSaving ? 'Saving...' : 'Save') : 'Edit Profile'}
+                        </button>
+                    </div>
                     <section className="space-y-8">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
                             {isEditing ? (
