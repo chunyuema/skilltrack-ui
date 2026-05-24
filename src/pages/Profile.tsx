@@ -88,8 +88,22 @@ export default function Profile() {
                 </div>
             </aside>
 
-            {/* Main Content: Experience */}
+            {/* Main Content: Bio & Experience */}
             <main className="space-y-8">
+                <div className="bg-bg-card border border-divider p-6 rounded-lg space-y-4">
+                     <h2 className="text-sm font-black text-white uppercase tracking-[0.3em]">Bio</h2>
+                     {isEditing ? (
+                        <textarea 
+                            value={profile.bio || ''} 
+                            onChange={(e) => setProfile({...profile, bio: e.target.value})} 
+                            className="w-full bg-bg-deep border border-divider rounded p-3 text-xs text-white" 
+                            rows={4}
+                        />
+                     ) : (
+                        <p className="text-sm text-text-secondary leading-relaxed">{profile.bio || "No bio added."}</p>
+                     )}
+                </div>
+
                  <div className="flex justify-between items-center pb-4 border-b border-divider">
                      <h2 className="text-sm font-black text-white uppercase tracking-[0.3em]">Work History</h2>
                      <button onClick={() => setIsAddingExp(true)} className="text-primary"><Plus size={18} /></button>
