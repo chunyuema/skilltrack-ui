@@ -93,148 +93,125 @@ export default function Profile() {
     };
 
     return (
-        <div className="animate-in fade-in duration-700">
-            <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-8 lg:gap-16">
-                {/* Name Card (Sidebar) */}
-                <aside className="space-y-6">
-                    <div className="bg-bg-card border border-divider p-6 rounded-lg space-y-6">
-                        <div className="space-y-4 text-center">
-                            <div className="w-20 h-20 mx-auto bg-slate-900 border-2 border-divider rounded-full flex items-center justify-center text-3xl font-black text-white shadow-inner">
-                                {profile.firstName.charAt(0)}
-                            </div>
-                            <div className="space-y-1">
-                                {isEditing ? (
-                                    <div className="grid grid-cols-2 gap-2">
-                                        <input 
-                                            value={profile.firstName} 
-                                            onChange={(e) => handleFieldChange("firstName", e.target.value)} 
-                                            className="w-full bg-bg-deep border border-divider rounded px-2 py-1 text-center text-sm text-white"
-                                        />
-                                        <input 
-                                            value={profile.lastName} 
-                                            onChange={(e) => handleFieldChange("lastName", e.target.value)} 
-                                            className="w-full bg-bg-deep border border-divider rounded px-2 py-1 text-center text-sm text-white"
-                                        />
-                                    </div>
-                                ) : (
-                                    <h3 className="font-black text-xl text-white uppercase tracking-tight">{profile.firstName} {profile.lastName}</h3>
-                                )}
-                            </div>
+        <div className="animate-in fade-in duration-700 max-w-xl mx-auto">
+            {/* Unified Sidebar Card */}
+            <aside className="space-y-6">
+                <div className="bg-bg-card border border-divider p-6 rounded-lg space-y-6">
+                    <div className="space-y-4 text-center">
+                        <div className="w-20 h-20 mx-auto bg-slate-900 border-2 border-divider rounded-full flex items-center justify-center text-3xl font-black text-white shadow-inner">
+                            {profile.firstName.charAt(0)}
                         </div>
+                        <div className="space-y-1">
+                            {isEditing ? (
+                                <div className="grid grid-cols-2 gap-2">
+                                    <input 
+                                        value={profile.firstName} 
+                                        onChange={(e) => handleFieldChange("firstName", e.target.value)} 
+                                        className="w-full bg-bg-deep border border-divider rounded px-2 py-1 text-center text-sm text-white"
+                                    />
+                                    <input 
+                                        value={profile.lastName} 
+                                        onChange={(e) => handleFieldChange("lastName", e.target.value)} 
+                                        className="w-full bg-bg-deep border border-divider rounded px-2 py-1 text-center text-sm text-white"
+                                    />
+                                </div>
+                            ) : (
+                                <h3 className="font-black text-xl text-white uppercase tracking-tight">{profile.firstName} {profile.lastName}</h3>
+                            )}
+                        </div>
+                    </div>
 
+                    <div className="space-y-4 pt-4 border-t border-divider">
+                        <FormInput 
+                            label="Email" 
+                            name="email" 
+                            value={profile.email} 
+                            isEditing={isEditing} 
+                            onChange={val => handleFieldChange("email", val)} 
+                            icon={<Mail size={14} />} 
+                        />
+                        <FormInput 
+                            label="Years of Exp" 
+                            name="yearsOfExperience" 
+                            value={profile.yearsOfExperience} 
+                            isEditing={isEditing} 
+                            onChange={val => handleFieldChange("yearsOfExperience", val)} 
+                            type="number" 
+                            icon={<Clock size={14} />} 
+                        />
+                        <FormInput 
+                            label="Country" 
+                            name="country" 
+                            value={profile.country} 
+                            isEditing={isEditing} 
+                            onChange={val => handleFieldChange("country", val)} 
+                            type="select"
+                            options={COUNTRY_OPTIONS}
+                            icon={<Globe size={14} />} 
+                        />
+                        <FormInput 
+                            label="Education" 
+                            name="education" 
+                            value={profile.education} 
+                            isEditing={isEditing} 
+                            onChange={val => handleFieldChange("education", val)} 
+                            icon={<GraduationCap size={14} />} 
+                        />
+                        <FormInput 
+                            label="Visa" 
+                            name="visaStatus" 
+                            value={profile.visaStatus} 
+                            isEditing={isEditing} 
+                            onChange={val => handleFieldChange("visaStatus", val)} 
+                            icon={<Shield size={14} />} 
+                        />
+                        <FormInput 
+                            label="LinkedIn" 
+                            name="linkedinUrl" 
+                            value={profile.linkedinUrl} 
+                            isEditing={isEditing} 
+                            onChange={val => handleFieldChange("linkedinUrl", val)} 
+                            icon={<Linkedin size={14} />} 
+                        />
+                        <FormInput 
+                            label="GitHub" 
+                            name="githubUrl" 
+                            value={profile.githubUrl} 
+                            isEditing={isEditing} 
+                            onChange={val => handleFieldChange("githubUrl", val)} 
+                            icon={<Github size={14} />} 
+                        />
                         {isEditing ? (
-                            <div className="space-y-2 pt-4 border-t border-divider">
+                            <div className="space-y-2">
                                 <label className="text-[10px] font-mono font-bold text-text-secondary uppercase tracking-[0.2em]">Bio</label>
                                 <textarea
                                     value={profile.bio || ''}
                                     onChange={(e) => handleFieldChange("bio", e.target.value)}
-                                    placeholder="Write a small bio..."
                                     rows={4}
                                     className="w-full px-3 py-2 bg-bg-deep border border-divider rounded text-xs text-white focus:outline-none focus:ring-1 focus:ring-primary/40 focus:border-primary transition-all resize-none leading-relaxed"
                                 />
                             </div>
                         ) : (
-                            <div className="space-y-2 pt-4 border-t border-divider">
+                            <div className="space-y-2">
                                 <h4 className="text-[10px] font-mono font-bold text-text-secondary uppercase tracking-[0.2em]">Bio</h4>
-                                <p className="text-xs text-white leading-relaxed font-medium whitespace-pre-wrap">
-                                    {profile.bio || (
-                                        <span className="text-slate-600 italic">No bio added yet.</span>
-                                    )}
-                                </p>
+                                <p className="text-xs text-white leading-relaxed font-medium whitespace-pre-wrap">{profile.bio || "No bio added."}</p>
                             </div>
                         )}
-
-                        <button
-                            onClick={() => isEditing ? handleSave() : setIsEditing(true)}
-                            disabled={isSaving}
-                            className={`w-full flex items-center justify-center gap-2 px-5 py-3 rounded font-bold text-[10px] uppercase tracking-widest transition-all ${isEditing
-                                ? 'bg-primary text-white hover:bg-primary-hover shadow-lg shadow-primary/20'
-                                : 'bg-white/[0.03] border border-divider text-text-secondary hover:text-white hover:bg-white/[0.08]'
-                                } ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        >
-                            {isEditing ? <Save size={14} /> : <Edit3 size={14} />}
-                            {isEditing ? (isSaving ? 'Saving...' : 'Save') : 'Edit Profile'}
-                        </button>
                     </div>
-                </aside>
 
-                {/* Simplified Sections */}
-                <div className="space-y-12">
-                    <section className="space-y-8">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
-                            {/* Row 1: Email */}
-                            <FormInput
-                                label="Email Address"
-                                name="email"
-                                value={profile.email}
-                                isEditing={isEditing}
-                                onChange={val => handleFieldChange("email", val)}
-                                icon={<Mail size={16} />}
-                            />
-                            {/* Placeholder for layout balance */}
-                            <div className="hidden md:block"></div>
-
-                            {/* Row 2: Experience | Education */}
-                            <FormInput 
-                                label="Years of Experience" 
-                                name="yearsOfExperience" 
-                                value={profile.yearsOfExperience} 
-                                isEditing={isEditing} 
-                                onChange={val => handleFieldChange("yearsOfExperience", val)} 
-                                type="number" 
-                                icon={<Clock size={16} />}
-                            />
-                            <FormInput 
-                                label="Education" 
-                                name="education" 
-                                value={profile.education} 
-                                isEditing={isEditing} 
-                                onChange={val => handleFieldChange("education", val)} 
-                                icon={<GraduationCap size={16} />}
-                            />
-                            
-                            {/* Row 3: Country | Visa */}
-                            <FormInput 
-                                label="Country of Residence" 
-                                name="country" 
-                                value={profile.country} 
-                                isEditing={isEditing} 
-                                onChange={val => handleFieldChange("country", val)} 
-                                type="select"
-                                options={COUNTRY_OPTIONS}
-                                placeholder="Select a country"
-                                icon={<Globe size={16} />}
-                            />
-                            <FormInput 
-                                label="Visa Status" 
-                                name="visaStatus" 
-                                value={profile.visaStatus} 
-                                isEditing={isEditing} 
-                                onChange={val => handleFieldChange("visaStatus", val)} 
-                                icon={<Shield size={16} />}
-                            />
-
-                            {/* Row 4: LinkedIn | GitHub */}
-                            <FormInput
-                                label="LinkedIn Profile"
-                                name="linkedinUrl"
-                                value={profile.linkedinUrl}
-                                isEditing={isEditing}
-                                onChange={val => handleFieldChange("linkedinUrl", val)}
-                                icon={<Linkedin size={16} />}
-                            />
-                            <FormInput
-                                label="GitHub Profile"
-                                name="githubUrl"
-                                value={profile.githubUrl}
-                                isEditing={isEditing}
-                                onChange={val => handleFieldChange("githubUrl", val)}
-                                icon={<Github size={16} />}
-                            />
-                        </div>
-                    </section>
+                    <button
+                        onClick={() => isEditing ? handleSave() : setIsEditing(true)}
+                        disabled={isSaving}
+                        className={`w-full flex items-center justify-center gap-2 px-5 py-3 rounded font-bold text-[10px] uppercase tracking-widest transition-all ${isEditing
+                            ? 'bg-primary text-white hover:bg-primary-hover shadow-lg shadow-primary/20'
+                            : 'bg-white/[0.03] border border-divider text-text-secondary hover:text-white hover:bg-white/[0.08]'
+                            } ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    >
+                        {isEditing ? <Save size={14} /> : <Edit3 size={14} />}
+                        {isEditing ? (isSaving ? 'Saving...' : 'Save') : 'Edit Profile'}
+                    </button>
                 </div>
-            </div>
+            </aside>
         </div>
     );
 }
