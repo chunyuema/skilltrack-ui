@@ -147,35 +147,34 @@ export default function Profile() {
                 <div className="space-y-12">
                     <section className="space-y-8">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+                            {/* Row 1: Name | Email */}
                             {isEditing ? (
                                 <>
-                                    <FormInput label="First Name" name="firstName" value={profile.firstName} isEditing={true} onChange={val => handleFieldChange("firstName", val)} icon={<User size={16} />} />
-                                    <FormInput label="Last Name" name="lastName" value={profile.lastName} isEditing={true} onChange={val => handleFieldChange("lastName", val)} icon={<User size={16} />} />
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <FormInput label="First Name" name="firstName" value={profile.firstName} isEditing={true} onChange={val => handleFieldChange("firstName", val)} icon={<User size={16} />} />
+                                        <FormInput label="Last Name" name="lastName" value={profile.lastName} isEditing={true} onChange={val => handleFieldChange("lastName", val)} icon={<User size={16} />} />
+                                    </div>
                                 </>
                             ) : (
-                                <div className="md:col-span-2">
-                                    <FormInput 
-                                        label="Full Name" 
-                                        name="fullName" 
-                                        value={`${profile.firstName} ${profile.lastName}`.toUpperCase()} 
-                                        isEditing={false} 
-                                        onChange={() => {}} 
-                                        icon={<User size={16} />}
-                                    />
-                                </div>
-                            )}
-
-                            <div className="md:col-span-2">
                                 <FormInput 
-                                    label="Education" 
-                                    name="education" 
-                                    value={profile.education} 
-                                    isEditing={isEditing} 
-                                    onChange={val => handleFieldChange("education", val)} 
-                                    icon={<GraduationCap size={16} />}
+                                    label="Full Name" 
+                                    name="fullName" 
+                                    value={`${profile.firstName} ${profile.lastName}`.toUpperCase()} 
+                                    isEditing={false} 
+                                    onChange={() => {}} 
+                                    icon={<User size={16} />}
                                 />
-                            </div>
+                            )}
+                            <FormInput
+                                label="Email Address"
+                                name="email"
+                                value={profile.email}
+                                isEditing={isEditing}
+                                onChange={val => handleFieldChange("email", val)}
+                                icon={<Mail size={16} />}
+                            />
 
+                            {/* Row 2: Experience | Education */}
                             <FormInput 
                                 label="Years of Experience" 
                                 name="yearsOfExperience" 
@@ -185,7 +184,16 @@ export default function Profile() {
                                 type="number" 
                                 icon={<Clock size={16} />}
                             />
+                            <FormInput 
+                                label="Education" 
+                                name="education" 
+                                value={profile.education} 
+                                isEditing={isEditing} 
+                                onChange={val => handleFieldChange("education", val)} 
+                                icon={<GraduationCap size={16} />}
+                            />
                             
+                            {/* Row 3: Country | Visa */}
                             <FormInput 
                                 label="Country of Residence" 
                                 name="country" 
@@ -197,7 +205,6 @@ export default function Profile() {
                                 placeholder="Select a country"
                                 icon={<Globe size={16} />}
                             />
-
                             <FormInput 
                                 label="Visa Status" 
                                 name="visaStatus" 
@@ -207,15 +214,7 @@ export default function Profile() {
                                 icon={<Shield size={16} />}
                             />
 
-                            <FormInput
-                                label="Email Address"
-                                name="email"
-                                value={profile.email}
-                                isEditing={isEditing}
-                                onChange={val => handleFieldChange("email", val)}
-                                icon={<Mail size={16} />}
-                            />
-
+                            {/* Row 4: LinkedIn | GitHub */}
                             <FormInput
                                 label="LinkedIn Profile"
                                 name="linkedinUrl"
@@ -224,7 +223,6 @@ export default function Profile() {
                                 onChange={val => handleFieldChange("linkedinUrl", val)}
                                 icon={<Linkedin size={16} />}
                             />
-
                             <FormInput
                                 label="GitHub Profile"
                                 name="githubUrl"
