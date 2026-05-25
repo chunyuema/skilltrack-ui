@@ -33,7 +33,17 @@ export default function Profile() {
     const [editingExpId, setEditingExpId] = useState<string | null>(null);
     const [newExp, setNewExp] = useState<Partial<Experience>>({});
     const [editExp, setEditExp] = useState<Partial<Experience>>({});
+    const [expError, setExpError] = useState<string | null>(null);
     const { token, logout } = useAuth();
+
+    const validateDates = (start?: string, end?: string): string | null => {
+        if (!start) return 'Start date is required.';
+        if (!end) return 'End date is required.';
+        if (end !== 'Present' && end < start) {
+            return 'End date cannot be before start date.';
+        }
+        return null;
+    };
 
     useEffect(() => {
         const loadData = async () => {
@@ -54,7 +64,15 @@ export default function Profile() {
 
     const handleAddExperience = async () => {
         if (!token || !newExp.company || !newExp.role) return;
+
+        const validationError = validateDates(newExp.startDate, newExp.endDate);
+        if (validationError) {
+            setExpError(validationError);
+            return;
+        }
+
         setIsSaving(true);
+        setExpError(null);
         const exp = await profileService.addExperience({ company: newExp.company, role: newExp.role, startDate: newExp.startDate || '', endDate: newExp.endDate || 'Present', description: newExp.description || '', technologies: newExp.technologies || [] }, token);
         setExperiences([exp, ...experiences]);
         setIsAddingExp(false); setNewExp({}); setIsSaving(false);
@@ -62,7 +80,15 @@ export default function Profile() {
 
     const handleUpdateExperience = async () => {
         if (!editingExpId) return;
+
+        const validationError = validateDates(editExp.startDate, editExp.endDate);
+        if (validationError) {
+            setExpError(validationError);
+            return;
+        }
+
         setIsSaving(true);
+        setExpError(null);
         const updated = await profileService.updateExperience(editingExpId, editExp as any, token!);
         setExperiences(experiences.map(e => e.id === editingExpId ? updated : e));
         setEditingExpId(null); setIsSaving(false);
@@ -108,8 +134,14 @@ export default function Profile() {
 
                  <div className="flex justify-between items-center pb-4 border-b border-divider">
                      <h2 className="text-sm font-black text-white uppercase tracking-[0.3em]">Work History</h2>
-                     <button onClick={() => setIsAddingExp(true)} className="text-primary"><Plus size={18} /></button>
+                     <button onClick={() => { setIsAddingExp(true); setExpError(null); }} className="text-primary"><Plus size={18} /></button>
                  </div>
+
+                 {expError && (
+                     <div className="bg-red-900/10 border border-red-900/20 text-red-400 p-4 rounded-lg text-xs font-bold uppercase tracking-widest">
+                         {expError}
+                     </div>
+                 )}
 
                  {isAddingExp && (
                      <div className="bg-bg-deep p-6 rounded-lg border border-divider space-y-4">
@@ -151,7 +183,7 @@ export default function Profile() {
                                    <p className="text-xs text-text-secondary mt-2">{exp.description}</p>
                                </div>
                                <div className="flex gap-2">
-                                   <button onClick={() => { setEditingExpId(exp.id); setEditExp(exp); }} className="text-text-secondary hover:text-white"><Pencil size={14}/></button>
+                                   <button onClick={() => { setEditingExpId(exp.id); setEditExp(exp); setExpError(null); }} className="text-text-secondary hover:text-white"><Pencil size={14}/></button>
                                    <button onClick={() => handleDeleteExperience(exp.id)} className="text-text-secondary hover:text-red-400"><Trash2 size={14}/></button>
                                </div>
                            </div>
