@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { SkillTheme } from '../types';
 import SkillsRadar from '../components/skills/SkillsRadar';
 import SkillsList from '../components/skills/SkillsList';
+import { Sparkles } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { profileService } from '../services/profileService';
 
@@ -99,6 +100,9 @@ export default function SkillsPage() {
         'SPECIAL': 'Advanced Specializations'
     };
 
+    const activeDomain = themesByTier['DOMAIN']?.[0]?.track?.name;
+    const activeSpecials = Array.from(new Set(themesByTier['SPECIAL']?.filter(t => t.track).map(t => t.track!.name) || []));
+
     return (
         <div className="space-y-10 animate-in fade-in duration-700">
             {/* Tab Navigation Header */}
@@ -126,9 +130,33 @@ export default function SkillsPage() {
                     <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
                         {themesByTier[activeTab] ? (
                             <div className="space-y-10">
-                                <div className="space-y-1">
-                                    <h2 className="text-xs font-black uppercase tracking-[0.3em] text-primary">{tierLabels[activeTab]}</h2>
-                                    <div className="h-1 w-20 bg-primary/20"></div>
+                                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                    <div className="space-y-1">
+                                        <h2 className="text-xs font-black uppercase tracking-[0.3em] text-primary">{tierLabels[activeTab]}</h2>
+                                        <div className="h-1 w-20 bg-primary/20"></div>
+                                    </div>
+                                    
+                                    {activeTab === 'DOMAIN' && activeDomain && (
+                                        <div className="flex items-center gap-3 bg-primary/5 border border-primary/20 px-4 py-2 rounded-lg self-start md:self-auto">
+                                            <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white">
+                                                Active Role: {activeDomain}
+                                            </span>
+                                        </div>
+                                    )}
+
+                                    {activeTab === 'SPECIAL' && activeSpecials.length > 0 && (
+                                        <div className="flex flex-wrap gap-2 justify-start md:justify-end">
+                                            {activeSpecials.map(name => (
+                                                <div key={name} className="flex items-center gap-2 bg-emerald-400/5 border border-emerald-400/20 px-3 py-1.5 rounded-lg">
+                                                    <Sparkles size={10} className="text-emerald-400" />
+                                                    <span className="text-[10px] font-black uppercase tracking-[0.1em] text-emerald-400/90">
+                                                        {name}
+                                                    </span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
                                 </div>
                                 <SkillsList themes={themesByTier[activeTab]} onUpdateSkill={updateSkill} />
                             </div>
