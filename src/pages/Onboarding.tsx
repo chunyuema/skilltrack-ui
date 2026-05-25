@@ -13,7 +13,7 @@ export default function Onboarding() {
   const [tracks, setTracks] = useState<Track[]>([]);
   const [coreSkills, setCoreSkills] = useState<SkillTheme[]>([]);
   const [selectedDomain, setSelectedDomain] = useState<string>('');
-  const [selectedSpecials, setSelectedSpecials] = useState<string[]>([]);
+  const [selectedSpecial, setSelectedSpecial] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -42,10 +42,8 @@ export default function Onboarding() {
 
   const handleDomainSelect = (id: string) => setSelectedDomain(id);
   
-  const toggleSpecial = (id: string) => {
-    setSelectedSpecials(prev => 
-      prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]
-    );
+  const handleSpecialSelect = (id: string) => {
+    setSelectedSpecial(prev => prev === id ? '' : id);
   };
 
   const handleSkillRate = async (skillId: string, level: number) => {
@@ -61,7 +59,7 @@ export default function Onboarding() {
     if (!token) return;
     setIsSaving(true);
     try {
-      const trackIds = [selectedDomain, ...selectedSpecials].filter(Boolean);
+      const trackIds = [selectedDomain, selectedSpecial].filter(Boolean);
       await profileService.updateUserTracks(trackIds, token);
       await refreshProfile();
       navigate('/skills');
@@ -231,17 +229,17 @@ export default function Onboarding() {
               {specialTracks.map(track => (
                 <button
                   key={track.id}
-                  onClick={() => toggleSpecial(track.id)}
+                  onClick={() => handleSpecialSelect(track.id)}
                   className={cn(
                     "flex items-center gap-6 p-8 rounded-lg border-2 transition-all text-left group",
-                    selectedSpecials.includes(track.id) 
+                    selectedSpecial === track.id 
                       ? "bg-primary/5 border-primary" 
                       : "bg-bg-card border-divider hover:border-primary/30"
                   )}
                 >
                   <div className={cn(
                     "w-12 h-12 flex-shrink-0 rounded-full flex items-center justify-center transition-all",
-                    selectedSpecials.includes(track.id) ? "bg-primary text-white" : "bg-divider text-text-secondary group-hover:text-white"
+                    selectedSpecial === track.id ? "bg-primary text-white" : "bg-divider text-text-secondary group-hover:text-white"
                   )}>
                     <Sparkles size={20} />
                   </div>
@@ -249,7 +247,7 @@ export default function Onboarding() {
                     <h3 className="font-black text-lg uppercase tracking-tight mb-1">{track.name}</h3>
                     <p className="text-xs text-text-secondary uppercase tracking-widest font-mono">Specialization</p>
                   </div>
-                  {selectedSpecials.includes(track.id) && <Check className="ml-auto text-primary" size={24} />}
+                  {selectedSpecial === track.id && <Check className="ml-auto text-primary" size={24} />}
                 </button>
               ))}
             </div>
