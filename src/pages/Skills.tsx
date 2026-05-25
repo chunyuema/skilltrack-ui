@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { SkillTheme } from '../types';
 import SkillsRadar from '../components/skills/SkillsRadar';
 import SkillsList from '../components/skills/SkillsList';
-import { Target } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { profileService } from '../services/profileService';
 
@@ -102,17 +101,8 @@ export default function SkillsPage() {
 
     return (
         <div className="space-y-10 animate-in fade-in duration-700">
-            {/* Compact Header */}
-            <div className="flex flex-col md:flex-row justify-between items-center gap-6 pb-4 border-b border-divider">
-                <div className="flex items-center gap-4">
-                    <div className="pill-success flex items-center gap-1.5">
-                        <Target size={12} />
-                        Active Skills
-                    </div>
-                    <h1 className="text-2xl font-black text-white uppercase tracking-tight">Skills</h1>
-                </div>
-                
-                {/* Tab Navigation */}
+            {/* Tab Navigation Header */}
+            <div className="flex justify-end pb-4 border-b border-divider">
                 <div className="flex bg-bg-card border border-divider p-1 rounded-lg">
                     {(['CORE', 'DOMAIN', 'SPECIAL'] as const).map(tier => (
                         <button
