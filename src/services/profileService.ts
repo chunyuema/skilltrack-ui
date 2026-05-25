@@ -204,7 +204,7 @@ export const profileService = {
   },
 
   fetchSkills: async (token: string): Promise<SkillTheme[]> => {
-    const response = await fetch(`${API_URL}/profiles/skill-list/`, {
+    const response = await fetch(`${API_URL}/skills/skill-list/`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -214,7 +214,7 @@ export const profileService = {
   },
 
   fetchTracks: async (token: string): Promise<Track[]> => {
-    const response = await fetch(`${API_URL}/profiles/tracks/`, {
+    const response = await fetch(`${API_URL}/skills/tracks/`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -224,7 +224,7 @@ export const profileService = {
   },
 
   updateUserTracks: async (trackIds: string[], token: string): Promise<void> => {
-    const response = await fetch(`${API_URL}/profiles/tracks/update/`, {
+    const response = await fetch(`${API_URL}/skills/tracks/update/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -239,18 +239,18 @@ export const profileService = {
   },
 
   updateSkillLevel: async (
-    skillId: string,
+    subCategoryId: string,
     level: number,
     token: string
   ): Promise<void> => {
-    const response = await fetch(`${API_URL}/profiles/skills/update/`, {
+    const response = await fetch(`${API_URL}/skills/skills/update/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
-        skill_id: skillId,
+        sub_category_id: subCategoryId,
         level,
       }),
     });
