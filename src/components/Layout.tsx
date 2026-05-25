@@ -16,20 +16,19 @@ export default function Layout() {
   return (
     <div className="min-h-screen bg-bg-deep flex flex-col font-main overflow-x-hidden">
       {/* Sticky Top Header */}
-      <header className="sticky top-0 z-50 bg-bg-deep/80 backdrop-blur-md border-b border-divider h-20 flex items-center px-6 md:px-12">
+      <header className="sticky top-0 z-50 bg-bg-deep/80 backdrop-blur-md border-b border-divider h-16 flex items-center px-6 md:px-12">
         <div className="max-w-[1400px] w-full mx-auto flex items-center justify-between gap-8">
           {/* Logo */}
-          <div className="flex items-center gap-2.5 group cursor-pointer" onClick={() => navigate('/')}>
-            <div className="w-9 h-9 bg-primary rounded-lg flex items-center justify-center shadow-lg shadow-primary/30 transition-transform group-hover:scale-105">
-              <Layers className="w-5 h-5 text-white" />
+          <div className="flex items-center gap-2 group cursor-pointer" onClick={() => navigate('/')}>
+            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shadow-lg shadow-primary/30 transition-transform group-hover:scale-105">
+              <Layers className="w-4 h-4 text-white" />
             </div>
-            <span className="text-xl font-extrabold tracking-tighter text-white uppercase hidden sm:block">SkillTrack</span>
+            <span className="text-lg font-extrabold tracking-tighter text-white uppercase hidden sm:block">SkillTrack</span>
           </div>
 
           {/* Centered Navigation */}
-          <nav className="hidden md:flex items-center gap-8">
+          <nav className="hidden md:flex items-center gap-6">
             <HeaderLink to="/profile" label="Profile" />
-            <HeaderLink to="/experience" label="Experience" />
             <HeaderLink to="/skills" label="Skills" />
             <HeaderLink to="/directory" label="Community" />
           </nav>
@@ -88,7 +87,7 @@ function HeaderLink({ to, label }: { to: string; label: string }) {
       to={to}
       className={({ isActive }) =>
         cn(
-          "text-sm font-bold transition-all hover:text-white uppercase tracking-widest relative py-1",
+          "text-xs font-bold transition-all hover:text-white uppercase tracking-wider relative py-1",
           isActive ? "text-white" : "text-text-secondary"
         )
       }

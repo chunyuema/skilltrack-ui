@@ -1,244 +1,196 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { UserProfile } from '../types';
+import { UserProfile, Experience } from '../types';
 import { useAuth } from '../hooks/useAuth';
 import { profileService } from '../services/profileService';
-import { Save, MapPin, Mail, Phone, Github, Linkedin, GraduationCap, Edit3, Shield } from 'lucide-react';
+import { Save, Mail, Github, Linkedin, GraduationCap, Edit3, Shield, User, Clock, Globe, Plus, Trash2, Pencil } from 'lucide-react';
 import { FormInput } from '../components/ui/FormInput';
+import { MonthYearPicker } from '../components/ui/MonthYearPicker';
+
+const COUNTRY_OPTIONS = [
+  { label: 'United States', value: 'United States' },
+  { label: 'United Kingdom', value: 'United Kingdom' },
+  { label: 'Canada', value: 'Canada' },
+  { label: 'Germany', value: 'Germany' },
+  { label: 'France', value: 'France' },
+  { label: 'Japan', value: 'Japan' },
+  { label: 'China', value: 'China' },
+  { label: 'India', value: 'India' },
+  { label: 'Brazil', value: 'Brazil' },
+  { label: 'Australia', value: 'Australia' },
+  { label: 'Singapore', value: 'Singapore' },
+  { label: 'Netherlands', value: 'Netherlands' },
+];
 
 export default function Profile() {
     const navigate = useNavigate();
     const [profile, setProfile] = useState<UserProfile | null>(null);
+    const [experiences, setExperiences] = useState<Experience[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
     const [isEditing, setIsEditing] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
+    const [isAddingExp, setIsAddingExp] = useState(false);
+    const [editingExpId, setEditingExpId] = useState<string | null>(null);
+    const [newExp, setNewExp] = useState<Partial<Experience>>({});
+    const [editExp, setEditExp] = useState<Partial<Experience>>({});
+    const [expError, setExpError] = useState<string | null>(null);
     const { token, logout } = useAuth();
 
+    const validateDates = (start?: string, end?: string): string | null => {
+        if (!start) return 'Start date is required.';
+        if (!end) return 'End date is required.';
+        if (end !== 'Present' && end < start) {
+            return 'End date cannot be before start date.';
+        }
+        return null;
+    };
+
     useEffect(() => {
-        const fetchProfileData = async () => {
-            if (!token) {
-                setIsLoading(false);
-                setError("No authentication token found.");
-                return;
-            }
-
+        const loadData = async () => {
+            if (!token) { setIsLoading(false); return; }
             try {
-                const userProfile = await profileService.fetchProfile(token);
-                setProfile(userProfile);
-            } catch (err) {
-                // Graceful session expiry handling:
-                // If the service identifies an 'Unauthorized' error, we clear the local 
-                // auth state and send the user back to Login to re-authenticate.
-                if (err instanceof Error && err.message === 'Unauthorized') {
-                    logout();
-                    navigate('/login');
-                } else {
-                    setError(err instanceof Error ? err.message : 'An unknown error occurred');
-                }
-            } finally {
-                setIsLoading(false);
-            }
+                const [p, e] = await Promise.all([profileService.fetchProfile(token), profileService.fetchExperiences(token)]);
+                setProfile(p); setExperiences(e);
+            } catch (err) { logout(); navigate('/login'); } finally { setIsLoading(false); }
         };
-
-        fetchProfileData();
+        loadData();
     }, [token, logout, navigate]);
 
     const handleSave = async () => {
-        if (profile && token) {
-            setIsSaving(true);
-            try {
-                await profileService.updateProfile(profile, token);
-                setIsEditing(false);
-            } catch (err) {
-                if (err instanceof Error && err.message === 'Unauthorized') {
-                    logout();
-                    navigate('/login');
-                } else {
-                    console.error("Failed to save profile:", err);
-                }
-            } finally {
-                setIsSaving(false);
-            }
-        }
+        setIsSaving(true);
+        await profileService.updateProfile(profile!, token!);
+        setIsEditing(false); setIsSaving(false);
     };
 
-    if (isLoading) {
-        return (
-            <div className="flex flex-col items-center justify-center py-24 gap-4">
-                <div className="w-12 h-12 border-2 border-primary/20 border-t-primary rounded-full animate-spin"></div>
-            </div>
-        );
-    }
+    const handleAddExperience = async () => {
+        if (!token || !newExp.company || !newExp.role) return;
 
-    if (error) return <div className="text-red-400 p-6 bg-red-900/10 rounded-2xl border border-red-900/20 font-bold uppercase tracking-widest text-xs">{error}</div>;
-    if (!profile) return <div className="text-slate-500 font-bold uppercase tracking-widest text-xs">No profile data found.</div>;
-
-    const handleFieldChange = (name: string, value: string) => {
-        if (profile) {
-            setProfile(prev => prev ? { ...prev, [name]: value } : null);
+        const validationError = validateDates(newExp.startDate, newExp.endDate);
+        if (validationError) {
+            setExpError(validationError);
+            return;
         }
+
+        setIsSaving(true);
+        setExpError(null);
+        const exp = await profileService.addExperience({ company: newExp.company, role: newExp.role, startDate: newExp.startDate || '', endDate: newExp.endDate || 'Present', description: newExp.description || '', technologies: newExp.technologies || [] }, token);
+        setExperiences([exp, ...experiences]);
+        setIsAddingExp(false); setNewExp({}); setIsSaving(false);
     };
+
+    const handleUpdateExperience = async () => {
+        if (!editingExpId) return;
+
+        const validationError = validateDates(editExp.startDate, editExp.endDate);
+        if (validationError) {
+            setExpError(validationError);
+            return;
+        }
+
+        setIsSaving(true);
+        setExpError(null);
+        const updated = await profileService.updateExperience(editingExpId, editExp as any, token!);
+        setExperiences(experiences.map(e => e.id === editingExpId ? updated : e));
+        setEditingExpId(null); setIsSaving(false);
+    };
+
+    const handleDeleteExperience = async (id: string) => {
+        await profileService.deleteExperience(id, token!);
+        setExperiences(experiences.filter(exp => exp.id !== id));
+    };
+
+    if (isLoading || !profile) return <div className="p-24 text-center text-white">Loading...</div>;
 
     return (
-        <div className="space-y-12 animate-in fade-in duration-700">
-            {/* Compact Header */}
-            <div className="flex flex-col md:flex-row justify-between items-center gap-6 pb-6 border-b border-divider">
-                <div className="flex items-center gap-4">
-                    <div className="pill-success flex items-center gap-1.5">
-                        <Shield size={12} />
-                        Verified
+        <div className="animate-in fade-in duration-700 max-w-[1200px] mx-auto grid grid-cols-1 lg:grid-cols-[350px_1fr] gap-12">
+            <aside className="space-y-6">
+                <div className="bg-bg-card border border-divider p-6 rounded-lg space-y-6 sticky top-24">
+                    <div className="text-center">
+                        <div className="w-24 h-24 mx-auto bg-slate-900 rounded-full flex items-center justify-center text-4xl font-black text-white">{profile.firstName.charAt(0)}</div>
+                        <h3 className="mt-4 font-black text-xl text-white uppercase">{profile.firstName} {profile.lastName}</h3>
                     </div>
-                    <h1 className="text-2xl font-black text-white tracking-tight">PROFILE</h1>
+
+                    <div className="space-y-4 pt-4 border-t border-divider">
+                        <FormInput label="Email" value={profile.email} onChange={v => setProfile({...profile, email: v})} isEditing={isEditing} icon={<Mail size={14}/>} />
+                        <FormInput label="Years of Exp" value={profile.yearsOfExperience} onChange={v => setProfile({...profile, yearsOfExperience: parseInt(v)})} isEditing={isEditing} type="number" icon={<Clock size={14}/>} />
+                        <FormInput label="Country" value={profile.country} onChange={v => setProfile({...profile, country: v})} isEditing={isEditing} type="select" options={COUNTRY_OPTIONS} icon={<Globe size={14}/>} />
+                        <FormInput label="Education" value={profile.education} onChange={v => setProfile({...profile, education: v})} isEditing={isEditing} icon={<GraduationCap size={14}/>} />
+                        <FormInput label="Visa" value={profile.visaStatus} onChange={v => setProfile({...profile, visaStatus: v})} isEditing={isEditing} icon={<Shield size={14}/>} />
+                        <FormInput label="LinkedIn" value={profile.linkedinUrl} onChange={v => setProfile({...profile, linkedinUrl: v})} isEditing={isEditing} icon={<Linkedin size={14}/>} />
+                        <FormInput label="GitHub" value={profile.githubUrl} onChange={v => setProfile({...profile, githubUrl: v})} isEditing={isEditing} icon={<Github size={14}/>} />
+                    </div>
+
+                    <button onClick={() => isEditing ? handleSave() : setIsEditing(true)} className="w-full py-3 bg-primary text-white rounded font-bold text-[10px] uppercase">
+                        {isEditing ? 'Save Profile' : 'Edit Profile'}
+                    </button>
                 </div>
-                <button
-                    onClick={() => isEditing ? handleSave() : setIsEditing(true)}
-                    disabled={isSaving}
-                    className={`flex items-center gap-2 px-5 py-2 rounded font-bold text-[10px] uppercase tracking-widest transition-all ${isEditing
-                        ? 'bg-primary text-white hover:bg-primary-hover shadow-lg shadow-primary/20'
-                        : 'bg-transparent border border-divider text-white hover:bg-white/[0.05]'
-                        } ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
-                >
-                    {isEditing ? <Save size={14} /> : <Edit3 size={14} />}
-                    {isEditing ? (isSaving ? 'Saving...' : 'Save') : 'Edit Profile'}
-                </button>
-            </div>
+            </aside>
 
-            <div className="grid grid-cols-1 lg:grid-cols-[360px_1fr] gap-12 lg:gap-20">
-                {/* Sidebar Column */}
-                <aside className="space-y-8">
-                    <div className="bg-bg-card border border-divider p-8 rounded-lg space-y-8">
-                        <div className="space-y-4 text-center">
-                            <div className="w-24 h-24 mx-auto bg-slate-900 border-2 border-divider rounded-full flex items-center justify-center text-4xl font-black text-white shadow-inner">
-                                {profile.firstName.charAt(0)}
-                            </div>
-                            <div className="space-y-1">
-                                <h3 className="font-black text-xl text-white uppercase tracking-tight">{profile.firstName}</h3>
-                                <p className="text-[10px] font-bold text-text-secondary uppercase tracking-[0.2em] font-mono">Tier: Senior Engineer</p>
-                            </div>
+            <main className="space-y-8">
+                <div className="bg-bg-card border border-divider p-6 rounded-lg space-y-4">
+                     <h2 className="text-sm font-black text-white uppercase tracking-[0.3em]">Bio</h2>
+                     {isEditing ? <textarea value={profile.bio || ''} onChange={(e) => setProfile({...profile, bio: e.target.value})} className="w-full bg-bg-deep border border-divider rounded p-3 text-xs text-white" rows={4} /> : <p className="text-sm text-text-secondary leading-relaxed">{profile.bio || "No bio added."}</p>}
+                </div>
+
+                 <div className="flex justify-between items-center pb-4 border-b border-divider">
+                     <h2 className="text-sm font-black text-white uppercase tracking-[0.3em]">Work History</h2>
+                     <button onClick={() => { setIsAddingExp(true); setExpError(null); }} className="text-primary"><Plus size={18} /></button>
+                 </div>
+
+                 {expError && (
+                     <div className="bg-red-900/10 border border-red-900/20 text-red-400 p-4 rounded-lg text-xs font-bold uppercase tracking-widest">
+                         {expError}
+                     </div>
+                 )}
+
+                 {isAddingExp && (
+                     <div className="bg-bg-deep p-6 rounded-lg border border-divider space-y-4">
+                        <FormInput label="Company" value={newExp.company || ''} onChange={v => setNewExp({...newExp, company: v})} />
+                        <FormInput label="Role" value={newExp.role || ''} onChange={v => setNewExp({...newExp, role: v})} />
+                        <div className="grid grid-cols-2 gap-4">
+                            <MonthYearPicker label="Start" value={newExp.startDate || ''} onChange={v => setNewExp({...newExp, startDate: v})} />
+                            <MonthYearPicker label="End" value={newExp.endDate || ''} onChange={v => setNewExp({...newExp, endDate: v})} allowPresent />
                         </div>
+                        <textarea value={newExp.description || ''} onChange={e => setNewExp({...newExp, description: e.target.value})} className="w-full bg-bg-card border border-divider rounded p-3 text-xs text-white" rows={3} placeholder="Description" />
+                        <div className="flex gap-2">
+                            <button onClick={handleAddExperience} className="px-4 py-2 bg-primary text-white text-xs font-bold rounded flex-1">Save Position</button>
+                            <button onClick={() => setIsAddingExp(false)} className="px-4 py-2 bg-white/5 text-white text-xs font-bold rounded">Cancel</button>
+                        </div>
+                     </div>
+                 )}
 
-                        {isEditing ? (
-                            <div className="space-y-2 pt-4 border-t border-divider">
-                                <label className="text-[10px] font-mono font-bold text-text-secondary uppercase tracking-[0.2em]">Bio</label>
-                                <textarea
-                                    value={profile.bio || ''}
-                                    onChange={(e) => handleFieldChange("bio", e.target.value)}
-                                    placeholder="Write a small bio..."
-                                    rows={4}
-                                    className="w-full px-3 py-2 bg-bg-deep border border-divider rounded text-xs text-white focus:outline-none focus:ring-1 focus:ring-primary/40 focus:border-primary transition-all resize-none leading-relaxed"
-                                />
-                            </div>
+                 {experiences.map(exp => (
+                     <div key={exp.id} className="bg-bg-card border border-divider p-6 rounded-lg">
+                        {editingExpId === exp.id ? (
+                           <div className="space-y-4">
+                              <FormInput label="Company" value={editExp.company || exp.company} onChange={v => setEditExp({...editExp, company: v})} />
+                              <FormInput label="Role" value={editExp.role || exp.role} onChange={v => setEditExp({...editExp, role: v})} />
+                              <div className="grid grid-cols-2 gap-4">
+                                  <MonthYearPicker label="Start" value={editExp.startDate || exp.startDate} onChange={v => setEditExp({...editExp, startDate: v})} />
+                                  <MonthYearPicker label="End" value={editExp.endDate || exp.endDate} onChange={v => setEditExp({...editExp, endDate: v})} allowPresent />
+                              </div>
+                              <textarea value={editExp.description || exp.description} onChange={e => setEditExp({...editExp, description: e.target.value})} className="w-full bg-bg-deep border border-divider rounded p-3 text-xs text-white" rows={3} />
+                              <div className="flex gap-2">
+                                <button onClick={handleUpdateExperience} className="px-4 py-2 bg-primary text-white text-xs font-bold rounded flex-1">Commit Changes</button>
+                                <button onClick={() => setEditingExpId(null)} className="px-4 py-2 bg-white/5 text-white text-xs font-bold rounded">Cancel</button>
+                              </div>
+                           </div>
                         ) : (
-                            <div className="space-y-2 pt-4 border-t border-divider">
-                                <h4 className="text-[10px] font-mono font-bold text-text-secondary uppercase tracking-[0.2em]">Bio</h4>
-                                <p className="text-xs text-white leading-relaxed font-medium whitespace-pre-wrap">
-                                    {profile.bio || (
-                                        <span className="text-slate-600 italic">No bio added yet. Click 'Edit Profile' to add one.</span>
-                                    )}
-                                </p>
-                            </div>
+                           <div className="flex justify-between items-start">
+                               <div>
+                                   <h4 className="font-bold text-white text-lg">{exp.role}</h4>
+                                   <p className="text-sm text-text-secondary">{exp.company} • {exp.startDate} to {exp.endDate}</p>
+                                   <p className="text-xs text-text-secondary mt-2">{exp.description}</p>
+                               </div>
+                               <div className="flex gap-2">
+                                   <button onClick={() => { setEditingExpId(exp.id); setEditExp(exp); setExpError(null); }} className="text-text-secondary hover:text-white"><Pencil size={14}/></button>
+                                   <button onClick={() => handleDeleteExperience(exp.id)} className="text-text-secondary hover:text-red-400"><Trash2 size={14}/></button>
+                               </div>
+                           </div>
                         )}
-
-                        <button className="w-full py-4 bg-white/[0.03] border border-divider rounded font-black text-[10px] uppercase tracking-[0.2em] text-text-secondary hover:text-white hover:bg-white/[0.08] transition-all">
-                             Generate Resume PDF
-                        </button>
-                    </div>
-                </aside>
-
-                {/* Main Column */}
-                <div className="space-y-16">
-                    {/* Basic Info */}
-                    <section className="space-y-10">
-                        <div className="space-y-1">
-                            <h2 className="text-xs font-black uppercase tracking-[0.3em] text-primary">Personal Information</h2>
-                            <div className="h-1 w-20 bg-primary/20"></div>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            {isEditing ? (
-                                <>
-                                    <FormInput label="First Name" name="firstName" value={profile.firstName} isEditing={true} onChange={val => handleFieldChange("firstName", val)} />
-                                    <FormInput label="Last Name" name="lastName" value={profile.lastName} isEditing={true} onChange={val => handleFieldChange("lastName", val)} />
-                                </>
-                            ) : (
-                                <div className="md:col-span-2">
-                                    <FormInput label="Full Name" name="fullName" value={`${profile.firstName} ${profile.lastName}`} isEditing={false} onChange={() => {}} />
-                                </div>
-                            )}
-                            <div className="md:col-span-2">
-                                <FormInput label="Professional Title" name="title" value={profile.title} isEditing={isEditing} onChange={val => handleFieldChange("title", val)} />
-                            </div>
-
-                            <FormInput label="Years of Experience" name="yearsOfExperience" value={profile.yearsOfExperience} isEditing={isEditing} onChange={val => handleFieldChange("yearsOfExperience", val)} type="number" />
-                            <FormInput label="Visa Status" name="visaStatus" value={profile.visaStatus} isEditing={isEditing} onChange={val => handleFieldChange("visaStatus", val)} />
-                        </div>
-                    </section>
-
-                    {/* Links */}
-                    <section className="space-y-10">
-                         <div className="space-y-1">
-                            <h2 className="text-xs font-black uppercase tracking-[0.3em] text-primary">Contact & Social</h2>
-                            <div className="h-1 w-20 bg-primary/20"></div>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <FormInput
-                                label="Email Address"
-                                name="email"
-                                value={profile.email}
-                                isEditing={isEditing}
-                                onChange={val => handleFieldChange("email", val)}
-                                icon={<Mail size={16} />}
-                            />
-                            <FormInput
-                                label="Phone Number"
-                                name="phone"
-                                value={profile.phone}
-                                isEditing={isEditing}
-                                onChange={val => handleFieldChange("phone", val)}
-                                icon={<Phone size={16} />}
-                            />
-                            <FormInput
-                                label="Location"
-                                name="location"
-                                value={profile.location}
-                                isEditing={isEditing}
-                                onChange={val => handleFieldChange("location", val)}
-                                icon={<MapPin size={16} />}
-                            />
-                            <FormInput
-                                label="Education"
-                                name="education"
-                                value={profile.education}
-                                isEditing={isEditing}
-                                onChange={val => handleFieldChange("education", val)}
-                                icon={<GraduationCap size={16} />}
-                            />
-                            <FormInput
-                                label="GitHub Profile"
-                                name="githubUrl"
-                                value={profile.githubUrl}
-                                isEditing={isEditing}
-                                onChange={val => handleFieldChange("githubUrl", val)}
-                                icon={<Github size={16} />}
-                            />
-                            <FormInput
-                                label="LinkedIn Profile"
-                                name="linkedinUrl"
-                                value={profile.linkedinUrl}
-                                isEditing={isEditing}
-                                onChange={val => handleFieldChange("linkedinUrl", val)}
-                                icon={<Linkedin size={16} />}
-                            />
-                        </div>
-                    </section>
-                </div>
-            </div>
-
+                     </div>
+                 ))}
+            </main>
         </div>
     );
 }
-
-
-

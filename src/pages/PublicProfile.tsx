@@ -39,7 +39,7 @@ export default function PublicProfile() {
                                     <span className="text-[10px] font-bold text-slate-600 uppercase tracking-widest font-mono">NODE_ID: {user.id}</span>
                                 </div>
                                 <h1 className="text-4xl font-black text-white tracking-tighter uppercase">{user.profile.firstName} {user.profile.lastName}</h1>
-                                <p className="text-primary font-bold text-sm uppercase tracking-[0.2em] font-mono">{user.profile.title}</p>
+                                <p className="text-primary font-bold text-sm uppercase tracking-[0.2em] font-mono">{user.profile.country}</p>
                             </div>
                         </div>
                         <div className="flex gap-2.5 mb-2">

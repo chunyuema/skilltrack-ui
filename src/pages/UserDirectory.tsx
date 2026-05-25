@@ -55,7 +55,7 @@ export default function UserDirectory() {
                                                     <ShieldCheck size={16} className="text-emerald-accent opacity-50" />
                                                 </div>
                                                 <div className="flex items-center gap-3 text-primary font-bold text-xs uppercase tracking-widest font-mono">
-                                                    <span>{user.profile.title}</span>
+                                                    <span>{user.profile.country}</span>
                                                 </div>
                                             </div>
                                             <div className="flex items-center gap-3 self-start md:self-auto">
