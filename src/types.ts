@@ -15,9 +15,16 @@ export interface SkillSubCategory {
   skills: Skill[];
 }
 
+export interface Track {
+  id: string;
+  name: string;
+  track_type: 'CORE' | 'DOMAIN' | 'SPECIAL';
+}
+
 export interface SkillTheme {
   id: string;
   name: string;
+  track?: Track;
   icon?: string;
   description?: string;
   subCategories: SkillSubCategory[];
@@ -46,6 +53,7 @@ export interface UserProfile {
   githubUrl: string;
   linkedinUrl: string;
   bio: string;
+  selectedTrackIds: string[];
 }
 
 export interface AppState {

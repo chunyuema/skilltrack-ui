@@ -1,11 +1,15 @@
 import React, { createContext, useState, useEffect } from 'react';
+import { UserProfile } from '../types';
+import { profileService } from '../services/profileService';
 
 interface AuthContextType {
     user: string | null;      // Store user's email
+    profile: UserProfile | null;
     token: string | null;     // Access token from backend
     login: (email: string, password: string) => Promise<void>;
     register: (first_name: string, last_name: string, email: string, password: string) => Promise<void>;
     logout: () => void;
+    refreshProfile: () => Promise<void>;
     isAuthenticating: boolean; // Used to prevent flickering on refresh
 }
 
@@ -13,19 +17,37 @@ export const AuthContext = createContext<AuthContextType>(null!);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<string | null>(null);
+    const [profile, setProfile] = useState<UserProfile | null>(null);
     const [token, setToken] = useState<string | null>(null);
     const [isAuthenticating, setIsAuthenticating] = useState(true);
 
+    const fetchAndSetProfile = async (accessToken: string) => {
+        try {
+            const userProfile = await profileService.fetchProfile(accessToken);
+            setProfile(userProfile);
+        } catch (err) {
+            console.error("Failed to fetch profile in AuthContext", err);
+            // If fetching fails with 401, logout
+            if (err instanceof Error && err.message === "Unauthorized") {
+                logout();
+            }
+        }
+    };
+
     // Check localStorage when the app first loads
     useEffect(() => {
-        const savedToken = localStorage.getItem('token');
-        const savedUser = localStorage.getItem('user_email');
+        const initAuth = async () => {
+            const savedToken = localStorage.getItem('token');
+            const savedUser = localStorage.getItem('user_email');
 
-        if (savedToken && savedUser) {
-            setToken(savedToken);
-            setUser(savedUser);
-        }
-        setIsAuthenticating(false); // Finished checking localStorage
+            if (savedToken && savedUser) {
+                setToken(savedToken);
+                setUser(savedUser);
+                await fetchAndSetProfile(savedToken);
+            }
+            setIsAuthenticating(false);
+        };
+        initAuth();
     }, []);
 
     const login = async (username: string, password: string) => {
@@ -40,16 +62,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
 
         const data = await response.json();
-        // Based on standard JWT backends, this returns { access: "...", refresh: "..." }
         const accessToken = data.access;
 
-        // Save to browser storage
         localStorage.setItem('token', accessToken);
         localStorage.setItem('user_email', username);
 
-        // Update React state
         setToken(accessToken);
         setUser(username);
+        await fetchAndSetProfile(accessToken);
     };
 
     const register = async (first_name: string, last_name: string, email: string, password: string) => {
@@ -64,7 +84,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             throw new Error(errorData.detail || 'Registration failed');
         }
 
-        // If registration is successful, automatically log the user in
         await login(email, password);
     };
 
@@ -73,14 +92,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         localStorage.removeItem('user_email');
         setToken(null);
         setUser(null);
+        setProfile(null);
     };
 
-    const value = { user, token, login, register, logout, isAuthenticating };
+    const refreshProfile = async () => {
+        if (token) {
+            await fetchAndSetProfile(token);
+        }
+    };
+
+    const value = { user, profile, token, login, register, logout, refreshProfile, isAuthenticating };
 
     return (
         <AuthContext.Provider value={value}>
-            {/* We only render the app once we know if the user is logged in or not */}
-            {!isAuthenticating ? children : <div>Loading session...</div>}
+            {!isAuthenticating ? children : <div className="min-h-screen bg-bg-deep flex items-center justify-center text-primary font-mono text-xs uppercase tracking-widest animate-pulse">Initializing Core...</div>}
         </AuthContext.Provider>
     );
 }

@@ -1,5 +1,5 @@
 /// <reference types="vite/client" />
-import { UserProfile, Experience } from "../types";
+import { UserProfile, Experience, Track, SkillTheme } from "../types";
 
 // Type for the raw API response
 interface ApiUserProfile {
@@ -15,6 +15,7 @@ interface ApiUserProfile {
   github_url: string;
   linkedin_url: string;
   bio: string;
+  selected_tracks: string[];
 }
 
 interface ApiExperience {
@@ -67,6 +68,7 @@ export const profileService = {
       githubUrl: data.github_url || "",
       linkedinUrl: data.linkedin_url || "",
       bio: data.bio || "",
+      selectedTrackIds: data.selected_tracks || [],
     };
   },
 
@@ -209,6 +211,31 @@ export const profileService = {
     });
 
     return handleResponse(response);
+  },
+
+  fetchTracks: async (token: string): Promise<Track[]> => {
+    const response = await fetch(`${API_URL}/profiles/tracks/`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return handleResponse(response);
+  },
+
+  updateUserTracks: async (trackIds: string[], token: string): Promise<void> => {
+    const response = await fetch(`${API_URL}/profiles/tracks/update/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        track_ids: trackIds,
+      }),
+    });
+
+    await handleResponse(response);
   },
 
   updateSkillLevel: async (

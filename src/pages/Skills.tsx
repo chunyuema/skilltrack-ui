@@ -46,7 +46,7 @@ export default function SkillsPage() {
                         ...sub,
                         skills: sub.skills.map(skill => {
                             if (skill.id !== skillId) return skill;
-                            return { ...skill, level };
+                            return { ...skill, level: level as any };
                         })
                     };
                 })
@@ -86,6 +86,19 @@ export default function SkillsPage() {
         );
     }
 
+    const themesByTier = themes.reduce((acc, theme) => {
+        const tier = theme.track?.track_type || 'CORE';
+        if (!acc[tier]) acc[tier] = [];
+        acc[tier].push(theme);
+        return acc;
+    }, {} as Record<string, SkillTheme[]>);
+
+    const tierLabels: Record<string, string> = {
+        'CORE': 'Core Essentials',
+        'DOMAIN': 'Professional Domain',
+        'SPECIAL': 'Advanced Specializations'
+    };
+
     return (
         <div className="space-y-12 animate-in fade-in duration-700">
             {/* Compact Header */}
@@ -103,12 +116,16 @@ export default function SkillsPage() {
             <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-12 lg:gap-20">
                 {/* Main Content: Skill Inputs */}
                 <div className="lg:col-span-1">
-                    <div className="space-y-10">
-                        <div className="space-y-1">
-                            <h2 className="text-xs font-black uppercase tracking-[0.3em] text-primary">Technical Domains</h2>
-                            <div className="h-1 w-20 bg-primary/20"></div>
-                        </div>
-                        <SkillsList themes={themes} onUpdateSkill={updateSkill} />
+                    <div className="space-y-16">
+                        {['CORE', 'DOMAIN', 'SPECIAL'].map(tier => themesByTier[tier] && (
+                            <div key={tier} className="space-y-10">
+                                <div className="space-y-1">
+                                    <h2 className="text-xs font-black uppercase tracking-[0.3em] text-primary">{tierLabels[tier]}</h2>
+                                    <div className="h-1 w-20 bg-primary/20"></div>
+                                </div>
+                                <SkillsList themes={themesByTier[tier]} onUpdateSkill={updateSkill} />
+                            </div>
+                        ))}
                     </div>
                 </div>
 

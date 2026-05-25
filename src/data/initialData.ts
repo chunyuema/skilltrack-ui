@@ -366,6 +366,7 @@ export const INITIAL_PROFILE = {
   githubUrl: 'https://github.com',
   linkedinUrl: 'https://linkedin.com',
   bio: 'Passionate full-stack engineer with a focus on scalable web applications and developer experience.',
+  selectedTrackIds: [],
 };
 
 export const INITIAL_EXPERIENCE = [
