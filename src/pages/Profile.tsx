@@ -120,7 +120,10 @@ export default function Profile() {
                             <MonthYearPicker label="End" value={newExp.endDate || ''} onChange={v => setNewExp({...newExp, endDate: v})} allowPresent />
                         </div>
                         <textarea value={newExp.description || ''} onChange={e => setNewExp({...newExp, description: e.target.value})} className="w-full bg-bg-card border border-divider rounded p-3 text-xs text-white" rows={3} placeholder="Description" />
-                        <button onClick={handleAddExperience} className="px-4 py-2 bg-primary text-white text-xs font-bold rounded">Save Position</button>
+                        <div className="flex gap-2">
+                            <button onClick={handleAddExperience} className="px-4 py-2 bg-primary text-white text-xs font-bold rounded flex-1">Save Position</button>
+                            <button onClick={() => setIsAddingExp(false)} className="px-4 py-2 bg-white/5 text-white text-xs font-bold rounded">Cancel</button>
+                        </div>
                      </div>
                  )}
 
@@ -135,7 +138,10 @@ export default function Profile() {
                                   <MonthYearPicker label="End" value={editExp.endDate || exp.endDate} onChange={v => setEditExp({...editExp, endDate: v})} allowPresent />
                               </div>
                               <textarea value={editExp.description || exp.description} onChange={e => setEditExp({...editExp, description: e.target.value})} className="w-full bg-bg-deep border border-divider rounded p-3 text-xs text-white" rows={3} />
-                              <button onClick={handleUpdateExperience} className="px-4 py-2 bg-primary text-white text-xs font-bold rounded">Commit</button>
+                              <div className="flex gap-2">
+                                <button onClick={handleUpdateExperience} className="px-4 py-2 bg-primary text-white text-xs font-bold rounded flex-1">Commit Changes</button>
+                                <button onClick={() => setEditingExpId(null)} className="px-4 py-2 bg-white/5 text-white text-xs font-bold rounded">Cancel</button>
+                              </div>
                            </div>
                         ) : (
                            <div className="flex justify-between items-start">
