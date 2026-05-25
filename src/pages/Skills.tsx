@@ -104,33 +104,31 @@ export default function SkillsPage() {
     const activeSpecials = Array.from(new Set(themesByTier['SPECIAL']?.filter(t => t.track).map(t => t.track!.name) || []));
 
     return (
-        <div className="space-y-10 animate-in fade-in duration-700">
-            {/* Tab Navigation Header */}
-            <div className="flex justify-end pb-4 border-b border-divider">
-                <div className="flex bg-bg-card border border-divider p-1 rounded-lg">
-                    {(['CORE', 'DOMAIN', 'SPECIAL'] as const).map(tier => (
-                        <button
-                            key={tier}
-                            onClick={() => setActiveTab(tier)}
-                            className={`px-4 py-2 rounded font-black text-[10px] uppercase tracking-widest transition-all ${
-                                activeTab === tier 
-                                ? 'bg-primary text-white shadow-lg shadow-primary/20' 
-                                : 'text-text-secondary hover:text-white'
-                            }`}
-                        >
-                            {tier === 'CORE' ? 'Core' : tier === 'DOMAIN' ? 'Domain' : 'Special'}
-                        </button>
-                    ))}
-                </div>
-            </div>
-
+        <div className="animate-in fade-in duration-700">
             <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-12 lg:gap-20">
-                {/* Main Content: Skill Inputs */}
-                <div className="lg:col-span-1">
+                {/* Main Content: Tabs & Skill Inputs */}
+                <div className="lg:col-span-1 space-y-10">
+                    {/* Tab Navigation */}
+                    <div className="flex bg-bg-card border border-divider p-1 rounded-lg w-fit">
+                        {(['CORE', 'DOMAIN', 'SPECIAL'] as const).map(tier => (
+                            <button
+                                key={tier}
+                                onClick={() => setActiveTab(tier)}
+                                className={`px-4 py-2 rounded font-black text-[10px] uppercase tracking-widest transition-all ${
+                                    activeTab === tier 
+                                    ? 'bg-primary text-white shadow-lg shadow-primary/20' 
+                                    : 'text-text-secondary hover:text-white'
+                                }`}
+                            >
+                                {tier === 'CORE' ? 'Core' : tier === 'DOMAIN' ? 'Domain' : 'Special'}
+                            </button>
+                        ))}
+                    </div>
+
                     <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
                         {themesByTier[activeTab] ? (
                             <div className="space-y-10">
-                                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-divider">
                                     <div className="space-y-1">
                                         <h2 className="text-xs font-black uppercase tracking-[0.3em] text-primary">{tierLabels[activeTab]}</h2>
                                         <div className="h-1 w-20 bg-primary/20"></div>
@@ -169,7 +167,7 @@ export default function SkillsPage() {
                 </div>
 
                 {/* Sidebar: Visualization */}
-                <aside className="lg:col-span-1 space-y-8">
+                <aside className="lg:col-span-1 space-y-8 sticky top-24 self-start">
                      <div className="space-y-1 lg:mb-10">
                         <h2 className="text-xs font-black uppercase tracking-[0.3em] text-primary">Proficiency Map</h2>
                         <div className="h-1 w-20 bg-primary/20"></div>
