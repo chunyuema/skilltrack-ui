@@ -11,6 +11,7 @@ export default function SkillsPage() {
     const [themes, setThemes] = useState<SkillTheme[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [activeTab, setActiveTab] = useState<'CORE' | 'DOMAIN' | 'SPECIAL'>('CORE');
 
     useEffect(() => {
         const loadSkills = async () => {
@@ -87,11 +88,11 @@ export default function SkillsPage() {
     }
 
     const themesByTier = themes.reduce((acc, theme) => {
-        const tier = theme.track?.track_type || 'CORE';
+        const tier = (theme.track?.track_type || 'CORE') as 'CORE' | 'DOMAIN' | 'SPECIAL';
         if (!acc[tier]) acc[tier] = [];
         acc[tier].push(theme);
         return acc;
-    }, {} as Record<string, SkillTheme[]>);
+    }, {} as Record<'CORE' | 'DOMAIN' | 'SPECIAL', SkillTheme[]>);
 
     const tierLabels: Record<string, string> = {
         'CORE': 'Core Essentials',
@@ -100,9 +101,9 @@ export default function SkillsPage() {
     };
 
     return (
-        <div className="space-y-12 animate-in fade-in duration-700">
+        <div className="space-y-10 animate-in fade-in duration-700">
             {/* Compact Header */}
-            <div className="flex flex-col md:flex-row justify-between items-center gap-6 pb-6 border-b border-divider">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-6 pb-4 border-b border-divider">
                 <div className="flex items-center gap-4">
                     <div className="pill-success flex items-center gap-1.5">
                         <Target size={12} />
@@ -110,22 +111,42 @@ export default function SkillsPage() {
                     </div>
                     <h1 className="text-2xl font-black text-white uppercase tracking-tight">Skills</h1>
                 </div>
-                <div className="text-[9px] font-bold text-text-secondary uppercase tracking-[0.2em] opacity-50">Reviewing: Professional Portfolio</div>
+                
+                {/* Tab Navigation */}
+                <div className="flex bg-bg-card border border-divider p-1 rounded-lg">
+                    {(['CORE', 'DOMAIN', 'SPECIAL'] as const).map(tier => (
+                        <button
+                            key={tier}
+                            onClick={() => setActiveTab(tier)}
+                            className={`px-4 py-2 rounded font-black text-[10px] uppercase tracking-widest transition-all ${
+                                activeTab === tier 
+                                ? 'bg-primary text-white shadow-lg shadow-primary/20' 
+                                : 'text-text-secondary hover:text-white'
+                            }`}
+                        >
+                            {tier === 'CORE' ? 'Core' : tier === 'DOMAIN' ? 'Domain' : 'Special'}
+                        </button>
+                    ))}
+                </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-12 lg:gap-20">
                 {/* Main Content: Skill Inputs */}
                 <div className="lg:col-span-1">
-                    <div className="space-y-16">
-                        {['CORE', 'DOMAIN', 'SPECIAL'].map(tier => themesByTier[tier] && (
-                            <div key={tier} className="space-y-10">
+                    <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
+                        {themesByTier[activeTab] ? (
+                            <div className="space-y-10">
                                 <div className="space-y-1">
-                                    <h2 className="text-xs font-black uppercase tracking-[0.3em] text-primary">{tierLabels[tier]}</h2>
+                                    <h2 className="text-xs font-black uppercase tracking-[0.3em] text-primary">{tierLabels[activeTab]}</h2>
                                     <div className="h-1 w-20 bg-primary/20"></div>
                                 </div>
-                                <SkillsList themes={themesByTier[tier]} onUpdateSkill={updateSkill} />
+                                <SkillsList themes={themesByTier[activeTab]} onUpdateSkill={updateSkill} />
                             </div>
-                        ))}
+                        ) : (
+                            <div className="bg-bg-card border border-divider border-dashed p-12 rounded-lg text-center">
+                                <p className="text-text-secondary font-mono text-xs uppercase tracking-widest">No skill modules selected for this tier.</p>
+                            </div>
+                        )}
                     </div>
                 </div>
 
