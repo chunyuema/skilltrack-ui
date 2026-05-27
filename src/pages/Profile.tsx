@@ -26,6 +26,7 @@ export default function Profile() {
     const navigate = useNavigate();
     const [profile, setProfile] = useState<UserProfile | null>(null);
     const [experiences, setExperiences] = useState<Experience[]>([]);
+    const [globalScore, setGlobalScore] = useState<number>(0);
     const [isLoading, setIsLoading] = useState(true);
     const [isEditing, setIsEditing] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
@@ -49,8 +50,21 @@ export default function Profile() {
         const loadData = async () => {
             if (!token) { setIsLoading(false); return; }
             try {
-                const [p, e] = await Promise.all([profileService.fetchProfile(token), profileService.fetchExperiences(token)]);
-                setProfile(p); setExperiences(e);
+                const [p, e, s] = await Promise.all([
+                    profileService.fetchProfile(token), 
+                    profileService.fetchExperiences(token),
+                    profileService.fetchSkills(token)
+                ]);
+                setProfile(p); 
+                setExperiences(e);
+                
+                // Calculate global score
+                if (s && s.length > 0) {
+                    const allSubCats = s.flatMap((t: any) => t.subCategories);
+                    const totalLevel = allSubCats.reduce((sum: number, sub: any) => sum + (sub.level || 0), 0);
+                    const maxLevel = allSubCats.length * 5;
+                    setGlobalScore(maxLevel > 0 ? Math.round((totalLevel / maxLevel) * 100) : 0);
+                }
             } catch (err) { logout(); navigate('/login'); } finally { setIsLoading(false); }
         };
         loadData();
@@ -109,6 +123,48 @@ export default function Profile() {
                         <div className="w-24 h-24 mx-auto bg-slate-900 rounded-full flex items-center justify-center text-4xl font-black text-white">{profile.firstName.charAt(0)}</div>
                         <h3 className="mt-4 font-black text-xl text-white uppercase">{profile.firstName} {profile.lastName}</h3>
                     </div>
+
+                    {/* Overall Skill Score Card */}
+                    <button 
+                        onClick={() => navigate('/skills')}
+                        className="w-full bg-primary/5 border border-primary/20 p-4 rounded-xl flex items-center justify-between group hover:bg-primary/10 transition-all duration-300"
+                    >
+                        <div className="flex flex-col items-start">
+                            <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-1">Overall Skills</span>
+                            <div className="flex items-baseline gap-1">
+                                <span className="text-3xl font-black text-white tabular-nums">{globalScore}%</span>
+                                <span className="text-[10px] font-bold text-text-secondary uppercase">Score</span>
+                            </div>
+                        </div>
+                        <div className="w-12 h-12 rounded-full border-2 border-primary/20 flex items-center justify-center relative group-hover:scale-105 transition-transform duration-500">
+                            <svg className="w-12 h-12 -rotate-90">
+                                <circle
+                                    cx="24"
+                                    cy="24"
+                                    r="20"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="3"
+                                    className="text-white/5"
+                                />
+                                <circle
+                                    cx="24"
+                                    cy="24"
+                                    r="20"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="3"
+                                    strokeDasharray={126}
+                                    strokeDashoffset={126 - (126 * globalScore / 100)}
+                                    className="text-primary transition-all duration-1000 ease-out"
+                                    strokeLinecap="round"
+                                />
+                            </svg>
+                            <div className="absolute inset-0 flex items-center justify-center">
+                                <Shield size={16} className="text-primary opacity-50" />
+                            </div>
+                        </div>
+                    </button>
 
                     <div className="space-y-4 pt-4 border-t border-divider">
                         <FormInput label="Email" value={profile.email} onChange={v => setProfile({...profile, email: v})} isEditing={isEditing} icon={<Mail size={14}/>} />

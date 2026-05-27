@@ -243,7 +243,7 @@ export const profileService = {
     level: number,
     token: string
   ): Promise<void> => {
-    const response = await fetch(`${API_URL}/skills/skills/update/`, {
+    const response = await fetch(`${API_URL}/skills/update/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

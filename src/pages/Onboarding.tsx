@@ -118,24 +118,27 @@ export default function Onboarding() {
                     {theme.name}
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {theme.subCategories.flatMap(sc => sc.skills).map(skill => (
-                      <div key={skill.id} className="bg-bg-card border border-divider p-6 rounded-lg group hover:border-primary/30 transition-all">
-                        <div className="flex justify-between items-center mb-4">
-                          <span className="font-bold text-sm uppercase tracking-wider">{skill.name}</span>
-                          <span className="text-[10px] font-mono text-text-secondary">LVL {skill.level}</span>
+                    {theme.subCategories.map(subCat => (
+                      <div key={subCat.id} className="bg-bg-card border border-divider p-6 rounded-lg group hover:border-primary/30 transition-all">
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="font-bold text-sm uppercase tracking-wider">{subCat.name}</span>
+                          <span className="text-[10px] font-mono text-text-secondary">LVL {subCat.level}</span>
                         </div>
+                        <p className="text-[10px] text-text-secondary font-mono mb-4 italic opacity-60">
+                          Includes: {subCat.skills.map(s => s.name).join(', ')}
+                        </p>
                         <div className="flex gap-2">
                           {[1, 2, 3, 4, 5].map(lvl => (
                             <button
                               key={lvl}
                               onClick={() => {
-                                skill.level = lvl as any;
-                                handleSkillRate(skill.id, lvl);
+                                subCat.level = lvl as any;
+                                handleSkillRate(subCat.id, lvl);
                                 setCoreSkills([...coreSkills]);
                               }}
                               className={cn(
                                 "flex-1 h-2 rounded-full transition-all",
-                                skill.level >= lvl ? "bg-primary" : "bg-divider hover:bg-primary/20"
+                                subCat.level >= lvl ? "bg-primary" : "bg-divider hover:bg-primary/20"
                               )}
                             />
                           ))}

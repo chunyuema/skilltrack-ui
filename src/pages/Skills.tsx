@@ -32,7 +32,7 @@ export default function SkillsPage() {
         loadSkills();
     }, [token]);
 
-    const updateSkill = async (themeId: string, subCatId: string, skillId: string, level: number) => {
+    const updateSkill = async (themeId: string, subCatId: string, level: number) => {
         if (!token) return;
 
         // Optimistic update
@@ -43,20 +43,14 @@ export default function SkillsPage() {
                 ...theme,
                 subCategories: theme.subCategories.map(sub => {
                     if (sub.id !== subCatId) return sub;
-                    return {
-                        ...sub,
-                        skills: sub.skills.map(skill => {
-                            if (skill.id !== skillId) return skill;
-                            return { ...skill, level: level as any };
-                        })
-                    };
+                    return { ...sub, level: level as any };
                 })
             };
         });
         setThemes(newThemes);
 
         try {
-            await profileService.updateSkillLevel(skillId, level, token);
+            await profileService.updateSkillLevel(subCatId, level, token);
         } catch (err) {
             console.error("Failed to update skill:", err);
             // Rollback on failure
@@ -100,6 +94,40 @@ export default function SkillsPage() {
         'SPECIAL': 'Advanced Specializations'
     };
 
+    const tierStyles: Record<'CORE' | 'DOMAIN' | 'SPECIAL', { 
+        active: string, 
+        text: string, 
+        bg: string, 
+        border: string, 
+        dot: string,
+        radar: string
+    }> = {
+        'CORE': {
+            active: 'bg-primary shadow-primary/20',
+            text: 'text-primary',
+            bg: 'bg-primary/5',
+            border: 'border-primary/20',
+            dot: 'bg-primary',
+            radar: '#5a67d8'
+        },
+        'DOMAIN': {
+            active: 'bg-emerald-accent shadow-emerald-accent/20',
+            text: 'text-emerald-accent',
+            bg: 'bg-emerald-accent/5',
+            border: 'border-emerald-accent/20',
+            dot: 'bg-emerald-accent',
+            radar: '#48bb78'
+        },
+        'SPECIAL': {
+            active: 'bg-violet-500 shadow-violet-500/20',
+            text: 'text-violet-500',
+            bg: 'bg-violet-500/5',
+            border: 'border-violet-500/20',
+            dot: 'bg-violet-500',
+            radar: '#8b5cf6'
+        }
+    };
+
     const activeDomain = themesByTier['DOMAIN']?.[0]?.track?.name;
     const activeSpecials = Array.from(new Set(themesByTier['SPECIAL']?.filter(t => t.track).map(t => t.track!.name) || []));
 
@@ -108,55 +136,55 @@ export default function SkillsPage() {
             <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-12 lg:gap-20">
                 {/* Main Content: Tabs & Skill Inputs */}
                 <div className="lg:col-span-1 space-y-10">
-                    {/* Tab Navigation */}
-                    <div className="flex bg-bg-card border border-divider p-1 rounded-lg w-fit">
-                        {(['CORE', 'DOMAIN', 'SPECIAL'] as const).map(tier => (
-                            <button
-                                key={tier}
-                                onClick={() => setActiveTab(tier)}
-                                className={`px-4 py-2 rounded font-black text-[10px] uppercase tracking-widest transition-all ${
-                                    activeTab === tier 
-                                    ? 'bg-primary text-white shadow-lg shadow-primary/20' 
-                                    : 'text-text-secondary hover:text-white'
-                                }`}
-                            >
-                                {tier === 'CORE' ? 'Core' : tier === 'DOMAIN' ? 'Domain' : 'Special'}
-                            </button>
-                        ))}
+                    {/* Tab Navigation & Active Contexts */}
+                    <div className="flex items-center gap-4 overflow-x-auto pb-2 lg:pb-0 no-scrollbar">
+                        <div className="flex bg-bg-card border border-divider p-1 rounded-lg w-fit shrink-0">
+                            {(['CORE', 'DOMAIN', 'SPECIAL'] as const).map(tier => (
+                                <button
+                                    key={tier}
+                                    onClick={() => setActiveTab(tier)}
+                                    className={`px-4 py-2 rounded font-black text-[10px] uppercase tracking-widest transition-all whitespace-nowrap ${
+                                        activeTab === tier 
+                                        ? `${tierStyles[tier].active} text-white shadow-lg` 
+                                        : 'text-text-secondary hover:text-white'
+                                    }`}
+                                >
+                                    {tierLabels[tier]}
+                                </button>
+                            ))}
+                        </div>
+
+                        {activeTab === 'DOMAIN' && activeDomain && (
+                            <div className={`flex items-center gap-3 ${tierStyles.DOMAIN.bg} border ${tierStyles.DOMAIN.border} px-4 py-2 rounded-lg animate-in fade-in slide-in-from-left-4 duration-500 shrink-0`}>
+                                <div className={`w-2 h-2 rounded-full ${tierStyles.DOMAIN.dot} animate-pulse`} />
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white whitespace-nowrap">
+                                    Role: {activeDomain}
+                                </span>
+                            </div>
+                        )}
+
+                        {activeTab === 'SPECIAL' && activeSpecials.length > 0 && (
+                            <div className="flex gap-2 animate-in fade-in slide-in-from-left-4 duration-500 shrink-0">
+                                {activeSpecials.map(name => (
+                                    <div key={name} className={`flex items-center gap-2 ${tierStyles.SPECIAL.bg} border ${tierStyles.SPECIAL.border} px-3 py-1.5 rounded-lg whitespace-nowrap`}>
+                                        <Sparkles size={10} className={tierStyles.SPECIAL.text} />
+                                        <span className={`text-[10px] font-black uppercase tracking-[0.1em] ${tierStyles.SPECIAL.text}/90`}>
+                                            {name}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
 
                     <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
                         {themesByTier[activeTab] ? (
                             <div className="space-y-10">
-                                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-divider">
-                                    <div className="space-y-1">
-                                        <h2 className="text-xs font-black uppercase tracking-[0.3em] text-primary">{tierLabels[activeTab]}</h2>
-                                        <div className="h-1 w-20 bg-primary/20"></div>
-                                    </div>
-                                    
-                                    {activeTab === 'DOMAIN' && activeDomain && (
-                                        <div className="flex items-center gap-3 bg-primary/5 border border-primary/20 px-4 py-2 rounded-lg self-start md:self-auto">
-                                            <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white">
-                                                Active Role: {activeDomain}
-                                            </span>
-                                        </div>
-                                    )}
-
-                                    {activeTab === 'SPECIAL' && activeSpecials.length > 0 && (
-                                        <div className="flex flex-wrap gap-2 justify-start md:justify-end">
-                                            {activeSpecials.map(name => (
-                                                <div key={name} className="flex items-center gap-2 bg-emerald-400/5 border border-emerald-400/20 px-3 py-1.5 rounded-lg">
-                                                    <Sparkles size={10} className="text-emerald-400" />
-                                                    <span className="text-[10px] font-black uppercase tracking-[0.1em] text-emerald-400/90">
-                                                        {name}
-                                                    </span>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-                                <SkillsList themes={themesByTier[activeTab]} onUpdateSkill={updateSkill} />
+                                <SkillsList 
+                                    themes={themesByTier[activeTab]} 
+                                    onUpdateSkill={updateSkill} 
+                                    activeColor={tierStyles[activeTab].active.split(' ')[0]} 
+                                />
                             </div>
                         ) : (
                             <div className="bg-bg-card border border-divider border-dashed p-12 rounded-lg text-center">
@@ -169,10 +197,15 @@ export default function SkillsPage() {
                 {/* Sidebar: Visualization */}
                 <aside className="lg:col-span-1 space-y-8 sticky top-24 self-start">
                      <div className="space-y-1 lg:mb-10">
-                        <h2 className="text-xs font-black uppercase tracking-[0.3em] text-primary">Proficiency Map</h2>
-                        <div className="h-1 w-20 bg-primary/20"></div>
+                        <h2 className={`text-xs font-black uppercase tracking-[0.3em] ${tierStyles[activeTab].text}`}>Proficiency Map</h2>
+                        <div className={`h-1 w-20 ${tierStyles[activeTab].bg.replace('/5', '/20')}`}></div>
                     </div>
-                    <SkillsRadar themes={themes} />
+                    <SkillsRadar 
+                        themes={themesByTier[activeTab] || []} 
+                        allThemes={themes}
+                        activeTierLabel={activeTab === 'CORE' ? 'Core' : activeTab === 'DOMAIN' ? 'Domain' : 'Special'}
+                        color={tierStyles[activeTab].radar}
+                    />
                 </aside>
             </div>
         </div>
