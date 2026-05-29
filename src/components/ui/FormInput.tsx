@@ -16,6 +16,7 @@ interface FormInputProps {
   labelClassName?: string;
   inputClassName?: string;
   readOnlyClassName?: string;
+  renderValue?: (value: string | number) => React.ReactNode;
 }
 
 export function FormInput({
@@ -33,6 +34,7 @@ export function FormInput({
   labelClassName,
   inputClassName,
   readOnlyClassName,
+  renderValue,
 }: FormInputProps) {
   const inputId = React.useId();
   const commonInputStyles = cn(
@@ -91,7 +93,7 @@ export function FormInput({
         )
       ) : (
         <div className={cn("text-white font-bold text-xl tracking-tight", type === 'textarea' && "whitespace-pre-wrap leading-relaxed", readOnlyClassName)}>
-          {value || <span className="text-slate-700 italic font-normal tracking-widest text-sm">NULL</span>}
+          {renderValue ? renderValue(value) : (value || <span className="text-slate-700 italic font-normal tracking-widest text-sm">NULL</span>)}
         </div>
       )}
     </div>

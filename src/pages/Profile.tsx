@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { UserProfile, Experience } from '../types';
 import { useAuth } from '../hooks/useAuth';
 import { profileService } from '../services/profileService';
-import { Save, Mail, Github, Linkedin, GraduationCap, Edit3, Shield, User, Clock, Globe, Plus, Trash2, Pencil, Briefcase, MapPin } from 'lucide-react';
+import { Save, Mail, Github, Linkedin, GraduationCap, Edit3, Shield, User, Clock, Globe, Plus, Trash2, Pencil, Briefcase, MapPin, ExternalLink } from 'lucide-react';
 import { FormInput } from '../components/ui/FormInput';
 import { MonthYearPicker } from '../components/ui/MonthYearPicker';
 import { ConfirmModal } from '../components/ui/ConfirmModal';
@@ -228,6 +228,16 @@ export default function Profile() {
                                 inputClassName="py-2 px-3 text-xs"
                                 labelClassName="text-[9px]"
                                 readOnlyClassName="text-sm font-medium tracking-normal text-text-secondary"
+                                renderValue={(val) => {
+                                    if (!val) return null;
+                                    const shortVal = String(val).replace(/https?:\/\/(www\.)?linkedin\.com\/in\//, '').replace(/\/$/, '');
+                                    return (
+                                        <a href={String(val)} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 hover:text-primary transition-colors">
+                                            {shortVal}
+                                            <ExternalLink size={10} className="opacity-50" />
+                                        </a>
+                                    );
+                                }}
                             />
                             <FormInput 
                                 label="GitHub" 
@@ -238,6 +248,16 @@ export default function Profile() {
                                 inputClassName="py-2 px-3 text-xs"
                                 labelClassName="text-[9px]"
                                 readOnlyClassName="text-sm font-medium tracking-normal text-text-secondary"
+                                renderValue={(val) => {
+                                    if (!val) return null;
+                                    const shortVal = String(val).replace(/https?:\/\/(www\.)?github\.com\//, '').replace(/\/$/, '');
+                                    return (
+                                        <a href={String(val)} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 hover:text-primary transition-colors">
+                                            {shortVal}
+                                            <ExternalLink size={10} className="opacity-50" />
+                                        </a>
+                                    );
+                                }}
                             />
                         </div>
                     </div>
