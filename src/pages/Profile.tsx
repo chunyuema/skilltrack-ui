@@ -3,10 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { UserProfile, Experience } from '../types';
 import { useAuth } from '../hooks/useAuth';
 import { profileService } from '../services/profileService';
-import { Save, Mail, Github, Linkedin, GraduationCap, Edit3, Shield, User, Clock, Globe, Plus, Trash2, Pencil } from 'lucide-react';
+import { Save, Mail, Github, Linkedin, GraduationCap, Edit3, Shield, User, Clock, Globe, Plus, Trash2, Pencil, Briefcase, MapPin } from 'lucide-react';
 import { FormInput } from '../components/ui/FormInput';
 import { MonthYearPicker } from '../components/ui/MonthYearPicker';
 import { ConfirmModal } from '../components/ui/ConfirmModal';
+import { cn } from '../lib/utils';
 
 const COUNTRY_OPTIONS = [
   { label: 'United States', value: 'United States' },
@@ -180,30 +181,132 @@ export default function Profile() {
                     </button>
 
                     <div className="space-y-4 pt-4 border-t border-divider">
-                        <FormInput label="Email" value={profile.email} onChange={v => setProfile({...profile, email: v})} isEditing={isEditing} icon={<Mail size={14}/>} />
-                        <FormInput label="Years of Exp" value={profile.yearsOfExperience} onChange={v => setProfile({...profile, yearsOfExperience: parseInt(v)})} isEditing={isEditing} type="number" icon={<Clock size={14}/>} />
-                        <FormInput label="Country" value={profile.country} onChange={v => setProfile({...profile, country: v})} isEditing={isEditing} type="select" options={COUNTRY_OPTIONS} icon={<Globe size={14}/>} />
-                        <FormInput label="Education" value={profile.education} onChange={v => setProfile({...profile, education: v})} isEditing={isEditing} icon={<GraduationCap size={14}/>} />
-                        <FormInput label="Visa" value={profile.visaStatus} onChange={v => setProfile({...profile, visaStatus: v})} isEditing={isEditing} icon={<Shield size={14}/>} />
-                        <FormInput label="LinkedIn" value={profile.linkedinUrl} onChange={v => setProfile({...profile, linkedinUrl: v})} isEditing={isEditing} icon={<Linkedin size={14}/>} />
-                        <FormInput label="GitHub" value={profile.githubUrl} onChange={v => setProfile({...profile, githubUrl: v})} isEditing={isEditing} icon={<Github size={14}/>} />
+                         <div className="space-y-2">
+                            <h2 className="text-[10px] font-black text-white uppercase tracking-[0.3em] flex items-center gap-2">
+                                <Edit3 size={12} className="text-primary" />
+                                Bio
+                            </h2>
+                            {isEditing ? (
+                                <textarea 
+                                    value={profile.bio || ''} 
+                                    onChange={(e) => setProfile({...profile, bio: e.target.value})} 
+                                    className="w-full bg-bg-deep border border-divider rounded p-3 text-xs text-white leading-relaxed focus:border-primary outline-none transition-all" 
+                                    rows={4} 
+                                />
+                            ) : (
+                                <p className="text-xs text-text-secondary leading-relaxed line-clamp-6">{profile.bio || "No bio added."}</p>
+                            )}
+                         </div>
+
+                        <div className="space-y-3 pt-4 border-t border-divider">
+                            <FormInput 
+                                label="Email" 
+                                value={profile.email} 
+                                onChange={v => setProfile({...profile, email: v})} 
+                                isEditing={isEditing} 
+                                icon={<Mail size={12}/>} 
+                                inputClassName="py-2 px-3 text-xs"
+                                labelClassName="text-[9px]"
+                                readOnlyClassName="text-sm font-medium tracking-normal text-text-secondary"
+                            />
+                            <FormInput 
+                                label="Visa Status" 
+                                value={profile.visaStatus} 
+                                onChange={v => setProfile({...profile, visaStatus: v})} 
+                                isEditing={isEditing} 
+                                icon={<Shield size={12}/>} 
+                                inputClassName="py-2 px-3 text-xs"
+                                labelClassName="text-[9px]"
+                                readOnlyClassName="text-sm font-medium tracking-normal text-text-secondary"
+                            />
+                            <FormInput 
+                                label="LinkedIn" 
+                                value={profile.linkedinUrl} 
+                                onChange={v => setProfile({...profile, linkedinUrl: v})} 
+                                isEditing={isEditing} 
+                                icon={<Linkedin size={12}/>} 
+                                inputClassName="py-2 px-3 text-xs"
+                                labelClassName="text-[9px]"
+                                readOnlyClassName="text-sm font-medium tracking-normal text-text-secondary"
+                            />
+                            <FormInput 
+                                label="GitHub" 
+                                value={profile.githubUrl} 
+                                onChange={v => setProfile({...profile, githubUrl: v})} 
+                                isEditing={isEditing} 
+                                icon={<Github size={12}/>} 
+                                inputClassName="py-2 px-3 text-xs"
+                                labelClassName="text-[9px]"
+                                readOnlyClassName="text-sm font-medium tracking-normal text-text-secondary"
+                            />
+                        </div>
                     </div>
 
-                    <button onClick={() => isEditing ? handleSave() : setIsEditing(true)} className="w-full py-3 bg-primary text-white rounded font-bold text-[10px] uppercase">
-                        {isEditing ? 'Save Profile' : 'Edit Profile'}
+                    <button onClick={() => isEditing ? handleSave() : setIsEditing(true)} className="w-full py-3 bg-primary text-white rounded font-bold text-[10px] uppercase transition-all hover:bg-primary-hover active:scale-[0.98]">
+                        {isEditing ? 'Save Changes' : 'Edit Profile'}
                     </button>
                 </div>
             </aside>
 
             <main className="space-y-8">
-                <div className="bg-bg-card border border-divider p-6 rounded-lg space-y-4">
-                     <h2 className="text-sm font-black text-white uppercase tracking-[0.3em]">Bio</h2>
-                     {isEditing ? <textarea value={profile.bio || ''} onChange={(e) => setProfile({...profile, bio: e.target.value})} className="w-full bg-bg-deep border border-divider rounded p-3 text-xs text-white" rows={4} /> : <p className="text-sm text-text-secondary leading-relaxed">{profile.bio || "No bio added."}</p>}
+                {/* Visual Metrics Row */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <MetricCard 
+                        icon={<Briefcase size={18} className="text-primary" />}
+                        label="Experience"
+                        isEditing={isEditing}
+                    >
+                        {isEditing ? (
+                            <input 
+                                type="number"
+                                value={profile.yearsOfExperience}
+                                onChange={(e) => setProfile({...profile, yearsOfExperience: parseInt(e.target.value)})}
+                                className="bg-transparent border-b border-primary/40 focus:border-primary outline-none w-full text-white font-black text-2xl"
+                            />
+                        ) : (
+                            <span className="text-white font-black text-2xl">{profile.yearsOfExperience} <span className="text-text-secondary text-sm font-bold uppercase tracking-widest ml-1">Years</span></span>
+                        )}
+                    </MetricCard>
+
+                    <MetricCard 
+                        icon={<MapPin size={18} className="text-emerald-accent" />}
+                        label="Location"
+                        isEditing={isEditing}
+                    >
+                        {isEditing ? (
+                            <select 
+                                value={profile.country}
+                                onChange={(e) => setProfile({...profile, country: e.target.value})}
+                                className="bg-transparent border-b border-emerald-accent/40 focus:border-emerald-accent outline-none w-full text-white font-black text-lg appearance-none"
+                            >
+                                {COUNTRY_OPTIONS.map(opt => <option key={opt.value} value={opt.value} className="bg-bg-deep">{opt.label}</option>)}
+                            </select>
+                        ) : (
+                            <span className="text-white font-black text-xl leading-tight">{profile.country}</span>
+                        )}
+                    </MetricCard>
+
+                    <MetricCard 
+                        icon={<GraduationCap size={18} className="text-amber-400" />}
+                        label="Education"
+                        isEditing={isEditing}
+                    >
+                        {isEditing ? (
+                            <input 
+                                type="text"
+                                value={profile.education}
+                                onChange={(e) => setProfile({...profile, education: e.target.value})}
+                                className="bg-transparent border-b border-amber-400/40 focus:border-amber-400 outline-none w-full text-white font-bold text-sm"
+                            />
+                        ) : (
+                            <span className="text-white font-bold text-sm leading-tight line-clamp-2">{profile.education}</span>
+                        )}
+                    </MetricCard>
                 </div>
 
                  <div className="flex justify-between items-center pb-4 border-b border-divider">
                      <h2 className="text-sm font-black text-white uppercase tracking-[0.3em]">Work History</h2>
-                     <button onClick={() => { setIsAddingExp(true); setExpError(null); }} className="text-primary"><Plus size={18} /></button>
+                     <button onClick={() => { setIsAddingExp(true); setExpError(null); }} className="text-primary hover:scale-110 transition-transform"><Plus size={18} /></button>
                  </div>
 
                  {expError && (
@@ -260,6 +363,25 @@ export default function Profile() {
                      </div>
                  ))}
             </main>
+        </div>
+    );
+}
+
+function MetricCard({ icon, label, children, isEditing }: { icon: React.ReactNode, label: string, children: React.ReactNode, isEditing: boolean }) {
+    return (
+        <div className={cn(
+            "bg-bg-card border border-divider p-5 rounded-xl flex flex-col justify-center min-h-[110px] transition-all duration-300",
+            isEditing ? "border-primary/30 bg-primary/5" : "hover:border-white/10"
+        )}>
+            <div className="flex items-center gap-2 mb-3">
+                <div className="w-7 h-7 rounded-lg bg-bg-deep flex items-center justify-center border border-divider">
+                    {icon}
+                </div>
+                <span className="text-[9px] font-black text-text-secondary uppercase tracking-[0.2em]">{label}</span>
+            </div>
+            <div className="flex items-end">
+                {children}
+            </div>
         </div>
     );
 }
