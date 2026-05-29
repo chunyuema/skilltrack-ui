@@ -6,6 +6,7 @@ import { profileService } from '../services/profileService';
 import { Save, Mail, Github, Linkedin, GraduationCap, Edit3, Shield, User, Clock, Globe, Plus, Trash2, Pencil } from 'lucide-react';
 import { FormInput } from '../components/ui/FormInput';
 import { MonthYearPicker } from '../components/ui/MonthYearPicker';
+import { ConfirmModal } from '../components/ui/ConfirmModal';
 
 const COUNTRY_OPTIONS = [
   { label: 'United States', value: 'United States' },
@@ -35,6 +36,7 @@ export default function Profile() {
     const [newExp, setNewExp] = useState<Partial<Experience>>({});
     const [editExp, setEditExp] = useState<Partial<Experience>>({});
     const [expError, setExpError] = useState<string | null>(null);
+    const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
     const { token, logout } = useAuth();
 
     const validateDates = (start?: string, end?: string): string | null => {
@@ -111,12 +113,23 @@ export default function Profile() {
     const handleDeleteExperience = async (id: string) => {
         await profileService.deleteExperience(id, token!);
         setExperiences(experiences.filter(exp => exp.id !== id));
+        setDeleteConfirmId(null);
     };
 
     if (isLoading || !profile) return <div className="p-24 text-center text-white">Loading...</div>;
 
     return (
-        <div className="animate-in fade-in duration-700 max-w-[1200px] mx-auto grid grid-cols-1 lg:grid-cols-[350px_1fr] gap-12">
+        <div className="animate-in fade-in duration-700 max-w-[1200px] mx-auto grid grid-cols-1 lg:grid-cols-[350px_1fr] gap-12 relative">
+            <ConfirmModal
+                isOpen={!!deleteConfirmId}
+                title="Delete Experience?"
+                description="This action cannot be undone. This work history entry will be permanently removed from your professional profile."
+                confirmLabel="Confirm Delete"
+                onConfirm={() => deleteConfirmId && handleDeleteExperience(deleteConfirmId)}
+                onCancel={() => setDeleteConfirmId(null)}
+                variant="danger"
+            />
+
             <aside className="space-y-6">
                 <div className="bg-bg-card border border-divider p-6 rounded-lg space-y-6 sticky top-24">
                     <div className="text-center">
@@ -240,7 +253,7 @@ export default function Profile() {
                                </div>
                                <div className="flex gap-2">
                                    <button onClick={() => { setEditingExpId(exp.id); setEditExp(exp); setExpError(null); }} className="text-text-secondary hover:text-white"><Pencil size={14}/></button>
-                                   <button onClick={() => handleDeleteExperience(exp.id)} className="text-text-secondary hover:text-red-400"><Trash2 size={14}/></button>
+                                   <button onClick={() => setDeleteConfirmId(exp.id)} className="text-text-secondary hover:text-red-400"><Trash2 size={14}/></button>
                                </div>
                            </div>
                         )}
