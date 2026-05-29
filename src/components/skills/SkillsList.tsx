@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { SkillTheme, Skill } from '../../types';
+import { SkillTheme, SkillSubCategory } from '../../types';
 import { 
   ChevronDown, 
   ChevronUp, 
@@ -20,8 +20,9 @@ import { motion, AnimatePresence } from 'motion/react';
 
 interface SkillsListProps {
   themes: SkillTheme[];
-  onUpdateSkill?: (themeId: string, subCatId: string, skillId: string, level: number) => void;
+  onUpdateSkill?: (themeId: string, subCatId: string, level: number) => void;
   readOnly?: boolean;
+  activeColor?: string;
 }
 
 const IconMapper: Record<string, { icon: React.ElementType, color: string, bg: string }> = {
@@ -40,7 +41,7 @@ const StringIconMapper: Record<string, React.ElementType> = {
   Cpu, Code2, Server, Database, Monitor, Cloud, ShieldCheck, Activity, Brain
 };
 
-export default function SkillsList({ themes, onUpdateSkill, readOnly = false }: SkillsListProps) {
+export default function SkillsList({ themes, onUpdateSkill, readOnly = false, activeColor = 'bg-primary' }: SkillsListProps) {
   const [expandedTheme, setExpandedTheme] = useState<string | null>('foundations');
   const [expandedSubCategory, setExpandedSubCategory] = useState<string | null>(null);
 
@@ -91,30 +92,15 @@ export default function SkillsList({ themes, onUpdateSkill, readOnly = false }: 
                   exit={{ height: 0, opacity: 0 }}
                   transition={{ duration: 0.3, ease: "easeInOut" }}
                 >
-                  <div className="p-8 pt-0 border-t border-divider space-y-6">
+                  <div className="p-8 pt-0 border-t border-divider space-y-4">
                     {theme.subCategories.map((subCat) => (
-                      <div key={subCat.id} className="border border-divider rounded-lg bg-bg-deep/50 overflow-hidden">
-                        <button
-                          onClick={() => setExpandedSubCategory(expandedSubCategory === subCat.id ? null : subCat.id)}
-                          className="w-full flex items-center justify-between p-5 hover:bg-white/[0.03] transition-colors"
-                        >
-                          <span className="font-black text-white text-xs uppercase tracking-[0.2em]">{subCat.name}</span>
-                          <ChevronRight size={14} className={cn("transition-transform duration-300 text-primary", expandedSubCategory === subCat.id ? "rotate-90" : "")} />
-                        </button>
-                        
-                        {expandedSubCategory === subCat.id && (
-                          <div className="p-8 bg-black/20 space-y-8 animate-in fade-in zoom-in-95 duration-300">
-                            {subCat.skills.map((skill) => (
-                              <SkillRow 
-                                key={skill.id} 
-                                skill={skill} 
-                                onChange={(val) => onUpdateSkill?.(theme.id, subCat.id, skill.id, val)}
-                                readOnly={readOnly}
-                              />
-                            ))}
-                          </div>
-                        )}
-                      </div>
+                      <SubCategoryRow 
+                        key={subCat.id} 
+                        subCat={subCat} 
+                        onChange={(val) => onUpdateSkill?.(theme.id, subCat.id, val)}
+                        readOnly={readOnly}
+                        activeColor={activeColor}
+                      />
                     ))}
                   </div>
                 </motion.div>
@@ -127,34 +113,43 @@ export default function SkillsList({ themes, onUpdateSkill, readOnly = false }: 
   );
 }
 
-const SkillRow: React.FC<{ skill: Skill; onChange: (val: number) => void; readOnly: boolean }> = ({ skill, onChange, readOnly }) => {
+const SubCategoryRow: React.FC<{ 
+  subCat: SkillSubCategory; 
+  onChange: (val: number) => void; 
+  readOnly: boolean;
+  activeColor: string;
+}> = ({ subCat, onChange, readOnly, activeColor }) => {
+  const activeColorShadow = activeColor.includes('primary') ? 'shadow-primary/20' : activeColor.replace('bg-', 'shadow-') + '/20';
+  const textColor = activeColor.replace('bg-', 'text-');
+
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 group">
-      <div className="flex-1 space-y-1">
-        <div className="font-bold text-white text-sm uppercase tracking-widest flex items-center gap-3">
-          <div className="w-1 h-4 bg-primary/20 group-hover:bg-primary transition-colors"></div>
-          {skill.name}
+    <div className="bg-bg-deep/50 border border-divider rounded-lg p-6 space-y-4">
+      <div className="flex justify-between items-start gap-4">
+        <div className="flex-1 space-y-1">
+          <h4 className="font-black text-white text-xs uppercase tracking-[0.2em]">{subCat.name}</h4>
+          <p className="text-[10px] text-text-secondary font-mono tracking-widest uppercase">
+            Includes: {subCat.skills.map(s => s.name).join(', ')}
+          </p>
         </div>
-      </div>
-      <div className="flex items-center gap-1.5 self-end sm:self-auto bg-slate-900/50 p-1.5 rounded-lg border border-divider">
-        {[0, 1, 2, 3, 4, 5].map((level) => (
-          <button
-            key={level}
-            onClick={() => !readOnly && onChange(level)}
-            disabled={readOnly}
-            className={cn(
-              "w-8 h-8 rounded text-[10px] font-black transition-all flex items-center justify-center font-mono",
-              skill.level >= level && level !== 0
-                ? "bg-primary text-white shadow-lg shadow-primary/20" 
-                : level === 0 && skill.level === 0
-                ? "bg-white/[0.05] text-primary border border-primary/20"
-                : "bg-transparent text-text-secondary hover:text-white"
-            )}
-            title={`Set proficiency to ${level}`}
-          >
-            {level === 0 ? 'X' : level}
-          </button>
-        ))}
+        <div className="flex items-center gap-1 bg-slate-900/50 p-1 rounded-lg border border-divider">
+          {[0, 1, 2, 3, 4, 5].map((level) => (
+            <button
+              key={level}
+              onClick={() => !readOnly && onChange(level)}
+              disabled={readOnly}
+              className={cn(
+                "w-8 h-8 rounded text-[10px] font-black transition-all flex items-center justify-center font-mono",
+                subCat.level >= level && level !== 0
+                  ? cn(activeColor, "text-white shadow-lg", activeColorShadow) 
+                  : level === 0 && subCat.level === 0
+                  ? cn("bg-white/[0.05] border border-opacity-20", textColor, activeColor.replace('bg-', 'border-'))
+                  : "bg-transparent text-text-secondary hover:text-white"
+              )}
+            >
+              {level === 0 ? 'X' : level}
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 /// <reference types="vite/client" />
-import { UserProfile, Experience } from "../types";
+import { UserProfile, Experience, Track, SkillTheme } from "../types";
 
 // Type for the raw API response
 interface ApiUserProfile {
@@ -15,6 +15,7 @@ interface ApiUserProfile {
   github_url: string;
   linkedin_url: string;
   bio: string;
+  selected_tracks: string[];
 }
 
 interface ApiExperience {
@@ -67,6 +68,7 @@ export const profileService = {
       githubUrl: data.github_url || "",
       linkedinUrl: data.linkedin_url || "",
       bio: data.bio || "",
+      selectedTrackIds: data.selected_tracks || [],
     };
   },
 
@@ -202,7 +204,7 @@ export const profileService = {
   },
 
   fetchSkills: async (token: string): Promise<SkillTheme[]> => {
-    const response = await fetch(`${API_URL}/profiles/skill-list/`, {
+    const response = await fetch(`${API_URL}/skills/skill-list/`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -211,19 +213,44 @@ export const profileService = {
     return handleResponse(response);
   },
 
-  updateSkillLevel: async (
-    skillId: string,
-    level: number,
-    token: string
-  ): Promise<void> => {
-    const response = await fetch(`${API_URL}/profiles/skills/update/`, {
+  fetchTracks: async (token: string): Promise<Track[]> => {
+    const response = await fetch(`${API_URL}/skills/tracks/`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return handleResponse(response);
+  },
+
+  updateUserTracks: async (trackIds: string[], token: string): Promise<void> => {
+    const response = await fetch(`${API_URL}/skills/tracks/update/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
-        skill_id: skillId,
+        track_ids: trackIds,
+      }),
+    });
+
+    await handleResponse(response);
+  },
+
+  updateSkillLevel: async (
+    subCategoryId: string,
+    level: number,
+    token: string
+  ): Promise<void> => {
+    const response = await fetch(`${API_URL}/skills/update/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        sub_category_id: subCategoryId,
         level,
       }),
     });
