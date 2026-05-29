@@ -5,7 +5,7 @@ interface FormInputProps {
   label: string;
   name?: string;
   value: string | number;
-  onChange: (val: string) => void;
+  onChange?: (val: string) => void;
   type?: 'text' | 'textarea' | 'number' | 'month' | 'select';
   options?: { label: string; value: string }[];
   placeholder?: string;
@@ -57,7 +57,7 @@ export function FormInput({
             id={inputId}
             name={name}
             value={value}
-            onChange={(e) => onChange(e.target.value)}
+            onChange={(e) => onChange?.(e.target.value)}
             placeholder={placeholder}
             disabled={disabled}
             rows={5}
@@ -68,7 +68,7 @@ export function FormInput({
             id={inputId}
             name={name}
             value={value}
-            onChange={(e) => onChange(e.target.value)}
+            onChange={(e) => onChange?.(e.target.value)}
             disabled={disabled}
             className={cn(commonInputStyles, "appearance-none cursor-pointer")}
           >
@@ -85,7 +85,7 @@ export function FormInput({
             type={type}
             name={name}
             value={value}
-            onChange={(e) => onChange(e.target.value)}
+            onChange={(e) => onChange?.(e.target.value)}
             placeholder={placeholder}
             disabled={disabled}
             className={commonInputStyles}
