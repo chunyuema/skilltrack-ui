@@ -31,17 +31,35 @@ interface ApiExperience {
 const API_URL = import.meta.env.VITE_API_URL;
 
 const handleResponse = async (response: Response) => {
-  // If the server returns 401 Unauthorized, it means the JWT access token is expired or invalid.
-  // We throw a specific "Unauthorized" error message that the UI components look for 
-  // to trigger a graceful logout and redirect to the login page.
+  // 1. Check for Auth Errors First
   if (response.status === 401) {
     throw new Error("Unauthorized");
   }
-  if (!response.ok) {
-    const errorBody = await response.json().catch(() => ({}));
-    throw new Error(errorBody.detail || "API request failed");
+
+  // 2. Extract Body as Text (Always consumes the stream)
+  const text = await response.text();
+  let data = null;
+
+  // 3. Attempt JSON Parse safely
+  if (text) {
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      // If success code but invalid JSON, return raw text or null
+      if (response.ok) return text || null;
+      // If error code and invalid JSON, use raw text as error message
+      throw new Error(`Server Error (${response.status}): ${text.substring(0, 100)}`);
+    }
   }
-  return response.json();
+
+  // 4. Handle HTTP Error Statuses
+  if (!response.ok) {
+    const errorMessage = data?.detail || data?.message || `API request failed with status ${response.status}`;
+    throw new Error(errorMessage);
+  }
+
+  // 5. Return parsed data or null for empty success
+  return data;
 };
 
 export const profileService = {
@@ -107,7 +125,7 @@ export const profileService = {
 
     const data: ApiExperience[] = await handleResponse(response);
 
-    return data.map((exp) => ({
+    return (data || []).map((exp) => ({
       id: exp.id,
       company: exp.company,
       role: exp.role,
@@ -195,12 +213,7 @@ export const profileService = {
       },
     });
 
-    if (response.status === 401) {
-      throw new Error("Unauthorized");
-    }
-    if (!response.ok) {
-      throw new Error("Failed to delete experience");
-    }
+    await handleResponse(response);
   },
 
   fetchSkills: async (token: string): Promise<SkillTheme[]> => {

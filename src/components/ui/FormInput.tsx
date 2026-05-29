@@ -1,11 +1,12 @@
 import React from 'react';
 import { cn } from '../../lib/utils';
+import { ChevronDown } from 'lucide-react';
 
 interface FormInputProps {
   label: string;
   name?: string;
   value: string | number;
-  onChange: (val: string) => void;
+  onChange?: (val: string) => void;
   type?: 'text' | 'textarea' | 'number' | 'month' | 'select';
   options?: { label: string; value: string }[];
   placeholder?: string;
@@ -16,6 +17,7 @@ interface FormInputProps {
   labelClassName?: string;
   inputClassName?: string;
   readOnlyClassName?: string;
+  renderValue?: (value: string | number) => React.ReactNode;
 }
 
 export function FormInput({
@@ -33,6 +35,7 @@ export function FormInput({
   labelClassName,
   inputClassName,
   readOnlyClassName,
+  renderValue,
 }: FormInputProps) {
   const inputId = React.useId();
   const commonInputStyles = cn(
@@ -55,35 +58,43 @@ export function FormInput({
             id={inputId}
             name={name}
             value={value}
-            onChange={(e) => onChange(e.target.value)}
+            onChange={(e) => onChange?.(e.target.value)}
             placeholder={placeholder}
             disabled={disabled}
             rows={5}
             className={cn(commonInputStyles, "h-32 leading-relaxed")}
           />
         ) : type === 'select' ? (
-          <select
-            id={inputId}
-            name={name}
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-            disabled={disabled}
-            className={cn(commonInputStyles, "appearance-none cursor-pointer")}
-          >
-            {placeholder && <option value="" disabled>{placeholder}</option>}
-            {options.map((opt) => (
-              <option key={opt.value} value={opt.value} className="bg-bg-deep text-white">
-                {opt.label}
-              </option>
-            ))}
-          </select>
+          <div className="relative group">
+            <select
+              id={inputId}
+              name={name}
+              value={value}
+              onChange={(e) => onChange?.(e.target.value)}
+              disabled={disabled}
+              className={cn(
+                commonInputStyles, 
+                "appearance-none cursor-pointer pr-10 hover:border-primary/40 transition-colors"
+              )}
+            >
+              {placeholder && <option value="" disabled>{placeholder}</option>}
+              {options.map((opt) => (
+                <option key={opt.value} value={opt.value} className="bg-bg-deep text-white">
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-text-secondary group-hover:text-primary transition-colors">
+              <ChevronDown size={16} strokeWidth={2.5} />
+            </div>
+          </div>
         ) : (
           <input
             id={inputId}
             type={type}
             name={name}
             value={value}
-            onChange={(e) => onChange(e.target.value)}
+            onChange={(e) => onChange?.(e.target.value)}
             placeholder={placeholder}
             disabled={disabled}
             className={commonInputStyles}
@@ -91,7 +102,7 @@ export function FormInput({
         )
       ) : (
         <div className={cn("text-white font-bold text-xl tracking-tight", type === 'textarea' && "whitespace-pre-wrap leading-relaxed", readOnlyClassName)}>
-          {value || <span className="text-slate-700 italic font-normal tracking-widest text-sm">NULL</span>}
+          {renderValue ? renderValue(value) : (value || <span className="text-slate-700 italic font-normal tracking-widest text-sm">NULL</span>)}
         </div>
       )}
     </div>
