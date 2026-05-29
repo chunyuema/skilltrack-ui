@@ -7,7 +7,9 @@ import { Save, Mail, Github, Linkedin, GraduationCap, Edit3, Shield, User, Clock
 import { FormInput } from '../components/ui/FormInput';
 import { MonthYearPicker } from '../components/ui/MonthYearPicker';
 import { ConfirmModal } from '../components/ui/ConfirmModal';
+import { ExperienceCard } from '../components/profile/ExperienceCard';
 import { cn } from '../lib/utils';
+import { motion, AnimatePresence } from 'motion/react';
 
 const COUNTRY_OPTIONS = [
   { label: 'United States', value: 'United States' },
@@ -352,8 +354,13 @@ export default function Profile() {
                  )}
 
                  {experiences.map(exp => (
-                     <div key={exp.id} className="bg-bg-card border border-divider p-6 rounded-lg">
-                        {editingExpId === exp.id ? (
+                    <ExperienceCard 
+                        key={exp.id}
+                        exp={exp}
+                        isEditing={editingExpId === exp.id}
+                        onEdit={() => { setEditingExpId(exp.id); setEditExp(exp); setExpError(null); }}
+                        onDelete={() => setDeleteConfirmId(exp.id)}
+                        editUI={
                            <div className="space-y-4">
                               <FormInput label="Company" value={editExp.company || exp.company} onChange={v => setEditExp({...editExp, company: v})} />
                               <FormInput label="Role" value={editExp.role || exp.role} onChange={v => setEditExp({...editExp, role: v})} />
@@ -367,20 +374,8 @@ export default function Profile() {
                                 <button onClick={() => setEditingExpId(null)} className="px-4 py-2 bg-white/5 text-white text-xs font-bold rounded">Cancel</button>
                               </div>
                            </div>
-                        ) : (
-                           <div className="flex justify-between items-start">
-                               <div>
-                                   <h4 className="font-bold text-white text-lg">{exp.role}</h4>
-                                   <p className="text-sm text-text-secondary">{exp.company} • {exp.startDate} to {exp.endDate}</p>
-                                   <p className="text-xs text-text-secondary mt-2">{exp.description}</p>
-                               </div>
-                               <div className="flex gap-2">
-                                   <button onClick={() => { setEditingExpId(exp.id); setEditExp(exp); setExpError(null); }} className="text-text-secondary hover:text-white"><Pencil size={14}/></button>
-                                   <button onClick={() => setDeleteConfirmId(exp.id)} className="text-text-secondary hover:text-red-400"><Trash2 size={14}/></button>
-                               </div>
-                           </div>
-                        )}
-                     </div>
+                        }
+                    />
                  ))}
             </main>
         </div>
