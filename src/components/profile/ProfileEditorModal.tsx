@@ -21,6 +21,16 @@ const COUNTRY_OPTIONS = [
   { label: 'Netherlands', value: 'Netherlands' },
 ];
 
+const VISA_STATUS_OPTIONS = [
+  { label: 'Citizen', value: 'Citizen' },
+  { label: 'Permanent Resident (PR)', value: 'Permanent Resident' },
+  { label: 'Work Visa (Requires Sponsorship)', value: 'Work Visa (Sponsorship Required)' },
+  { label: 'Work Visa (No Sponsorship Required)', value: 'Work Visa (No Sponsorship)' },
+  { label: 'Spouse Visa', value: 'Spouse Visa' },
+  { label: 'Student Visa', value: 'Student Visa' },
+  { label: 'Other', value: 'Other' },
+];
+
 interface ProfileEditorModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -157,7 +167,13 @@ export function ProfileEditorModal({ isOpen, onClose, profile: initialProfile, e
                      Metrics
                    </h3>
                    <FormInput label="Years of Experience" type="number" value={profile.yearsOfExperience} onChange={v => setProfile({...profile, yearsOfExperience: parseInt(v)})} />
-                   <FormInput label="Visa Status" value={profile.visaStatus} onChange={v => setProfile({...profile, visaStatus: v})} />
+                   <FormInput 
+                     label="Visa Status" 
+                     type="select" 
+                     options={VISA_STATUS_OPTIONS} 
+                     value={profile.visaStatus} 
+                     onChange={v => setProfile({...profile, visaStatus: v})} 
+                   />
                 </div>
 
                 <div className="space-y-6">

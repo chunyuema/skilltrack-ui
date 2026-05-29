@@ -1,5 +1,6 @@
 import React from 'react';
 import { cn } from '../../lib/utils';
+import { ChevronDown } from 'lucide-react';
 
 interface FormInputProps {
   label: string;
@@ -64,21 +65,29 @@ export function FormInput({
             className={cn(commonInputStyles, "h-32 leading-relaxed")}
           />
         ) : type === 'select' ? (
-          <select
-            id={inputId}
-            name={name}
-            value={value}
-            onChange={(e) => onChange?.(e.target.value)}
-            disabled={disabled}
-            className={cn(commonInputStyles, "appearance-none cursor-pointer")}
-          >
-            {placeholder && <option value="" disabled>{placeholder}</option>}
-            {options.map((opt) => (
-              <option key={opt.value} value={opt.value} className="bg-bg-deep text-white">
-                {opt.label}
-              </option>
-            ))}
-          </select>
+          <div className="relative group">
+            <select
+              id={inputId}
+              name={name}
+              value={value}
+              onChange={(e) => onChange?.(e.target.value)}
+              disabled={disabled}
+              className={cn(
+                commonInputStyles, 
+                "appearance-none cursor-pointer pr-10 hover:border-primary/40 transition-colors"
+              )}
+            >
+              {placeholder && <option value="" disabled>{placeholder}</option>}
+              {options.map((opt) => (
+                <option key={opt.value} value={opt.value} className="bg-bg-deep text-white">
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-text-secondary group-hover:text-primary transition-colors">
+              <ChevronDown size={16} strokeWidth={2.5} />
+            </div>
+          </div>
         ) : (
           <input
             id={inputId}
