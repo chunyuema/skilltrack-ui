@@ -9,33 +9,33 @@ export const TRACK_VISUALS: Record<string, {
     radar: string,
     active: string
 }> = {
-    // Standardized Professional Domains (Emerald Theme)
+    // Standardized Professional Domains (Cyan/Sky Theme - Distinct from Primary Blue)
     'frontend': {
         icon: Monitor,
-        color: 'text-emerald-400',
-        bg: 'bg-emerald-400/5',
-        border: 'border-emerald-400/20',
-        dot: 'bg-emerald-400',
-        radar: '#10b981',
-        active: 'bg-emerald-500 shadow-emerald-500/20'
+        color: 'text-cyan-400',
+        bg: 'bg-cyan-400/5',
+        border: 'border-cyan-400/20',
+        dot: 'bg-cyan-400',
+        radar: '#22d3ee',
+        active: 'bg-cyan-500 shadow-cyan-500/20'
     },
     'backend': {
         icon: Server,
-        color: 'text-emerald-400',
-        bg: 'bg-emerald-400/5',
-        border: 'border-emerald-400/20',
-        dot: 'bg-emerald-400',
-        radar: '#10b981',
-        active: 'bg-emerald-500 shadow-emerald-500/20'
+        color: 'text-cyan-400',
+        bg: 'bg-cyan-400/5',
+        border: 'border-cyan-400/20',
+        dot: 'bg-cyan-400',
+        radar: '#22d3ee',
+        active: 'bg-cyan-500 shadow-cyan-500/20'
     },
     'fullstack': {
         icon: Layers,
-        color: 'text-emerald-400',
-        bg: 'bg-emerald-400/5',
-        border: 'border-emerald-400/20',
-        dot: 'bg-emerald-400',
-        radar: '#10b981',
-        active: 'bg-emerald-500 shadow-emerald-500/20'
+        color: 'text-cyan-400',
+        bg: 'bg-cyan-400/5',
+        border: 'border-cyan-400/20',
+        dot: 'bg-cyan-400',
+        radar: '#22d3ee',
+        active: 'bg-cyan-500 shadow-cyan-500/20'
     },
     // Standardized Advanced Specializations (Violet Theme)
     'ai-eng': {
@@ -65,14 +65,14 @@ export const TRACK_VISUALS: Record<string, {
         radar: '#8b5cf6',
         active: 'bg-violet-500 shadow-violet-500/20'
     },
-    // Default fallback (Neutral Slate)
+    // Default fallback (Primary Electric Blue)
     'default': {
         icon: Target,
-        color: 'text-slate-400',
-        bg: 'bg-slate-400/5',
-        border: 'border-slate-400/20',
-        dot: 'bg-slate-400',
-        radar: '#94a3b8',
-        active: 'bg-slate-500 shadow-slate-500/20'
+        color: 'text-blue-400',
+        bg: 'bg-blue-400/5',
+        border: 'border-blue-400/20',
+        dot: 'bg-blue-400',
+        radar: '#3b82f6',
+        active: 'bg-blue-500 shadow-blue-500/20'
     }
 };
