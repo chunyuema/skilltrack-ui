@@ -1,14 +1,14 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #5a67d8; /* Indigo Accent */
-  --color-primary-hover: #4c51bf;
-  --color-emerald-accent: #48bb78; /* Positive Status */
+  --color-primary: #94a3b8; /* Slate Neutral Accent */
+  --color-primary-hover: #cbd5e1;
+  --color-emerald-accent: #10b981; /* Standard Emerald */
   --color-bg-deep: #0b0e14; /* Deep Navy Background */
   --color-bg-card: #11141b; /* Subtle Layered look */
   --color-text-main: #ffffff; /* Headings */
-  --color-text-secondary: #a0aec0; /* Body/Secondary */
-  --color-divider: #1a202c; /* Subtle Dividers */
+  --color-text-secondary: #94a3b8; /* Body/Secondary */
+  --color-divider: #1e293b; /* Slate-800 Dividers */
   --font-main: "Inter", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", monospace;
 }

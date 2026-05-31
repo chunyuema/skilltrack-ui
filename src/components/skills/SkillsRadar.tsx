@@ -12,7 +12,6 @@ import {
 
 interface SkillsRadarProps {
   themes: SkillTheme[];
-  allThemes?: SkillTheme[];
   activeTierLabel?: string;
   color?: string;
 }

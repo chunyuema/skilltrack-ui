@@ -5,6 +5,7 @@ import { profileService } from '../services/profileService';
 import { Track, SkillTheme } from '../types';
 import { ChevronRight, ChevronLeft, Check, Sparkles, Target, Zap, ShieldCheck } from 'lucide-react';
 import { cn } from '../lib/utils';
+import { TRACK_VISUALS } from '../lib/constants';
 
 export default function Onboarding() {
   const navigate = useNavigate();
@@ -173,29 +174,36 @@ export default function Onboarding() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-              {domainTracks.map(track => (
-                <button
-                  key={track.id}
-                  onClick={() => handleDomainSelect(track.id)}
-                  className={cn(
-                    "flex flex-col items-start p-8 rounded-lg border-2 transition-all text-left group",
-                    selectedDomain === track.id 
-                      ? "bg-primary/5 border-primary shadow-2xl shadow-primary/10" 
-                      : "bg-bg-card border-divider hover:border-primary/30"
-                  )}
-                >
-                  <div className={cn(
-                    "w-12 h-12 rounded-lg flex items-center justify-center mb-6 transition-all",
-                    selectedDomain === track.id ? "bg-primary text-white" : "bg-divider text-text-secondary group-hover:text-white"
-                  )}>
-                    <Target size={24} />
-                  </div>
-                  <h3 className="font-black text-lg uppercase tracking-tight mb-2">{track.name}</h3>
-                  <p className="text-xs text-text-secondary leading-relaxed">
-                    Unlocks specialized {track.name.toLowerCase()} skill trees and architectures.
-                  </p>
-                </button>
-              ))}
+              {domainTracks.map(track => {
+                const visual = TRACK_VISUALS[track.id] || TRACK_VISUALS.default;
+                const Icon = visual.icon;
+                
+                return (
+                  <button
+                    key={track.id}
+                    onClick={() => handleDomainSelect(track.id)}
+                    className={cn(
+                      "flex flex-col items-start p-8 rounded-lg border-2 transition-all text-left group",
+                      selectedDomain === track.id 
+                        ? `${visual.bg} ${visual.border.replace('/20', '/60')} shadow-2xl` 
+                        : "bg-bg-card border-divider hover:border-primary/30"
+                    )}
+                  >
+                    <div className={cn(
+                      "w-12 h-12 rounded-lg flex items-center justify-center mb-6 transition-all",
+                      selectedDomain === track.id 
+                        ? `${visual.active.split(' ')[0]} text-white` 
+                        : "bg-divider text-text-secondary group-hover:text-white"
+                    )}>
+                      <Icon size={24} />
+                    </div>
+                    <h3 className="font-black text-lg uppercase tracking-tight mb-2">{track.name}</h3>
+                    <p className="text-xs text-text-secondary leading-relaxed">
+                      Unlocks specialized {track.name.toLowerCase()} skill trees and architectures.
+                    </p>
+                  </button>
+                );
+              })}
             </div>
 
             <div className="flex justify-between">
@@ -229,30 +237,37 @@ export default function Onboarding() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
-              {specialTracks.map(track => (
-                <button
-                  key={track.id}
-                  onClick={() => handleSpecialSelect(track.id)}
-                  className={cn(
-                    "flex items-center gap-6 p-8 rounded-lg border-2 transition-all text-left group",
-                    selectedSpecial === track.id 
-                      ? "bg-primary/5 border-primary" 
-                      : "bg-bg-card border-divider hover:border-primary/30"
-                  )}
-                >
-                  <div className={cn(
-                    "w-12 h-12 flex-shrink-0 rounded-full flex items-center justify-center transition-all",
-                    selectedSpecial === track.id ? "bg-primary text-white" : "bg-divider text-text-secondary group-hover:text-white"
-                  )}>
-                    <Sparkles size={20} />
-                  </div>
-                  <div>
-                    <h3 className="font-black text-lg uppercase tracking-tight mb-1">{track.name}</h3>
-                    <p className="text-xs text-text-secondary uppercase tracking-widest font-mono">Specialization</p>
-                  </div>
-                  {selectedSpecial === track.id && <Check className="ml-auto text-primary" size={24} />}
-                </button>
-              ))}
+              {specialTracks.map(track => {
+                const visual = TRACK_VISUALS[track.id] || TRACK_VISUALS.default;
+                const Icon = visual.icon;
+                
+                return (
+                  <button
+                    key={track.id}
+                    onClick={() => handleSpecialSelect(track.id)}
+                    className={cn(
+                      "flex items-center gap-6 p-8 rounded-lg border-2 transition-all text-left group",
+                      selectedSpecial === track.id 
+                        ? `${visual.bg} ${visual.border.replace('/20', '/60')}` 
+                        : "bg-bg-card border-divider hover:border-primary/30"
+                    )}
+                  >
+                    <div className={cn(
+                      "w-12 h-12 flex-shrink-0 rounded-full flex items-center justify-center transition-all",
+                      selectedSpecial === track.id 
+                        ? `${visual.active.split(' ')[0]} text-white` 
+                        : "bg-divider text-text-secondary group-hover:text-white"
+                    )}>
+                      <Icon size={20} />
+                    </div>
+                    <div>
+                      <h3 className="font-black text-lg uppercase tracking-tight mb-1">{track.name}</h3>
+                      <p className="text-xs text-text-secondary uppercase tracking-widest font-mono">Specialization</p>
+                    </div>
+                    {selectedSpecial === track.id && <Check className="ml-auto text-primary" size={24} />}
+                  </button>
+                );
+              })}
             </div>
 
             <div className="flex justify-between">

@@ -2,9 +2,10 @@ import { useState, useEffect } from 'react';
 import { SkillTheme } from '../types';
 import SkillsRadar from '../components/skills/SkillsRadar';
 import SkillsList from '../components/skills/SkillsList';
-import { Sparkles } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { profileService } from '../services/profileService';
+import { TRACK_VISUALS } from '../lib/constants';
+import { cn } from '../lib/utils';
 
 export default function SkillsPage() {
     const { token } = useAuth();
@@ -53,9 +54,8 @@ export default function SkillsPage() {
             await profileService.updateSkillLevel(subCatId, level, token);
         } catch (err) {
             console.error("Failed to update skill:", err);
-            // Rollback on failure
             setThemes(previousThemes);
-            alert("Failed to save skill update. Please check your connection.");
+            alert("Failed to save skill update.");
         }
     };
 
@@ -71,12 +71,7 @@ export default function SkillsPage() {
         return (
             <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
                 <div className="text-red-500 font-bold uppercase">{error}</div>
-                <button 
-                    onClick={() => window.location.reload()}
-                    className="px-4 py-2 border border-divider hover:bg-white/5 transition-colors uppercase text-xs font-black"
-                >
-                    Retry Connection
-                </button>
+                <button onClick={() => window.location.reload()} className="px-4 py-2 border border-divider hover:bg-white/5 transition-colors uppercase text-xs font-black">Retry Connection</button>
             </div>
         );
     }
@@ -88,55 +83,28 @@ export default function SkillsPage() {
         return acc;
     }, {} as Record<'CORE' | 'DOMAIN' | 'SPECIAL', SkillTheme[]>);
 
-    const tierLabels: Record<string, string> = {
-        'CORE': 'Core Essentials',
-        'DOMAIN': 'Professional Domain',
-        'SPECIAL': 'Advanced Specializations'
-    };
+    const activeDomain = themesByTier['DOMAIN']?.[0]?.track;
+    const domainVisual = activeDomain ? (TRACK_VISUALS[activeDomain.id] || TRACK_VISUALS.default) : TRACK_VISUALS.default;
 
-    const tierStyles: Record<'CORE' | 'DOMAIN' | 'SPECIAL', { 
-        active: string, 
-        text: string, 
-        bg: string, 
-        border: string, 
-        dot: string,
-        radar: string
-    }> = {
-        'CORE': {
-            active: 'bg-primary shadow-primary/20',
-            text: 'text-primary',
-            bg: 'bg-primary/5',
-            border: 'border-primary/20',
-            dot: 'bg-primary',
-            radar: '#5a67d8'
-        },
-        'DOMAIN': {
-            active: 'bg-emerald-accent shadow-emerald-accent/20',
-            text: 'text-emerald-accent',
-            bg: 'bg-emerald-accent/5',
-            border: 'border-emerald-accent/20',
-            dot: 'bg-emerald-accent',
-            radar: '#48bb78'
-        },
-        'SPECIAL': {
-            active: 'bg-violet-500 shadow-violet-500/20',
-            text: 'text-violet-500',
-            bg: 'bg-violet-500/5',
-            border: 'border-violet-500/20',
-            dot: 'bg-violet-500',
-            radar: '#8b5cf6'
-        }
-    };
+    const activeSpecials = Array.from(
+        (themesByTier['SPECIAL'] || []).reduce((map, t) => {
+            if (t.track) map.set(t.track.id, t.track);
+            return map;
+        }, new Map<string, any>()).values()
+    );
 
-    const activeDomain = themesByTier['DOMAIN']?.[0]?.track?.name;
-    const activeSpecials = Array.from(new Set(themesByTier['SPECIAL']?.filter(t => t.track).map(t => t.track!.name) || []));
+    const firstSpecialVisual = activeSpecials.length > 0 ? (TRACK_VISUALS[activeSpecials[0]!.id] || TRACK_VISUALS.default) : TRACK_VISUALS.default;
+
+    const tierStyles = {
+        'CORE': TRACK_VISUALS.default,
+        'DOMAIN': domainVisual,
+        'SPECIAL': firstSpecialVisual
+    };
 
     return (
         <div className="animate-in fade-in duration-700">
             <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-12 lg:gap-20">
-                {/* Main Content: Tabs & Skill Inputs */}
                 <div className="lg:col-span-1 space-y-10">
-                    {/* Tab Navigation & Active Contexts */}
                     <div className="flex items-center gap-4 overflow-x-auto pb-2 lg:pb-0 no-scrollbar">
                         <div className="flex bg-bg-card border border-divider p-1 rounded-lg w-fit shrink-0">
                             {(['CORE', 'DOMAIN', 'SPECIAL'] as const).map(tier => (
@@ -149,32 +117,40 @@ export default function SkillsPage() {
                                         : 'text-text-secondary hover:text-white'
                                     }`}
                                 >
-                                    {tierLabels[tier]}
+                                    {tier === 'CORE' ? 'Essentials' : tier === 'DOMAIN' ? 'Professional' : 'Superpowers'}
                                 </button>
                             ))}
                         </div>
 
-                        {activeTab === 'DOMAIN' && activeDomain && (
-                            <div className={`flex items-center gap-3 ${tierStyles.DOMAIN.bg} border ${tierStyles.DOMAIN.border} px-4 py-2 rounded-lg animate-in fade-in slide-in-from-left-4 duration-500 shrink-0`}>
-                                <div className={`w-2 h-2 rounded-full ${tierStyles.DOMAIN.dot} animate-pulse`} />
-                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white whitespace-nowrap">
-                                    Role: {activeDomain}
-                                </span>
-                            </div>
-                        )}
+                        {activeTab === 'DOMAIN' && activeDomain && (() => {
+                            const Icon = domainVisual.icon;
+                            return (
+                                <div className={cn("flex items-center gap-3 px-4 py-2 rounded-lg animate-in fade-in slide-in-from-left-4 duration-500 shrink-0 border", domainVisual.bg, domainVisual.border)}>
+                                    <div className={cn("w-2 h-2 rounded-full animate-pulse", domainVisual.dot)} />
+                                    <Icon size={12} className={domainVisual.color} />
+                                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white whitespace-nowrap">
+                                        Role: {activeDomain.name}
+                                    </span>
+                                </div>
+                            );
+                        })()}
 
-                        {activeTab === 'SPECIAL' && activeSpecials.length > 0 && (
-                            <div className="flex gap-2 animate-in fade-in slide-in-from-left-4 duration-500 shrink-0">
-                                {activeSpecials.map(name => (
-                                    <div key={name} className={`flex items-center gap-2 ${tierStyles.SPECIAL.bg} border ${tierStyles.SPECIAL.border} px-3 py-1.5 rounded-lg whitespace-nowrap`}>
-                                        <Sparkles size={10} className={tierStyles.SPECIAL.text} />
-                                        <span className={`text-[10px] font-black uppercase tracking-[0.1em] ${tierStyles.SPECIAL.text}/90`}>
-                                            {name}
-                                        </span>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
+                        {activeTab === 'SPECIAL' && activeSpecials.length > 0 && (() => {
+                            const Icon = firstSpecialVisual.icon;
+                            const label = activeSpecials.length > 1 
+                                ? `${activeSpecials[0]!.name} +${activeSpecials.length - 1}`
+                                : activeSpecials[0]!.name;
+                            
+                            return (
+                                <div className={cn("flex items-center gap-3 px-4 py-2 rounded-lg animate-in fade-in slide-in-from-left-4 duration-500 shrink-0 border", firstSpecialVisual.bg, firstSpecialVisual.border)}>
+                                    <div className={cn("w-2 h-2 rounded-full animate-pulse", firstSpecialVisual.dot)} />
+                                    <Icon size={12} className={firstSpecialVisual.color} />
+                                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white whitespace-nowrap">
+                                        Specialization: {label}
+                                    </span>
+                                </div>
+                            );
+                        })()}
                     </div>
 
                     <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
@@ -188,21 +164,19 @@ export default function SkillsPage() {
                             </div>
                         ) : (
                             <div className="bg-bg-card border border-divider border-dashed p-12 rounded-lg text-center">
-                                <p className="text-text-secondary font-mono text-xs uppercase tracking-widest">No skill modules selected for this tier.</p>
+                                <p className="text-text-secondary font-mono text-xs uppercase tracking-widest">No skill modules selected.</p>
                             </div>
                         )}
                     </div>
                 </div>
 
-                {/* Sidebar: Visualization */}
                 <aside className="lg:col-span-1 space-y-8 sticky top-24 self-start">
                      <div className="space-y-1 lg:mb-10">
-                        <h2 className={`text-xs font-black uppercase tracking-[0.3em] ${tierStyles[activeTab].text}`}>Proficiency Map</h2>
-                        <div className={`h-1 w-20 ${tierStyles[activeTab].bg.replace('/5', '/20')}`}></div>
+                        <h2 className={cn("text-xs font-black uppercase tracking-[0.3em]", tierStyles[activeTab].color)}>Proficiency Map</h2>
+                        <div className={cn("h-1 w-20 opacity-40", tierStyles[activeTab].bg.replace('/5', '/40'))}></div>
                     </div>
                     <SkillsRadar 
                         themes={themesByTier[activeTab] || []} 
-                        allThemes={themes}
                         activeTierLabel={activeTab === 'CORE' ? 'Core' : activeTab === 'DOMAIN' ? 'Domain' : 'Special'}
                         color={tierStyles[activeTab].radar}
                     />
