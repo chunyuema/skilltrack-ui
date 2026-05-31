@@ -66,7 +66,7 @@ export default function Profile() {
     const handleSaveExperience = async (exp: Experience | Omit<Experience, 'id'>) => {
         if (!token) return;
         if ('id' in exp && exp.id) {
-            await profileService.updateExperience(exp.id, exp as Experience, token);
+            await profileService.updateExperience(String(exp.id), exp as Experience, token);
         } else {
             await profileService.addExperience(exp, token);
         }
@@ -118,16 +118,29 @@ export default function Profile() {
             )}
 
             <aside className="space-y-6">
-                <div className="bg-bg-card border border-divider p-6 rounded-lg space-y-6 sticky top-24">
-                    <div className="text-center">
-                        <div className="w-24 h-24 mx-auto bg-slate-900 rounded-full flex items-center justify-center text-4xl font-black text-white ring-1 ring-white/5">{profile.firstName.charAt(0)}</div>
-                        <h3 className="mt-4 font-black text-xl text-white uppercase tracking-tight">{profile.firstName} {profile.lastName}</h3>
+                <div className="sticky top-24 space-y-4">
+                    {/* Identity Card */}
+                    <div className="bg-bg-card border border-divider p-6 rounded-lg space-y-6">
+                        <div className="text-center">
+                            <div className="w-24 h-24 mx-auto bg-slate-900 rounded-full flex items-center justify-center text-4xl font-black text-white ring-1 ring-white/5">{profile.firstName.charAt(0)}</div>
+                            <h3 className="mt-4 font-black text-xl text-white uppercase tracking-tight">{profile.firstName} {profile.lastName}</h3>
+                        </div>
+
+                        <div className="space-y-4 pt-4 border-t border-divider">
+                            <div className="space-y-2">
+                                <h2 className="text-[10px] font-black text-white uppercase tracking-[0.3em] flex items-center gap-2">
+                                    <Edit3 size={12} className="text-primary" />
+                                    Bio
+                                </h2>
+                                <p className="text-xs text-text-secondary leading-relaxed line-clamp-6">{profile.bio || "No bio added."}</p>
+                            </div>
+                        </div>
                     </div>
 
-                    {/* Overall Skill Score Card */}
+                    {/* Overall Skill Score Widget */}
                     <button 
                         onClick={() => navigate('/skills')}
-                        className="w-full bg-primary/5 border border-primary/20 p-4 rounded-xl flex items-center justify-between group hover:bg-primary/10 transition-all duration-300"
+                        className="w-full bg-bg-card border border-divider p-5 rounded-xl flex items-center justify-between group hover:border-primary/40 transition-all duration-300"
                     >
                         <div className="flex flex-col items-start text-left">
                             <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-1">Overall Skills</span>
@@ -153,16 +166,9 @@ export default function Profile() {
                         </div>
                     </button>
 
-                    <div className="space-y-4 pt-4 border-t border-divider">
-                         <div className="space-y-2">
-                            <h2 className="text-[10px] font-black text-white uppercase tracking-[0.3em] flex items-center gap-2">
-                                <Edit3 size={12} className="text-primary" />
-                                Bio
-                            </h2>
-                            <p className="text-xs text-text-secondary leading-relaxed line-clamp-6">{profile.bio || "No bio added."}</p>
-                         </div>
-
-                        <div className="space-y-3 pt-4 border-t border-divider">
+                    {/* Metadata Card */}
+                    <div className="bg-bg-card border border-divider p-6 rounded-lg space-y-4">
+                        <div className="space-y-3">
                             <FormInput 
                                 label="Email" value={profile.email} isEditing={false} icon={<Mail size={12}/>} 
                                 labelClassName="text-[9px]" readOnlyClassName="text-xs font-medium text-text-secondary"
@@ -192,14 +198,14 @@ export default function Profile() {
                                 )}
                             />
                         </div>
-                    </div>
 
-                    <button 
-                        onClick={() => setIsProfileEditorOpen(true)} 
-                        className="w-full py-4 bg-primary text-white rounded-xl font-black text-[10px] uppercase tracking-[0.2em] transition-all hover:bg-primary-hover active:scale-[0.98] shadow-lg shadow-primary/20"
-                    >
-                        Edit Profile
-                    </button>
+                        <button 
+                            onClick={() => setIsProfileEditorOpen(true)} 
+                            className="w-full py-3 bg-white/5 border border-divider text-white rounded-lg font-black text-[10px] uppercase tracking-[0.2em] transition-all hover:bg-primary hover:border-primary active:scale-[0.98] mt-2 shadow-lg shadow-black/20"
+                        >
+                            Edit Profile
+                        </button>
+                    </div>
                 </div>
             </aside>
 
@@ -253,18 +259,23 @@ function ProfileSkeleton() {
     return (
         <div className="max-w-[1200px] mx-auto grid grid-cols-1 lg:grid-cols-[350px_1fr] gap-12 relative animate-pulse">
             <aside className="space-y-6">
-                <div className="bg-bg-card border border-divider p-6 rounded-lg space-y-6">
-                    <div className="text-center">
-                        <div className="w-24 h-24 mx-auto bg-slate-900 rounded-full" />
-                        <div className="h-6 w-32 bg-slate-900 mx-auto mt-4 rounded" />
+                <div className="sticky top-24 space-y-4">
+                    <div className="bg-bg-card border border-divider p-6 rounded-lg space-y-6">
+                        <div className="text-center">
+                            <div className="w-24 h-24 mx-auto bg-slate-900 rounded-full" />
+                            <div className="h-6 w-32 bg-slate-900 mx-auto mt-4 rounded" />
+                        </div>
+                        <div className="space-y-4 pt-4 border-t border-divider">
+                            <div className="h-4 w-12 bg-slate-900 rounded" />
+                            <div className="h-20 w-full bg-slate-900 rounded" />
+                        </div>
                     </div>
-                    <div className="h-20 w-full bg-slate-900 rounded-xl" />
-                    <div className="space-y-4 pt-4 border-t border-divider">
-                        <div className="h-4 w-12 bg-slate-900 rounded" />
-                        <div className="h-20 w-full bg-slate-900 rounded" />
-                        <div className="space-y-3 pt-4 border-t border-divider">
+                    <div className="h-20 w-full bg-bg-card border border-divider rounded-xl" />
+                    <div className="bg-bg-card border border-divider p-6 rounded-lg space-y-4">
+                        <div className="space-y-3">
                             {[1, 2, 3, 4].map(i => <div key={i} className="h-10 w-full bg-slate-900 rounded" />)}
                         </div>
+                        <div className="h-10 w-full bg-slate-900 rounded mt-2" />
                     </div>
                 </div>
             </aside>
