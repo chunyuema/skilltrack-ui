@@ -11,21 +11,6 @@ import { PersonalInfoEditorModal } from '../components/profile/PersonalInfoEdito
 import { ExperienceEditorModal } from '../components/profile/ExperienceEditorModal';
 import { cn } from '../lib/utils';
 
-const COUNTRY_OPTIONS = [
-  { label: 'United States', value: 'United States' },
-  { label: 'United Kingdom', value: 'United Kingdom' },
-  { label: 'Canada', value: 'Canada' },
-  { label: 'Germany', value: 'Germany' },
-  { label: 'France', value: 'France' },
-  { label: 'Japan', value: 'Japan' },
-  { label: 'China', value: 'China' },
-  { label: 'India', value: 'India' },
-  { label: 'Brazil', value: 'Brazil' },
-  { label: 'Australia', value: 'Australia' },
-  { label: 'Singapore', value: 'Singapore' },
-  { label: 'Netherlands', value: 'Netherlands' },
-];
-
 export default function Profile() {
     const navigate = useNavigate();
     const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -94,7 +79,11 @@ export default function Profile() {
         setDeleteConfirmId(null);
     };
 
-    if (isLoading || !profile) return <div className="p-24 text-center text-white font-mono uppercase tracking-[0.3em] animate-pulse">Initializing Profile...</div>;
+    if (isLoading && !profile) {
+        return <ProfileSkeleton />;
+    }
+
+    if (!profile) return null;
 
     return (
         <div className="animate-in fade-in duration-700 max-w-[1200px] mx-auto grid grid-cols-1 lg:grid-cols-[350px_1fr] gap-12 relative">
@@ -239,20 +228,54 @@ export default function Profile() {
                      </button>
                  </div>
 
-                 {experiences.length === 0 ? (
-                    <div className="bg-bg-card border border-divider border-dashed p-12 rounded-xl text-center">
-                        <p className="text-[10px] font-black text-text-secondary uppercase tracking-widest">No work history records found.</p>
+                 <div className="space-y-4">
+                    {experiences.length === 0 ? (
+                        <div className="bg-bg-card border border-divider border-dashed p-12 rounded-xl text-center">
+                            <p className="text-[10px] font-black text-text-secondary uppercase tracking-widest">No work history records found.</p>
+                        </div>
+                    ) : experiences.map(exp => (
+                        <ExperienceCard 
+                            key={exp.id}
+                            exp={exp}
+                            isEditing={false}
+                            onEdit={() => setExperienceEditorState({ isOpen: true, experience: exp })}
+                            onDelete={() => setDeleteConfirmId(String(exp.id))}
+                            editUI={null}
+                        />
+                    ))}
+                 </div>
+            </main>
+        </div>
+    );
+}
+
+function ProfileSkeleton() {
+    return (
+        <div className="max-w-[1200px] mx-auto grid grid-cols-1 lg:grid-cols-[350px_1fr] gap-12 relative animate-pulse">
+            <aside className="space-y-6">
+                <div className="bg-bg-card border border-divider p-6 rounded-lg space-y-6">
+                    <div className="text-center">
+                        <div className="w-24 h-24 mx-auto bg-slate-900 rounded-full" />
+                        <div className="h-6 w-32 bg-slate-900 mx-auto mt-4 rounded" />
                     </div>
-                 ) : experiences.map(exp => (
-                    <ExperienceCard 
-                        key={exp.id}
-                        exp={exp}
-                        isEditing={false}
-                        onEdit={() => setExperienceEditorState({ isOpen: true, experience: exp })}
-                        onDelete={() => setDeleteConfirmId(String(exp.id))}
-                        editUI={null}
-                    />
-                 ))}
+                    <div className="h-20 w-full bg-slate-900 rounded-xl" />
+                    <div className="space-y-4 pt-4 border-t border-divider">
+                        <div className="h-4 w-12 bg-slate-900 rounded" />
+                        <div className="h-20 w-full bg-slate-900 rounded" />
+                        <div className="space-y-3 pt-4 border-t border-divider">
+                            {[1, 2, 3, 4].map(i => <div key={i} className="h-10 w-full bg-slate-900 rounded" />)}
+                        </div>
+                    </div>
+                </div>
+            </aside>
+            <main className="space-y-8">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {[1, 2, 3].map(i => <div key={i} className="h-[110px] bg-bg-card border border-divider rounded-xl" />)}
+                </div>
+                <div className="h-8 w-40 bg-bg-card border-b border-divider rounded" />
+                <div className="space-y-4">
+                    {[1, 2].map(i => <div key={i} className="h-24 bg-bg-card border border-divider rounded-lg" />)}
+                </div>
             </main>
         </div>
     );
