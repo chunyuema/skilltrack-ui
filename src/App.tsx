@@ -53,8 +53,10 @@ export default function App() {
                 <Route index element={<Navigate to="/profile" replace />} />
                 <Route path="profile" element={<Profile />} />
                 <Route path="skills" element={<SkillsPage />} />
+                {/* Community features disabled for now
                 <Route path="directory" element={<UserDirectory />} />
                 <Route path="users/:userId" element={<PublicProfile />} />
+                */}
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

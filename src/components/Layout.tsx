@@ -30,21 +30,10 @@ export default function Layout() {
           <nav className="hidden md:flex items-center gap-6">
             <HeaderLink to="/profile" label="Profile" />
             <HeaderLink to="/skills" label="Skills" />
-            <HeaderLink to="/directory" label="Community" />
           </nav>
 
           {/* Right Actions */}
           <div className="flex items-center gap-4 lg:gap-6">
-            <div className="hidden lg:flex items-center gap-2 text-text-secondary hover:text-white transition-colors cursor-pointer">
-              <Search size={18} />
-            </div>
-            <div className="hidden lg:flex items-center gap-2 text-text-secondary hover:text-white transition-colors cursor-pointer relative">
-              <Bell size={18} />
-              <span className="absolute -top-1 -right-1 w-2 h-2 bg-emerald-accent rounded-full border-2 border-bg-deep"></span>
-            </div>
-            
-            <div className="h-8 w-[1px] bg-divider hidden sm:block"></div>
-            
             <div className="flex items-center gap-3">
                <button
                 onClick={handleLogout}
