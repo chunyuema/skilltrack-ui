@@ -7,7 +7,8 @@ import { Mail, Github, Linkedin, GraduationCap, Shield, Clock, Globe, Plus, Tras
 import { FormInput } from '../components/ui/FormInput';
 import { ConfirmModal } from '../components/ui/ConfirmModal';
 import { ExperienceCard } from '../components/profile/ExperienceCard';
-import { ProfileEditorModal } from '../components/profile/ProfileEditorModal';
+import { PersonalInfoEditorModal } from '../components/profile/PersonalInfoEditorModal';
+import { ExperienceEditorModal } from '../components/profile/ExperienceEditorModal';
 import { cn } from '../lib/utils';
 
 const COUNTRY_OPTIONS = [
@@ -31,8 +32,14 @@ export default function Profile() {
     const [experiences, setExperiences] = useState<Experience[]>([]);
     const [globalScore, setGlobalScore] = useState<number>(0);
     const [isLoading, setIsLoading] = useState(true);
-    const [isEditorOpen, setIsEditorOpen] = useState(false);
+    
+    // UI States
+    const [isProfileEditorOpen, setIsProfileEditorOpen] = useState(false);
+    const [experienceEditorState, setExperienceEditorState] = useState<{ isOpen: boolean; experience?: Experience }>({
+        isOpen: false
+    });
     const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+    
     const { token, logout } = useAuth();
 
     const loadData = useCallback(async () => {
@@ -65,41 +72,25 @@ export default function Profile() {
         loadData();
     }, [loadData]);
 
-    const handleSaveAll = async (updatedProfile: UserProfile, updatedExps: Experience[], deletedIds: string[]) => {
+    const handleSaveProfile = async (updatedProfile: UserProfile) => {
         if (!token) return;
-        
-        try {
-            const promises: Promise<any>[] = [];
-            
-            // 1. Update Profile
-            promises.push(profileService.updateProfile(updatedProfile, token));
-            
-            // 2. Handle Experiences (Updates and Adds)
-            updatedExps.forEach(exp => {
-                if (String(exp.id).startsWith('temp-')) {
-                    const { id: _, ...data } = exp;
-                    promises.push(profileService.addExperience(data, token));
-                } else {
-                    promises.push(profileService.updateExperience(String(exp.id), exp, token));
-                }
-            });
-            
-            // 3. Handle Deletions
-            deletedIds.forEach(id => {
-                promises.push(profileService.deleteExperience(id, token));
-            });
-            
-            await Promise.all(promises);
-            await loadData(); // Reload to get fresh IDs from server
-        } catch (error) {
-            console.error("Centralized save failed:", error);
-            throw error;
+        await profileService.updateProfile(updatedProfile, token);
+        await loadData();
+    };
+
+    const handleSaveExperience = async (exp: Experience | Omit<Experience, 'id'>) => {
+        if (!token) return;
+        if ('id' in exp && exp.id) {
+            await profileService.updateExperience(exp.id, exp as Experience, token);
+        } else {
+            await profileService.addExperience(exp, token);
         }
+        await loadData();
     };
 
     const handleDeleteExperience = async (id: string) => {
         await profileService.deleteExperience(id, token!);
-        setExperiences(experiences.filter(exp => exp.id !== id));
+        setExperiences(experiences.filter(exp => String(exp.id) !== id));
         setDeleteConfirmId(null);
     };
 
@@ -117,13 +108,23 @@ export default function Profile() {
                 variant="danger"
             />
 
-            {isEditorOpen && (
-                <ProfileEditorModal 
-                    isOpen={isEditorOpen}
-                    onClose={() => setIsEditorOpen(false)}
+            {/* Personal Info Editor */}
+            {isProfileEditorOpen && (
+                <PersonalInfoEditorModal 
+                    isOpen={isProfileEditorOpen}
+                    onClose={() => setIsProfileEditorOpen(false)}
                     profile={profile}
-                    experiences={experiences}
-                    onSave={handleSaveAll}
+                    onSave={handleSaveProfile}
+                />
+            )}
+
+            {/* Experience Editor */}
+            {experienceEditorState.isOpen && (
+                <ExperienceEditorModal 
+                    isOpen={experienceEditorState.isOpen}
+                    onClose={() => setExperienceEditorState({ isOpen: false })}
+                    experience={experienceEditorState.experience}
+                    onSave={handleSaveExperience}
                 />
             )}
 
@@ -205,10 +206,10 @@ export default function Profile() {
                     </div>
 
                     <button 
-                        onClick={() => setIsEditorOpen(true)} 
+                        onClick={() => setIsProfileEditorOpen(true)} 
                         className="w-full py-4 bg-primary text-white rounded-xl font-black text-[10px] uppercase tracking-[0.2em] transition-all hover:bg-primary-hover active:scale-[0.98] shadow-lg shadow-primary/20"
                     >
-                        Enter Editor Mode
+                        Edit Profile
                     </button>
                 </div>
             </aside>
@@ -230,6 +231,12 @@ export default function Profile() {
 
                  <div className="flex justify-between items-center pb-4 border-b border-divider">
                      <h2 className="text-sm font-black text-white uppercase tracking-[0.3em]">Work History</h2>
+                     <button 
+                        onClick={() => setExperienceEditorState({ isOpen: true })}
+                        className="text-primary hover:scale-110 transition-transform p-2 -mr-2"
+                     >
+                        <Plus size={18} />
+                     </button>
                  </div>
 
                  {experiences.length === 0 ? (
@@ -241,8 +248,8 @@ export default function Profile() {
                         key={exp.id}
                         exp={exp}
                         isEditing={false}
-                        onEdit={() => setIsEditorOpen(true)}
-                        onDelete={() => setDeleteConfirmId(exp.id)}
+                        onEdit={() => setExperienceEditorState({ isOpen: true, experience: exp })}
+                        onDelete={() => setDeleteConfirmId(String(exp.id))}
                         editUI={null}
                     />
                  ))}
